@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS reference_submissions (
     supplier_link_id TEXT REFERENCES supplier_links(id) ON DELETE CASCADE,
     po_number TEXT NOT NULL,
     delivery_id TEXT NOT NULL,
+    delivery_postcode TEXT NOT NULL,
     reference_number TEXT NOT NULL,
     validation_number TEXT,
     submitted_by_email TEXT NOT NULL,

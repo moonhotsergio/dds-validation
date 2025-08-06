@@ -15,6 +15,7 @@ CREATE TABLE reference_submissions (
     supplier_link_id UUID REFERENCES supplier_links(id) ON DELETE CASCADE,
     po_number VARCHAR(255) NOT NULL,
     delivery_id VARCHAR(255) NOT NULL,
+    delivery_postcode VARCHAR(10) NOT NULL,
     reference_number VARCHAR(255) NOT NULL,
     validation_number VARCHAR(255),
     submitted_by_email VARCHAR(255) NOT NULL,

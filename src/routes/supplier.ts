@@ -193,14 +193,14 @@ router.post('/submit', authenticateSupplier, async (req: AuthRequest, res) => {
             return res.status(400).json({ error: error.details[0].message });
         }
 
-        const { poNumber, deliveryId, referenceNumber, validationNumber } = value;
+        const { poNumber, deliveryId, deliveryPostcode, referenceNumber, validationNumber } = value;
 
         // Always create new submission (allow multiple references per PO/Delivery)
         await pool.query(
             `INSERT INTO reference_submissions 
-             (supplier_link_id, po_number, delivery_id, reference_number, validation_number, submitted_by_email) 
-             VALUES ($1, $2, $3, $4, $5, $6)`,
-            [req.supplierLinkId, poNumber, deliveryId, referenceNumber, validationNumber, req.email]
+             (supplier_link_id, po_number, delivery_id, delivery_postcode, reference_number, validation_number, submitted_by_email) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [req.supplierLinkId, poNumber, deliveryId, deliveryPostcode, referenceNumber, validationNumber, req.email]
         );
 
         res.json({ message: 'Reference submitted successfully' });
@@ -241,6 +241,7 @@ router.post('/bulk-upload', authenticateSupplier, upload.single('csvFile'), asyn
                 const submissions = records.map(record => ({
                     poNumber: record.po_number || record.poNumber || record['PO Number'] || record['Po Number'],
                     deliveryId: record.delivery_id || record.deliveryId || record['Delivery ID'] || record['delivery id'],
+                    deliveryPostcode: record.delivery_postcode || record.deliveryPostcode || record['Delivery Postcode'] || record['delivery postcode'],
                     referenceNumber: record.reference_number || record.referenceNumber || record['Reference Number'] || record['reference number'],
                     validationNumber: record.validation_number || record.validationNumber || record['Validation Number'] || record['validation number']
                 }));
@@ -255,14 +256,14 @@ router.post('/bulk-upload', authenticateSupplier, upload.single('csvFile'), asyn
                 const results = [];
                 for (const submission of submissions) {
                     try {
-                        const { poNumber, deliveryId, referenceNumber, validationNumber } = submission;
+                        const { poNumber, deliveryId, deliveryPostcode, referenceNumber, validationNumber } = submission;
 
                         // Always create new submission (allow multiple references per PO/Delivery)
                         await pool.query(
                             `INSERT INTO reference_submissions 
-                             (supplier_link_id, po_number, delivery_id, reference_number, validation_number, submitted_by_email) 
-                             VALUES ($1, $2, $3, $4, $5, $6)`,
-                            [req.supplierLinkId, poNumber, deliveryId, referenceNumber, validationNumber, req.email]
+                             (supplier_link_id, po_number, delivery_id, delivery_postcode, reference_number, validation_number, submitted_by_email) 
+                             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                            [req.supplierLinkId, poNumber, deliveryId, deliveryPostcode, referenceNumber, validationNumber, req.email]
                         );
                         results.push({ ...submission, status: 'created' });
                     } catch (submissionError) {

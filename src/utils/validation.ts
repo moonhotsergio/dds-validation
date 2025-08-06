@@ -14,6 +14,7 @@ export const otpValidationSchema = Joi.object({
 export const referenceSubmissionSchema = Joi.object({
     poNumber: Joi.string().min(1).max(255).required(),
     deliveryId: Joi.string().min(1).max(255).required(),
+    deliveryPostcode: Joi.string().min(3).max(10).required(),
     referenceNumber: Joi.string().min(1).max(255).required(),
     validationNumber: Joi.string().max(255).optional()
 });
