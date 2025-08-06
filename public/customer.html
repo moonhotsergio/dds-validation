@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal - DDS Validation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f4f4; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { background: #28a745; color: white; padding: 2rem; text-align: center; border-radius: 8px; margin-bottom: 2rem; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .hidden { display: none; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn { background: #28a745; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 5px 10px 0; text-decoration: none; display: inline-block; text-align: center; }
+        .btn:hover { background: #218838; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #545b62; }
+        .btn-info { background: #17a2b8; }
+        .btn-info:hover { background: #138496; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .alert { padding: 15px; margin: 15px 0; border-radius: 4px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .access-method { margin-bottom: 2rem; }
+        .access-method h3 { margin-bottom: 1rem; color: #28a745; }
+        .reference-item { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 4px; border-left: 4px solid #28a745; }
+        .reference-actions { margin-top: 15px; }
+        .copy-btn { font-size: 0.8em; padding: 5px 10px; }
+        .reference-group { margin-bottom: 25px; border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; }
+        .group-header { background: #28a745; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .group-title { font-size: 1.2em; font-weight: bold; }
+        .group-subtitle { font-size: 0.9em; opacity: 0.9; }
+        .references-table { background: white; }
+        .table-header { background: #f8f9fa; padding: 15px; border-bottom: 1px solid #e9ecef; display: grid; grid-template-columns: 2fr 2fr 1fr auto; gap: 15px; font-weight: bold; color: #495057; }
+        .table-row { padding: 15px; border-bottom: 1px solid #f1f3f4; display: grid; grid-template-columns: 2fr 2fr 1fr auto; gap: 15px; align-items: center; }
+        .table-row:last-child { border-bottom: none; }
+        .table-row:hover { background: #f8f9fa; }
+        .ref-number { font-weight: bold; color: #007bff; }
+        .val-number { color: #28a745; }
+        .submitted-time { color: #6c757d; font-size: 0.9em; }
+        .row-actions { display: flex; gap: 5px; }
+        .group-actions { margin: 20px; padding-top: 15px; border-top: 1px solid #e9ecef; text-align: center; }
+        .share-section { background: #e9ecef; padding: 20px; border-radius: 4px; margin-top: 20px; }
+        .share-form { display: grid; gap: 1rem; }
+        .generated-link { background: white; padding: 15px; border-radius: 4px; word-break: break-all; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Customer Portal</h1>
+            <p>Access your reference numbers</p>
+        </div>
+
+        <!-- Access Form -->
+        <div id="access-form" class="card">
+            <h2>Access Reference Numbers</h2>
+            
+            <div class="access-method">
+                <h3>Access with Postcode Verification</h3>
+                <form id="postcode-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="po-number-postcode">PO Number:</label>
+                            <input type="text" id="po-number-postcode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="delivery-id-postcode">Delivery ID (Optional):</label>
+                            <input type="text" id="delivery-id-postcode">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="postcode">Delivery Postcode:</label>
+                        <input type="text" id="postcode" placeholder="e.g., SW1A 1AA" required>
+                    </div>
+                    <button type="submit" class="btn">Access with Postcode</button>
+                    <button type="button" class="btn btn-secondary" onclick="testBypassPostcode()">Skip Postcode (Test Mode)</button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- References Display -->
+        <div id="references-section" class="card hidden">
+            <h2>Your Reference Numbers</h2>
+            <div id="references-content"></div>
+            
+            <div class="reference-actions">
+                <button class="btn btn-secondary" onclick="copyAllReferences()">Copy All References</button>
+                <button class="btn btn-secondary" onclick="downloadAllCSV()">Download All as CSV</button>
+                <button class="btn btn-info" onclick="showShareOptions()">Generate Share Link</button>
+                <button class="btn btn-secondary" onclick="goBack()">New Search</button>
+            </div>
+
+            <div id="share-section" class="share-section hidden">
+                <h3>Generate Shareable Link</h3>
+                <form id="share-form" class="share-form">
+                    <div class="form-group">
+                        <label for="share-password">Password (Optional):</label>
+                        <input type="password" id="share-password" placeholder="Leave blank for no password">
+                    </div>
+                    <div class="form-group">
+                        <label for="share-expires">Expires in hours:</label>
+                        <input type="number" id="share-expires" value="24" min="1" max="168">
+                    </div>
+                    <button type="submit" class="btn">Generate Link</button>
+                </form>
+                <div id="generated-link" class="generated-link hidden">
+                    <strong>Shareable Link:</strong>
+                    <div id="link-url"></div>
+                    <button class="btn copy-btn" onclick="copyLink()">Copy Link</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alert-container"></div>
+    </div>
+
+    <script>
+        let currentData = null;
+
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        // Postcode form handler
+        document.getElementById('postcode-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                poNumber: document.getElementById('po-number-postcode').value,
+                deliveryId: document.getElementById('delivery-id-postcode').value,
+                postcode: document.getElementById('postcode').value.toUpperCase()
+            };
+
+            await submitAccessRequest(formData);
+        });
+
+
+        function displayReferences(references) {
+            const referencesContent = document.getElementById('references-content');
+            
+            // Group references by PO/Delivery
+            const grouped = {};
+            references.forEach(ref => {
+                const key = `${ref.poNumber}-${ref.deliveryId}`;
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        poNumber: ref.poNumber,
+                        deliveryId: ref.deliveryId,
+                        references: [],
+                        latestSubmission: ref.submittedAt
+                    };
+                }
+                grouped[key].references.push({
+                    referenceNumber: ref.referenceNumber,
+                    validationNumber: ref.validationNumber,
+                    submittedAt: ref.submittedAt
+                });
+                
+                // Keep track of latest submission
+                if (new Date(ref.submittedAt) > new Date(grouped[key].latestSubmission)) {
+                    grouped[key].latestSubmission = ref.submittedAt;
+                }
+            });
+
+            // Generate HTML for grouped references
+            referencesContent.innerHTML = Object.values(grouped).map(group => `
+                <div class="reference-group">
+                    <div class="group-header">
+                        <div>
+                            <div class="group-title">PO: ${group.poNumber} | Delivery: ${group.deliveryId}</div>
+                            <div class="group-subtitle">${group.references.length} reference${group.references.length !== 1 ? 's' : ''} found</div>
+                        </div>
+                        <div class="group-subtitle">
+                            Latest: ${new Date(group.latestSubmission).toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="references-table">
+                        <div class="table-header">
+                            <div>Reference Number</div>
+                            <div>Validation Number</div>
+                            <div>Submitted</div>
+                            <div>Actions</div>
+                        </div>
+                        ${group.references.map(ref => `
+                            <div class="table-row">
+                                <div class="ref-number">${ref.referenceNumber}</div>
+                                <div class="val-number">${ref.validationNumber || '-'}</div>
+                                <div class="submitted-time">${new Date(ref.submittedAt).toLocaleString()}</div>
+                                <div class="row-actions">
+                                    <button class="btn copy-btn" onclick="copyToClipboard('${ref.referenceNumber}')">Copy Ref</button>
+                                    ${ref.validationNumber ? `<button class="btn copy-btn" onclick="copyToClipboard('${ref.validationNumber}')">Copy Val</button>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('access-form').classList.add('hidden');
+            document.getElementById('references-section').classList.remove('hidden');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showAlert('Copied to clipboard', 'success');
+            }).catch(() => {
+                showAlert('Failed to copy to clipboard', 'error');
+            });
+        }
+
+        function copyAllReferences() {
+            // Copy all references from all groups
+            if (!currentData || !currentData.references) return;
+            
+            const allRefs = currentData.references.map(ref => 
+                `${ref.referenceNumber}${ref.validationNumber ? ` (${ref.validationNumber})` : ''}`
+            ).join(', ');
+            
+            copyToClipboard(allRefs);
+        }
+
+
+        function downloadAllCSV() {
+            if (!currentData) return;
+            
+            const params = new URLSearchParams();
+            if (currentData.deliveryId) params.append('deliveryId', currentData.deliveryId);
+            
+            const url = `/api/customer/download-csv/${currentData.poNumber}?${params.toString()}`;
+            window.open(url, '_blank');
+        }
+
+        function showShareOptions() {
+            const shareSection = document.getElementById('share-section');
+            shareSection.classList.toggle('hidden');
+        }
+
+        // Share form handler
+        document.getElementById('share-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentData) return;
+
+            const shareData = {
+                poNumber: currentData.poNumber,
+                deliveryId: currentData.deliveryId,
+                password: document.getElementById('share-password').value,
+                expiresInHours: parseInt(document.getElementById('share-expires').value)
+            };
+
+            try {
+                const response = await fetch('/api/customer/generate-link', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(shareData)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('link-url').textContent = data.shareUrl;
+                    document.getElementById('generated-link').classList.remove('hidden');
+                    showAlert('Shareable link generated successfully', 'success');
+                } else {
+                    showAlert(data.error || 'Failed to generate link', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error occurred', 'error');
+            }
+        });
+
+        function copyLink() {
+            const linkUrl = document.getElementById('link-url').textContent;
+            copyToClipboard(linkUrl);
+        }
+
+        function goBack() {
+            document.getElementById('references-section').classList.add('hidden');
+            document.getElementById('access-form').classList.remove('hidden');
+            document.getElementById('share-section').classList.add('hidden');
+            document.getElementById('generated-link').classList.add('hidden');
+            currentData = null;
+            
+            // Clear forms
+            document.getElementById('postcode-form').reset();
+            document.getElementById('share-form').reset();
+        }
+
+        function testBypassPostcode() {
+            const poNumber = document.getElementById('po-number-postcode').value;
+            const deliveryId = document.getElementById('delivery-id-postcode').value;
+            
+            if (!poNumber) {
+                showAlert('Please enter a PO Number', 'error');
+                return;
+            }
+
+            // Set a dummy postcode and submit
+            document.getElementById('postcode').value = 'TEST123';
+            
+            // Trigger the postcode form submission
+            const formData = {
+                poNumber: poNumber,
+                deliveryId: deliveryId,
+                postcode: 'TEST123'
+            };
+
+            submitAccessRequest(formData);
+        }
+
+        async function submitAccessRequest(formData) {
+            try {
+                const response = await fetch('/api/customer/request-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                if (response.ok && data.references) {
+                    currentData = { ...formData, references: data.references };
+                    displayReferences(data.references);
+                } else {
+                    showAlert(data.error || 'No references found', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error occurred', 'error');
+            }
+        }
+
+        // Check if accessing via token (from URL)
+        const urlParams = new URLSearchParams(window.location.search);
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts.includes('access') && pathParts[pathParts.length - 1]) {
+            // This is handled by the server-side HTML password prompt
+            // No need to load from token here since server handles it
+        } else if (urlParams.get('token') && urlParams.get('authorized')) {
+            const token = urlParams.get('token');
+            loadFromToken(token);
+        }
+
+        async function loadFromToken(token) {
+            try {
+                const response = await fetch(`/api/customer/access/${token}`);
+                const data = await response.json();
+                
+                if (response.ok && data.references) {
+                    displayReferences(data.references);
+                    // Set currentData for download/share functionality
+                    currentData = {
+                        poNumber: data.references[0]?.poNumber,
+                        deliveryId: data.references[0]?.deliveryId
+                    };
+                } else if (response.status === 401 && data.error === 'Password required') {
+                    const password = prompt('Enter password to access references:');
+                    if (password) {
+                        loadFromToken(token + '?password=' + encodeURIComponent(password));
+                    }
+                } else {
+                    showAlert(data.error || 'Failed to access references', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error occurred', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

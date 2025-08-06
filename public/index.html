@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDS Validation Portal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f4f4; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { background: #007bff; color: white; padding: 2rem; text-align: center; border-radius: 8px; margin-bottom: 2rem; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .btn { display: inline-block; background: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 10px; transition: background 0.3s; }
+        .btn:hover { background: #0056b3; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #545b62; }
+        .description { margin-bottom: 1rem; line-height: 1.8; }
+        .feature-list { list-style: none; margin: 1rem 0; }
+        .feature-list li { padding: 0.5rem 0; padding-left: 1rem; position: relative; }
+        .feature-list li:before { content: "✓"; color: #28a745; font-weight: bold; position: absolute; left: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DDS Validation Portal</h1>
+            <p>Secure External Reference Number Exchange</p>
+        </div>
+
+        <div class="card">
+            <h2>Welcome to the Reference Exchange Portal</h2>
+            <p class="description">
+                This portal facilitates secure exchange of reference numbers between suppliers and customers. 
+                Choose your role below to get started.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>For Suppliers</h3>
+            <p class="description">
+                Submit and manage reference numbers for purchase orders and deliveries.
+            </p>
+            <ul class="feature-list">
+                <li>Submit reference numbers individually or via CSV upload</li>
+                <li>View submission history</li>
+                <li>Secure email-based authentication</li>
+                <li>Update existing submissions</li>
+            </ul>
+            <a href="#" class="btn" onclick="promptSupplierLink()">Access Supplier Portal</a>
+        </div>
+
+        <div class="card">
+            <h3>For Customers</h3>
+            <p class="description">
+                Access reference numbers for your purchase orders and deliveries.
+            </p>
+            <ul class="feature-list">
+                <li>Access via postcode or email verification</li>
+                <li>Download references as CSV</li>
+                <li>Generate shareable links</li>
+                <li>Mobile-friendly interface</li>
+            </ul>
+            <a href="/customer" class="btn btn-secondary">Access Customer Portal</a>
+        </div>
+
+        <div class="card">
+            <h3>How it Works</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+                <div>
+                    <h4>Suppliers</h4>
+                    <ol style="padding-left: 1.5rem;">
+                        <li>Access via unique supplier link</li>
+                        <li>Verify email with OTP</li>
+                        <li>Submit reference numbers</li>
+                        <li>Track submission history</li>
+                    </ol>
+                </div>
+                <div>
+                    <h4>Customers</h4>
+                    <ol style="padding-left: 1.5rem;">
+                        <li>Enter PO/Delivery number</li>
+                        <li>Verify with postcode or email</li>
+                        <li>View reference numbers</li>
+                        <li>Download or share as needed</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function promptSupplierLink() {
+            const linkId = prompt('Please enter your supplier link ID:');
+            if (linkId && linkId.trim()) {
+                window.location.href = `/supplier/${linkId.trim()}`;
+            }
+        }
+    </script>
+</body>
+</html>

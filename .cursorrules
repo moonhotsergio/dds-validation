@@ -1,0 +1,24 @@
+# Cursor Rules for DDS Validation Project
+
+## MCP Configuration
+You can use the following MCP servers with this project:
+
+### MIRO MCP
+To use MIRO MCP, you need to:
+1. Install the MIRO MCP server
+2. Configure it in your Cursor settings
+3. Use it through the chat interface
+
+### Available MCP Commands
+- Create boards
+- Add elements to boards
+- Manage team access
+- Export boards
+- Real-time collaboration features
+
+## Project Guidelines
+- Work within the 'app' folder structure
+- Follow modern code style and architecture
+- Prioritize reusable components
+- Maintain full responsiveness
+- Use structured Design System with light/dark themes 
