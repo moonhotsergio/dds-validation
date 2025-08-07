@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Portal - Interu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            line-height: 1.6; 
+            color: #000000; 
+            background: radial-gradient(circle, #dfeeda, #c0d9bd, #a2c6a3);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background image layer */
+        body::before {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 50vw;
+            height: 100vh;
+            background-image: url('/bg-image.png');
+            background-position: right bottom;
+            background-repeat: no-repeat;
+            background-size: 50vw auto;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .interface-container {
+            position: fixed;
+            top: 140px;
+            left: 60px;
+            display: flex;
+            gap: 20px;
+            z-index: 2;
+            transform: scale(1.7);
+            transform-origin: top left;
+        }
+
+        .logo {
+            position: fixed;
+            top: 30px;
+            left: 60px;
+            z-index: 3;
+        }
+
+        .logo img {
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+        }
+
+        /* Add subtle texture/noise */
+        .gradient-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255,255,255,0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-wrapper {
+                padding: 10px;
+            }
+            
+            .gradient-container {
+                min-height: 95vh;
+                border-width: 6px;
+                border-radius: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-wrapper {
+                padding: 5px;
+            }
+            
+            .gradient-container {
+                min-height: 98vh;
+                border-width: 4px;
+                border-radius: 12px;
+            }
+        }
+
+        /* Keep existing styles for now */
+        .screen-container {
+            position: absolute;
+            background: #000000;
+            background-size: 100.43% 118.26%, auto;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUxMiIgaGVpZ2h0PSI4NTYiIHZpZXdCb3g9IjAgMCAxNTEyIDg1NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjE1MTIiIGhlaWdodD0iODU2IiBmaWxsPSIjMDA5OTNhIi8+CjxwYXRoIGQ9Ik04MDAgNDAwQzgwMCA0MDAgNzAwIDMwMCA2MDAgMzAwQzUwMCAzMDAgNDAwIDQwMCA0MDAgNTAwQzQwMCA2MDAgNTAwIDcwMCA2MDAgNzAwQzcwMCA3MDAgODAwIDYwMCA4MDAgNTAwWiIgZmlsbD0iIzAwN2EyZSIvPgo8cGF0aCBkPSJNNzAwIDMwMEw2MDAgNDAwTDUwMCAzMDBMNjAwIDIwMFoiIGZpbGw9IiMwMDc5MmUiLz4KPC9zdmc+');
+            top: 0;
+            left: 0;
+            width: 1512px;
+            height: 856px;
+            padding: 30px 60px 100px 60px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            position: relative;
+            z-index: 10;
+            height: 34px;
+            width: 111.609px;
+        }
+
+        .logo svg {
+            height: 34px;
+            width: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+        }
+
+        .content-area {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            padding: 40px 0 0 0;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .main-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 10px;
+            padding: 20px;
+            flex: 1;
+            max-width: 380px;
+            position: relative;
+            border: 1px solid #f3f3f3;
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
+            backdrop-filter: blur(10px);
+        }
+
+        .reference-panel {
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            border: 1px solid #f3f3f3;
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
+            height: 596px;
+            width: 367px;
+            padding: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Role Tabs */
+        .role-tabs {
+            display: flex;
+            gap: 11px;
+            margin-bottom: 16px;
+        }
+
+        .role-tab {
+            flex: 1;
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 24px;
+            color: #00251c;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .role-tab.active {
+            background: #b6ffe1;
+            color: #000000;
+        }
+
+        /* Sub Tabs */
+        .sub-tabs {
+            display: flex;
+            gap: 11px;
+            margin-bottom: 16px;
+            height: 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #868b90;
+        }
+
+        .sub-tab {
+            flex: 1;
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            font-size: 14.765px;
+            color: #000000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sub-tab.active {
+            background: #b6ffe1;
+            color: #000000;
+        }
+
+        /* Purchase Order Section */
+        .purchase-order-section {
+            border-bottom: 1px solid #f3f3f3;
+            padding: 20px 0;
+        }
+
+        .purchase-order-heading {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            padding: 0;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            color: #000000;
+        }
+
+        .purchase-order-heading .icon {
+            width: 12px;
+            height: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .purchase-order-heading.expanded .icon {
+            transform: rotate(90deg);
+        }
+
+        .purchase-order-form {
+            margin-top: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            animation: slideIn 0.2s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #000000;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #c3c6c8;
+            border-radius: 999px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00993a;
+            box-shadow: 0 0 0 3px rgba(0, 153, 58, 0.1);
+        }
+
+        /* Reference Input Section */
+        .reference-input-section {
+            margin-top: 16px;
+            background: rgba(249,251,252,0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(7.25px);
+        }
+
+        .section-header {
+            margin-bottom: 16px;
+        }
+
+        .section-header h3 {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            color: #000000;
+            margin: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .btn-add {
+            background: transparent;
+            color: #00993a;
+            border: none;
+            padding: 8px 16px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-add:hover {
+            color: #007a2e;
+        }
+
+        /* Submit Button */
+        .submit-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #000000;
+            color: rgba(255,255,255,0.8);
+            border: none;
+            padding: 16px 24px;
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        /* Authentication Section */
+        .auth-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .auth-section h2 {
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 28px;
+            color: #00251c;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            background: #00993a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px 4px;
+        }
+
+        .btn:hover {
+            background: #007a2e;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #00251c;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .reference-panel .header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .reference-panel .count {
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            color: #868b90;
+        }
+
+        .reference-panel .content {
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 12px;
+            margin-top: 16px;
+        }
+
+        .reference-panel .content::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Reference Cards */
+        .reference-card {
+            background: #f9fbfc;
+            border: 0.5px solid #000000;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 11px;
+            position: relative;
+        }
+
+        .reference-card.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+
+        .reference-card .remove-btn {
+            position: absolute;
+            top: -4px;
+            right: 20px;
+            background: #c3c6c8;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            color: #000000;
+            transition: background-color 0.3s ease;
+        }
+
+        .reference-card .remove-btn:hover {
+            background: #a8abae;
+        }
+
+        .reference-field {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .reference-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .reference-field-label {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #525961;
+            white-space: nowrap;
+        }
+
+        .reference-field-value {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid #e4e4e4;
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #767676;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+        }
+
+        .reference-field-value.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar {
+            position: absolute;
+            right: 12px;
+            width: 4px;
+            background: #bcbcbc;
+            border-radius: 99px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .custom-scrollbar:hover {
+            background: #999999;
+        }
+
+        /* Utility Classes */
+        .hidden { 
+            display: none !important; 
+        }
+
+        .collapsed { 
+            display: none; 
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .screen-container {
+                width: 100%;
+                height: 100vh;
+                padding: 20px;
+            }
+            
+            .content-area {
+                flex-direction: column;
+            }
+            
+            .main-panel,
+            .reference-panel {
+                max-width: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo -->
+    <div class="logo">
+        <img src="/Interu_Logo_white.svg" alt="Interu Logo" width="224" height="68">
+    </div>
+    
+    <div class="interface-container">
+        <!-- Main Panel -->
+        <div class="main-panel">
+            <!-- Role Tabs -->
+            <div class="role-tabs">
+                <button class="role-tab active" onclick="switchRole('supplier')">Supplier</button>
+                <div style="width: 1px; background: #d9d9d9; margin: 0 11px;"></div>
+                <button class="role-tab" onclick="switchRole('customer')">Customer</button>
+            </div>
+
+            <!-- Sub Tabs -->
+            <div class="sub-tabs">
+                <button class="sub-tab active" onclick="showTab('submit')">Submit References</button>
+                <button class="sub-tab" onclick="showTab('history')">History</button>
+            </div>
+
+            <!-- Purchase Order Section -->
+            <div class="purchase-order-section">
+                <button class="purchase-order-heading" id="purchase-order-heading" onclick="togglePurchaseOrder()">
+                    <span class="icon">►</span>
+                    Purchase Order Information
+                </button>
+                <div class="purchase-order-form hidden" id="purchase-order-form">
+                    <div class="form-group">
+                        <label>Purchase Order Number</label>
+                        <input type="text" placeholder="PO-2024-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Delivery ID</label>
+                        <input type="text" placeholder="DEL-12345">
+                    </div>
+                    <div class="form-group">
+                        <label>Postcode</label>
+                        <input type="text" placeholder="SW1A 1AA">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reference Input Section -->
+            <div class="reference-input-section">
+                <div class="section-header">
+                    <h3>Add Reference Numbers:</h3>
+                </div>
+                <div class="form-group">
+                    <label>Reference Number</label>
+                    <input type="text" id="reference-number" placeholder="12336">
+                </div>
+                <div class="form-group">
+                    <label>Validation Number (Optional)</label>
+                    <input type="text" id="validation-number" placeholder="11334">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-add" onclick="addReference()">+ Add Reference</button>
+                    <button class="btn-add" onclick="addCSVFile()">📎 Add CSV File</button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+                <button class="submit-btn" onclick="submitReferences()">Submit References</button>
+            </div>
+        </div>
+
+        <!-- Reference Panel -->
+        <div class="reference-panel">
+            <div class="header">
+                <span class="count" id="reference-count">0 References created</span>
+            </div>
+            <div class="content" id="reference-list">
+                <!-- References will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let references = [];
+        let isPurchaseOrderExpanded = false;
+        let scrollbarHeight = 0;
+        let scrollbarTop = 0;
+        let isScrollbarVisible = false;
+
+        // Authentication functions
+        function sendOTP() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+            
+            // Simulate OTP sending
+            document.getElementById('email-form').classList.add('hidden');
+            document.getElementById('otp-form').classList.remove('hidden');
+        }
+
+        function verifyOTP() {
+            const otp = document.getElementById('otp').value;
+            if (!otp || otp.length !== 6) {
+                alert('Please enter a valid 6-digit code');
+                return;
+            }
+            
+            // Simulate verification
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('app-section').classList.remove('hidden');
+        }
+
+        function resendOTP() {
+            alert('Verification code resent to your email');
+        }
+
+        function testLogin() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('app-section').classList.remove('hidden');
+        }
+
+        // Role switching
+        function switchRole(role) {
+            const tabs = document.querySelectorAll('.role-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update UI based on role
+            if (role === 'customer') {
+                window.location.href = '/customer.html';
+            }
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const subTabs = document.querySelectorAll('.sub-tab');
+            
+            tabs.forEach(tab => tab.classList.add('hidden'));
+            subTabs.forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+
+        // Purchase order toggle
+        function togglePurchaseOrder() {
+            const heading = document.getElementById('purchase-order-heading');
+            const form = document.getElementById('purchase-order-form');
+            
+            isPurchaseOrderExpanded = !isPurchaseOrderExpanded;
+            
+            if (isPurchaseOrderExpanded) {
+                heading.classList.add('expanded');
+                form.classList.remove('hidden');
+            } else {
+                heading.classList.remove('expanded');
+                form.classList.add('hidden');
+            }
+        }
+
+        // Reference management
+        function addReference() {
+            const refNumber = document.getElementById('reference-number').value;
+            const valNumber = document.getElementById('validation-number').value;
+            
+            if (!refNumber) {
+                alert('Please enter a reference number');
+                return;
+            }
+            
+            const newReference = {
+                id: Date.now().toString(),
+                referenceNumber: refNumber,
+                validationNumber: valNumber
+            };
+            
+            references.push(newReference);
+            updateReferenceDisplay();
+            
+            // Clear inputs
+            document.getElementById('reference-number').value = '';
+            document.getElementById('validation-number').value = '';
+        }
+
+        function removeReference(id) {
+            references = references.filter(ref => ref.id !== id);
+            updateReferenceDisplay();
+        }
+
+        function updateReferenceDisplay() {
+            const referenceList = document.getElementById('reference-list');
+            const referenceCount = document.getElementById('reference-count');
+            
+            referenceCount.textContent = `${references.length} References created`;
+            
+            referenceList.innerHTML = '';
+            
+            references.forEach(ref => {
+                const hasError = ref.referenceNumber === '12332';
+                const card = document.createElement('div');
+                card.className = `reference-card ${hasError ? 'error' : ''}`;
+                card.innerHTML = `
+                    <div class="reference-field">
+                        <span class="reference-field-label">Reference Number:</span>
+                        <div class="reference-field-value ${hasError ? 'error' : ''}">
+                            ${ref.referenceNumber}
+                        </div>
+                    </div>
+                    <div class="reference-field">
+                        <span class="reference-field-label">Validation Number:</span>
+                        <div class="reference-field-value">
+                            ${ref.validationNumber || '-------'}
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeReference('${ref.id}')">×</button>
+                `;
+                referenceList.appendChild(card);
+            });
+            
+            updateCustomScrollbar();
+        }
+
+        // Custom scrollbar functionality
+        function updateCustomScrollbar() {
+            const referenceList = document.getElementById('reference-list');
+            const { scrollTop, scrollHeight, clientHeight } = referenceList;
+            
+            // Remove existing scrollbar
+            const existingScrollbar = document.querySelector('.custom-scrollbar');
+            if (existingScrollbar) {
+                existingScrollbar.remove();
+            }
+            
+            // Check if scrolling is needed
+            const needsScrollbar = scrollHeight > clientHeight;
+            isScrollbarVisible = needsScrollbar;
+            
+            if (needsScrollbar) {
+                // Calculate scrollbar height proportional to visible content ratio
+                const visibleRatio = clientHeight / scrollHeight;
+                const maxScrollbarHeight = 480 - 40; // Account for padding
+                const calculatedHeight = Math.max(30, maxScrollbarHeight * visibleRatio);
+                scrollbarHeight = calculatedHeight;
+                
+                // Calculate scrollbar position
+                const scrollRatio = scrollTop / (scrollHeight - clientHeight);
+                const maxScrollbarTop = maxScrollbarHeight - calculatedHeight;
+                scrollbarTop = 20 + (maxScrollbarTop * scrollRatio); // 20px top offset
+                
+                // Create scrollbar
+                const scrollbar = document.createElement('div');
+                scrollbar.className = 'custom-scrollbar';
+                scrollbar.style.height = `${scrollbarHeight}px`;
+                scrollbar.style.top = `${scrollbarTop}px`;
+                scrollbar.onclick = handleScrollbarClick;
+                
+                const referencePanel = document.querySelector('.reference-panel');
+                referencePanel.appendChild(scrollbar);
+            }
+        }
+
+        function handleScrollbarClick(e) {
+            const referenceList = document.getElementById('reference-list');
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            const scrollbarRatio = clickY / rect.height;
+            
+            const { scrollHeight, clientHeight } = referenceList;
+            const maxScrollTop = scrollHeight - clientHeight;
+            referenceList.scrollTop = maxScrollTop * scrollbarRatio;
+        }
+
+        // Add scroll listener to reference list
+        document.addEventListener('DOMContentLoaded', function() {
+            const referenceList = document.getElementById('reference-list');
+            if (referenceList) {
+                referenceList.addEventListener('scroll', updateCustomScrollbar);
+                
+                // Add resize observer to handle content changes
+                const resizeObserver = new ResizeObserver(updateCustomScrollbar);
+                resizeObserver.observe(referenceList);
+            }
+        });
+
+        function addCSVFile() {
+            // CSV file upload logic
+            alert('CSV file upload functionality');
+        }
+
+        function submitReferences() {
+            const poNumber = document.querySelector('#purchase-order-form input[placeholder="PO-2024-001"]')?.value;
+            const deliveryId = document.querySelector('#purchase-order-form input[placeholder="DEL-12345"]')?.value;
+            const postcode = document.querySelector('#purchase-order-form input[placeholder="SW1A 1AA"]')?.value;
+            
+            if (!poNumber || !deliveryId || !postcode) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Submit logic here
+            alert('References submitted successfully');
+        }
+    </script>
+</body>
+</html> 
