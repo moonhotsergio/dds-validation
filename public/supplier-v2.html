@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         * { 
             margin: 0; 
@@ -46,11 +47,123 @@
             position: fixed;
             top: 140px;
             left: 60px;
+            z-index: 2;
+            transform: scale(1.2);
+            transform-origin: top left;
+        }
+
+        .wrapper-card {
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            padding: 20px 20px 20px 20px;
+            border: 1px solid #f3f3f3;
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
+            backdrop-filter: blur(10px);
+            transition: width 0.3s ease;
+            min-height: 600px;
+        }
+
+        /* Column 1: Header + Forms/History */
+        .column-1 {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            margin-top: 0;
+        }
+
+        /* Column 1 width based on active state */
+        .column-1.forms-active {
+            width: 420px;
+        }
+
+        .column-1.history-active {
+            width: 100%;
+        }
+
+        /* Header (Always visible in Column 1) */
+        .header {
+            margin-bottom: 20px;
+            margin-top: 0;
+        }
+
+        /* Forms Panel (Only when submit active) */
+        .forms-panel {
+            display: block;
+        }
+
+        .forms-panel.hidden {
+            display: none;
+        }
+
+        /* History Panel (Only when history active) */
+        .history-panel {
+            display: block;
+        }
+
+        .history-panel.hidden {
+            display: none;
+        }
+
+        /* Content Area (Two columns) */
+        .content-area {
             display: flex;
             gap: 20px;
-            z-index: 2;
-            transform: scale(1.7);
-            transform-origin: top left;
+            align-items: stretch;
+            margin-top: 0;
+        }
+
+        /* Column 2: Reference Panel */
+        .reference-panel {
+            width: 360px;
+            flex-shrink: 0;
+            height: auto;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Wrapper width based on content (including padding) */
+        .wrapper-card.no-references {
+            width: 460px; /* 420px content + 40px padding */
+        }
+
+        .wrapper-card.has-references {
+            width: 840px; /* 800px content + 40px padding */
+        }
+
+        .wrapper-card.history-active {
+            width: 100% !important;
+        }
+
+        /* Fix form spacing and overflow */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            border: 1px solid #c3c6c8;
+            border-radius: 999px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            background: white;
+            transition: border-color 0.3s ease;
+            height: 36px;
+        }
+
+        .purchase-order-section {
+            margin-bottom: 20px;
+        }
+
+        .reference-input-section {
+            margin-bottom: 20px;
+        }
+
+        .submit-section {
+            margin-top: 20px;
         }
 
         .logo {
@@ -58,10 +171,15 @@
             top: 30px;
             left: 60px;
             z-index: 3;
+            height: 51px;
+            width: 167.414px;
         }
 
         .logo img {
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+            width: 167.414px;
+            height: 51px;
+            object-fit: contain;
         }
 
         /* Add subtle texture/noise */
@@ -136,33 +254,32 @@
             display: flex;
             flex-direction: row;
             gap: 20px;
-            padding: 40px 0 0 0;
+            padding: 10px 0 0 0;
             width: 100%;
-            margin-top: 40px;
+            margin-top: 0;
         }
 
         .main-panel {
-            background: rgba(255,255,255,0.95);
+            background: transparent;
             border-radius: 10px;
-            padding: 20px;
-            flex: 1;
-            max-width: 380px;
+            padding: 0;
             position: relative;
-            border: 1px solid #f3f3f3;
-            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
-            backdrop-filter: blur(10px);
         }
 
         .reference-panel {
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.6);
             border-radius: 10px;
             border: 1px solid #f3f3f3;
             box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
-            height: 596px;
-            width: 367px;
+            height: auto;
+            width: 360px;
             padding: 20px;
             overflow: hidden;
             backdrop-filter: blur(10px);
+            flex-shrink: 0;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Role Tabs */
@@ -170,11 +287,13 @@
             display: flex;
             gap: 11px;
             margin-bottom: 16px;
+            align-items: center;
+            width: 100%;
         }
 
         .role-tab {
             flex: 1;
-            padding: 8px 16px;
+            padding: 0;
             background: transparent;
             border: none;
             cursor: pointer;
@@ -183,19 +302,35 @@
             font-size: 24px;
             color: #00251c;
             transition: all 0.3s ease;
-            border-radius: 6px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 24px;
         }
 
         .role-tab.active {
-            background: #b6ffe1;
-            color: #000000;
+            color: #00251c;
+            font-weight: 700;
+        }
+
+        .role-tab:not(.active) {
+            color: #868b90;
+            font-weight: 500;
+        }
+
+        .role-divider {
+            width: 1px;
+            height: 24px;
+            background: #d9d9d9;
+            flex-shrink: 0;
         }
 
         /* Sub Tabs */
         .sub-tabs {
             display: flex;
-            gap: 11px;
-            margin-bottom: 16px;
+            gap: 0;
+            margin-bottom: 20px;
             height: 30px;
             border-radius: 12px;
             overflow: hidden;
@@ -204,7 +339,7 @@
 
         .sub-tab {
             flex: 1;
-            padding: 8px 16px;
+            padding: 10px;
             background: transparent;
             border: none;
             cursor: pointer;
@@ -249,10 +384,11 @@
             width: 12px;
             height: 12px;
             transition: transform 0.2s ease;
+            transform: rotate(90deg);
         }
 
         .purchase-order-heading.expanded .icon {
-            transform: rotate(90deg);
+            transform: rotate(0deg);
         }
 
         .purchase-order-form {
@@ -276,7 +412,7 @@
 
         /* Form Styles */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 11px;
         }
 
         .form-group label {
@@ -285,7 +421,8 @@
             font-weight: 400;
             font-size: 14px;
             color: #000000;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            line-height: 14px;
         }
 
         .form-group input {
@@ -298,6 +435,8 @@
             color: #000000;
             background: white;
             transition: border-color 0.3s ease;
+            height: 36px;
+            box-sizing: border-box;
         }
 
         .form-group input:focus {
@@ -308,7 +447,7 @@
 
         /* Reference Input Section */
         .reference-input-section {
-            margin-top: 16px;
+            margin-top: 5px;
             background: rgba(249,251,252,0.6);
             border: 1px solid #c3c6c8;
             border-radius: 10px;
@@ -317,7 +456,7 @@
         }
 
         .section-header {
-            margin-bottom: 16px;
+            margin-bottom: 5px;
         }
 
         .section-header h3 {
@@ -337,11 +476,11 @@
 
         .btn-add {
             background: transparent;
-            color: #00993a;
+            color: #868b90;
             border: none;
-            padding: 8px 16px;
-            font-family: 'IBM Plex Sans Condensed', sans-serif;
-            font-weight: 500;
+            padding: 8px 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -351,28 +490,30 @@
         }
 
         .btn-add:hover {
-            color: #007a2e;
+            color: #000000;
         }
 
         /* Submit Button */
         .submit-section {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid #e0e0e0;
+            margin-top: 20px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: flex-end;
         }
 
         .submit-btn {
-            width: 100%;
             background: #000000;
             color: rgba(255,255,255,0.8);
             border: none;
-            padding: 16px 24px;
+            padding: 9px 18px;
             border-radius: 999px;
             font-family: 'Inter', sans-serif;
             font-weight: 400;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
+            height: 36px;
+            line-height: 20px;
         }
 
         .submit-btn:hover {
@@ -437,7 +578,7 @@
         }
 
         .reference-panel .content {
-            max-height: 480px;
+            flex: 1;
             overflow-y: auto;
             padding-right: 12px;
             margin-top: 16px;
@@ -452,9 +593,13 @@
             background: #f9fbfc;
             border: 0.5px solid #000000;
             border-radius: 10px;
-            padding: 20px;
+            padding: 20px 10px;
             margin-bottom: 11px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            width: 100%;
         }
 
         .reference-card.error {
@@ -465,10 +610,10 @@
         .reference-card .remove-btn {
             position: absolute;
             top: -4px;
-            right: 20px;
+            right: 15px;
             background: #c3c6c8;
             border: none;
-            border-radius: 50%;
+            border-radius: 499.5px;
             width: 20px;
             height: 20px;
             cursor: pointer;
@@ -478,6 +623,8 @@
             font-size: 7px;
             color: #000000;
             transition: background-color 0.3s ease;
+            padding: 9px 0;
+            z-index: 1;
         }
 
         .reference-card .remove-btn:hover {
@@ -488,7 +635,8 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            margin-bottom: 4px;
+            margin-bottom: 0;
+            width: 100%;
         }
 
         .reference-field:last-child {
@@ -501,6 +649,7 @@
             font-size: 14px;
             color: #525961;
             white-space: nowrap;
+            line-height: 14px;
         }
 
         .reference-field-value {
@@ -508,13 +657,16 @@
             background: #ffffff;
             border: 1px solid #e4e4e4;
             border-radius: 999px;
-            padding: 8px 12px;
+            padding: 10px 12px;
             font-family: 'IBM Plex Sans Condensed', sans-serif;
             font-size: 14px;
             color: #767676;
             min-height: 28px;
             display: flex;
             align-items: center;
+            line-height: 1.2;
+            height: 28px;
+            box-sizing: border-box;
         }
 
         .reference-field-value.error {
@@ -564,91 +716,224 @@
                 width: 100%;
             }
         }
+
+        /* History tab specific styles */
+        #history-tab {
+            width: 100%;
+            max-width: none;
+            transition: all 0.3s ease;
+        }
+
+        #history-tab .history-filters {
+            margin-bottom: 20px;
+        }
+
+        #history-tab .history-section {
+            width: 100%;
+        }
+
+        /* Hide sections only when history tab is active */
+        .history-active .purchase-order-section,
+        .history-active .reference-input-section,
+        .history-active .submit-section {
+            display: none !important;
+        }
+
+        /* Ensure purchase order form can be toggled properly */
+        .purchase-order-form.hidden {
+            display: none !important;
+        }
+
+        .purchase-order-form:not(.hidden) {
+            display: block !important;
+        }
+
+        /* History tab when outside main panel */
+        .wrapper-card > #history-tab {
+            width: 100%;
+            max-width: none;
+            margin-top: 20px;
+        }
+
+        /* Fix scrolling for history content */
+        .submission-history {
+            max-height: 60vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .submission-history::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .submission-history::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .submission-history::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .submission-history::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.hidden {
+            display: none;
+        }
+
+        .tab-content:not(.hidden) {
+            display: block;
+        }
+
+        #submit-tab {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <!-- Logo -->
     <div class="logo">
-        <img src="/Interu_Logo_white.svg" alt="Interu Logo" width="224" height="68">
+        <img src="/Interu_Logo_white.svg" alt="Interu Logo" width="167.414" height="51">
     </div>
     
     <div class="interface-container">
-        <!-- Main Panel -->
-        <div class="main-panel">
-            <!-- Role Tabs -->
-            <div class="role-tabs">
-                <button class="role-tab active" onclick="switchRole('supplier')">Supplier</button>
-                <div style="width: 1px; background: #d9d9d9; margin: 0 11px;"></div>
-                <button class="role-tab" onclick="switchRole('customer')">Customer</button>
-            </div>
+        <!-- Main Wrapper Card -->
+        <div class="wrapper-card">
+            <!-- Content Area with Two Columns -->
+            <div class="content-area">
+                <!-- Column 1: Header + Forms/History -->
+                <div class="column-1">
+                    <!-- Header (Always Visible) -->
+                    <div class="header">
+                        <!-- Role Tabs -->
+                        <div class="role-tabs">
+                            <button class="role-tab active" onclick="switchRole('supplier')">Supplier</button>
+                            <div class="role-divider"></div>
+                            <button class="role-tab" onclick="switchRole('customer')">Customer</button>
+                        </div>
 
-            <!-- Sub Tabs -->
-            <div class="sub-tabs">
-                <button class="sub-tab active" onclick="showTab('submit')">Submit References</button>
-                <button class="sub-tab" onclick="showTab('history')">History</button>
-            </div>
-
-            <!-- Purchase Order Section -->
-            <div class="purchase-order-section">
-                <button class="purchase-order-heading" id="purchase-order-heading" onclick="togglePurchaseOrder()">
-                    <span class="icon">►</span>
-                    Purchase Order Information
-                </button>
-                <div class="purchase-order-form hidden" id="purchase-order-form">
-                    <div class="form-group">
-                        <label>Purchase Order Number</label>
-                        <input type="text" placeholder="PO-2024-001">
+                        <!-- Sub Tabs -->
+                        <div class="sub-tabs">
+                            <button class="sub-tab active" onclick="showTab('submit')">Submit References</button>
+                            <button class="sub-tab" onclick="showTab('history')">History</button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Delivery ID</label>
-                        <input type="text" placeholder="DEL-12345">
-                    </div>
-                    <div class="form-group">
-                        <label>Postcode</label>
-                        <input type="text" placeholder="SW1A 1AA">
-                    </div>
-                </div>
-            </div>
 
-            <!-- Reference Input Section -->
-            <div class="reference-input-section">
-                <div class="section-header">
-                    <h3>Add Reference Numbers:</h3>
-                </div>
-                <div class="form-group">
-                    <label>Reference Number</label>
-                    <input type="text" id="reference-number" placeholder="12336">
-                </div>
-                <div class="form-group">
-                    <label>Validation Number (Optional)</label>
-                    <input type="text" id="validation-number" placeholder="11334">
-                </div>
-                <div class="action-buttons">
-                    <button class="btn-add" onclick="addReference()">+ Add Reference</button>
-                    <button class="btn-add" onclick="addCSVFile()">📎 Add CSV File</button>
-                </div>
-            </div>
+                    <!-- Forms Panel (Only when submit active) -->
+                    <div id="forms-panel" class="forms-panel">
+                        <!-- Purchase Order Section -->
+                        <div class="purchase-order-section">
+                            <button class="purchase-order-heading expanded" id="purchase-order-heading" onclick="togglePurchaseOrder()">
+                                <span class="icon">►</span>
+                                Purchase Order Information
+                            </button>
+                            <div class="purchase-order-form" id="purchase-order-form">
+                                <div class="form-group">
+                                    <label>PO Number</label>
+                                    <input type="text" value="235235">
+                                </div>
+                                <div class="form-group">
+                                    <label>Delivery ID</label>
+                                    <input type="text" value="2ffff4">
+                                </div>
+                                <div class="form-group">
+                                    <label>Delivery Postcode</label>
+                                    <input type="text" placeholder="--------">
+                                </div>
+                            </div>
+                        </div>
 
-            <!-- Submit Button -->
-            <div class="submit-section">
-                <button class="submit-btn" onclick="submitReferences()">Submit References</button>
+                        <!-- Reference Input Section -->
+                        <div class="reference-input-section">
+                            <div class="section-header">
+                                <h3>Add Reference Numbers</h3>
+                            </div>
+                            <div class="form-group">
+                                <label>Reference Number</label>
+                                <input type="text" id="reference-number" placeholder="------">
+                            </div>
+                            <div class="form-group">
+                                <label>Validation Number (Optional)</label>
+                                <input type="text" id="validation-number" placeholder="-------">
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn-add" onclick="addReference()"><i class="fas fa-plus">+</i> Add Reference</button>
+                                <button class="btn-add" onclick="addCSVFile()"><i class="fas fa-paperclip">📎</i> Add CSV File</button>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="submit-section">
+                            <button class="submit-btn" onclick="submitReferences()">Submit References</button>
+                        </div>
+                    </div>
+
+                    <!-- History Panel (Only when history active) -->
+                    <div id="history-panel" class="history-panel hidden">
+                        <!-- History Filters -->
+                        <div class="history-filters" style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 12px; margin-bottom: 4px;">PO Number</label>
+                                    <input type="text" id="po-filter" placeholder="Filter by PO" style="padding: 8px 12px; font-size: 14px;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 12px; margin-bottom: 4px;">Delivery ID</label>
+                                    <input type="text" id="delivery-filter" placeholder="Filter by delivery" style="padding: 8px 12px; font-size: 14px;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 12px; margin-bottom: 4px;">Date Range</label>
+                                    <select id="date-filter" style="padding: 8px 12px; font-size: 14px;">
+                                        <option value="">All Time</option>
+                                        <option value="today">Today</option>
+                                        <option value="week">This Week</option>
+                                        <option value="month">This Month</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn" onclick="applyHistoryFilters()" style="padding: 8px 16px; font-size: 12px;">Filter</button>
+                                    <button class="btn btn-secondary" onclick="clearHistoryFilters()" style="padding: 8px 16px; font-size: 12px;">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- History Content -->
+                        <div class="history-section">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <h3 style="color: #4a7c59; margin: 0; font-size: 18px;">Submission History</h3>
+                                <button class="btn btn-secondary" onclick="loadHistory()" style="padding: 8px 16px; font-size: 12px;">Refresh</button>
+                            </div>
+                            <div id="history-content" class="submission-history" style="background: white; border-radius: 8px; border: 1px solid #e9ecef; padding: 16px;">
+                                <p style="color: #6c757d; text-align: center; padding: 40px;">Loading your submission history...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Reference Panel -->
+                <div class="reference-panel" id="reference-panel" style="display: none;">
+                    <div class="header">
+                        <span class="count" id="reference-count">0 References created</span>
+                    </div>
+                    <div class="content" id="reference-list">
+                        <!-- References will be added here dynamically -->
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- Reference Panel -->
-        <div class="reference-panel">
-            <div class="header">
-                <span class="count" id="reference-count">0 References created</span>
-            </div>
-            <div class="content" id="reference-list">
-                <!-- References will be added here dynamically -->
-            </div>
-        </div>
+    </div>
     </div>
 
     <script>
         let references = [];
-        let isPurchaseOrderExpanded = false;
+        let isPurchaseOrderExpanded = true;
         let scrollbarHeight = 0;
         let scrollbarTop = 0;
         let isScrollbarVisible = false;
@@ -701,14 +986,64 @@
 
         // Tab switching
         function showTab(tabName) {
-            const tabs = document.querySelectorAll('.tab-content');
+            const formsPanel = document.getElementById('forms-panel');
+            const historyPanel = document.getElementById('history-panel');
+            const column1 = document.querySelector('.column-1');
+            const wrapperCard = document.querySelector('.wrapper-card');
             const subTabs = document.querySelectorAll('.sub-tab');
             
-            tabs.forEach(tab => tab.classList.add('hidden'));
+            // Update sub tab active states
             subTabs.forEach(tab => tab.classList.remove('active'));
-            
-            document.getElementById(tabName + '-tab').classList.remove('hidden');
             event.target.classList.add('active');
+            
+            if (tabName === 'history') {
+                // Show history panel, hide forms panel
+                formsPanel.classList.add('hidden');
+                historyPanel.classList.remove('hidden');
+                
+                // Set column 1 to history-active width
+                if (column1) {
+                    column1.classList.remove('forms-active');
+                    column1.classList.add('history-active');
+                }
+                
+                // Set wrapper to history-active width
+                if (wrapperCard) {
+                    wrapperCard.classList.add('history-active');
+                }
+                
+                // Hide reference panel in history mode
+                const referencePanel = document.getElementById('reference-panel');
+                if (referencePanel) {
+                    referencePanel.style.display = 'none';
+                }
+                
+                // Auto-refresh history when switching to history tab
+                setTimeout(() => {
+                    loadHistory();
+                }, 100);
+            } else {
+                // Show forms panel, hide history panel
+                formsPanel.classList.remove('hidden');
+                historyPanel.classList.add('hidden');
+                
+                // Set column 1 to forms-active width
+                if (column1) {
+                    column1.classList.remove('history-active');
+                    column1.classList.add('forms-active');
+                }
+                
+                // Remove history-active class from wrapper card
+                if (wrapperCard) {
+                    wrapperCard.classList.remove('history-active');
+                }
+                
+                // Show reference panel if there are references
+                const referencePanel = document.getElementById('reference-panel');
+                if (referencePanel && references.length > 0) {
+                    referencePanel.style.display = 'block';
+                }
+            }
         }
 
         // Purchase order toggle
@@ -749,16 +1084,29 @@
             // Clear inputs
             document.getElementById('reference-number').value = '';
             document.getElementById('validation-number').value = '';
+            
+            // Show reference panel if it was hidden
+            const referencePanel = document.getElementById('reference-panel');
+            if (referencePanel.style.display === 'none') {
+                referencePanel.style.display = 'block';
+            }
         }
 
         function removeReference(id) {
             references = references.filter(ref => ref.id !== id);
             updateReferenceDisplay();
+            
+            // Hide reference panel if no references left
+            if (references.length === 0) {
+                const referencePanel = document.getElementById('reference-panel');
+                referencePanel.style.display = 'none';
+            }
         }
 
         function updateReferenceDisplay() {
             const referenceList = document.getElementById('reference-list');
             const referenceCount = document.getElementById('reference-count');
+            const wrapperCard = document.querySelector('.wrapper-card');
             
             referenceCount.textContent = `${references.length} References created`;
             
@@ -785,6 +1133,18 @@
                 `;
                 referenceList.appendChild(card);
             });
+            
+            // Show/hide reference panel and update wrapper width
+            const referencePanel = document.getElementById('reference-panel');
+            if (references.length > 0) {
+                referencePanel.style.display = 'block';
+                wrapperCard.classList.remove('no-references');
+                wrapperCard.classList.add('has-references');
+            } else {
+                referencePanel.style.display = 'none';
+                wrapperCard.classList.remove('has-references');
+                wrapperCard.classList.add('no-references');
+            }
             
             updateCustomScrollbar();
         }
@@ -839,8 +1199,21 @@
             referenceList.scrollTop = maxScrollTop * scrollbarRatio;
         }
 
-        // Add scroll listener to reference list
+        // Initialize the layout
         document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state
+            const column1 = document.querySelector('.column-1');
+            const wrapperCard = document.querySelector('.wrapper-card');
+            
+            if (column1) {
+                column1.classList.add('forms-active');
+            }
+            
+            if (wrapperCard) {
+                wrapperCard.classList.add('no-references');
+            }
+            
+            // Add scroll listener to reference list
             const referenceList = document.getElementById('reference-list');
             if (referenceList) {
                 referenceList.addEventListener('scroll', updateCustomScrollbar);
@@ -868,6 +1241,104 @@
             
             // Submit logic here
             alert('References submitted successfully');
+        }
+
+        // History functionality
+        let historyFilters = {};
+        let authToken = localStorage.getItem('supplierToken');
+        let supplierLinkId = window.location.pathname.split('/').pop();
+
+        async function loadHistory() {
+            try {
+                const historyContent = document.getElementById('history-content');
+                historyContent.innerHTML = '<div style="text-align: center; padding: 20px; color: #6c757d;">Loading...</div>';
+
+                // Build query parameters
+                const params = new URLSearchParams();
+                if (historyFilters.poNumber) params.append('poNumber', historyFilters.poNumber);
+                if (historyFilters.deliveryId) params.append('deliveryId', historyFilters.deliveryId);
+                if (historyFilters.dateRange) params.append('dateRange', historyFilters.dateRange);
+
+                const response = await fetch(`/api/supplier/submissions?${params.toString()}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    if (data.submissions.length === 0) {
+                        historyContent.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 40px;">No submissions found.</p>';
+                    } else {
+                        // Group submissions by PO/Delivery
+                        const grouped = {};
+                        data.submissions.forEach(submission => {
+                            const key = `${submission.po_number}-${submission.delivery_id}`;
+                            if (!grouped[key]) {
+                                grouped[key] = {
+                                    poNumber: submission.po_number,
+                                    deliveryId: submission.delivery_id,
+                                    references: [],
+                                    submittedAt: submission.submitted_at
+                                };
+                            }
+                            grouped[key].references.push({
+                                referenceNumber: submission.reference_number,
+                                validationNumber: submission.validation_number,
+                                submittedAt: submission.submitted_at
+                            });
+                            
+                            // Keep the most recent submission time
+                            if (new Date(submission.submitted_at) > new Date(grouped[key].submittedAt)) {
+                                grouped[key].submittedAt = submission.submitted_at;
+                            }
+                        });
+
+                        // Generate compact HTML for grouped submissions
+                        historyContent.innerHTML = Object.values(grouped).map(group => `
+                            <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
+                                <div style="background: linear-gradient(135deg, #4a7c59, #6a9969); color: white; padding: 12px 16px; font-size: 14px; font-weight: 600;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>PO: ${group.poNumber} | Delivery: ${group.deliveryId}</span>
+                                        <small style="opacity: 0.8;">${group.references.length} ref${group.references.length !== 1 ? 's' : ''}</small>
+                                    </div>
+                                    <small style="opacity: 0.8;">Last updated: ${new Date(group.submittedAt).toLocaleString()}</small>
+                                </div>
+                                <div style="padding: 12px;">
+                                    ${group.references.map(ref => `
+                                        <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; padding: 8px; border-bottom: 1px solid #f1f3f4; align-items: center; font-size: 14px;">
+                                            <div style="font-weight: 600; color: #4a7c59;">${ref.referenceNumber}</div>
+                                            <div style="color: #28a745;">${ref.validationNumber || '-'}</div>
+                                            <div style="color: #6c757d; font-size: 12px;">${new Date(ref.submittedAt).toLocaleString()}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Failed to load history. Please try again.</p>';
+                }
+            } catch (error) {
+                historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Network error occurred.</p>';
+            }
+        }
+
+        function applyHistoryFilters() {
+            historyFilters = {
+                poNumber: document.getElementById('po-filter').value,
+                deliveryId: document.getElementById('delivery-filter').value,
+                dateRange: document.getElementById('date-filter').value
+            };
+            loadHistory();
+        }
+
+        function clearHistoryFilters() {
+            document.getElementById('po-filter').value = '';
+            document.getElementById('delivery-filter').value = '';
+            document.getElementById('date-filter').value = '';
+            historyFilters = {};
+            loadHistory();
         }
     </script>
 </body>
