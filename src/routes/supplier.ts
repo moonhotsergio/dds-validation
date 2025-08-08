@@ -169,13 +169,55 @@ router.post('/validate-otp', strictLimiter, async (req, res) => {
 // Get supplier's past submissions
 router.get('/submissions', authenticateSupplier, async (req: AuthRequest, res) => {
     try {
+        const poNumber = req.query.poNumber as string;
+        const deliveryId = req.query.deliveryId as string;
+        const dateRange = req.query.dateRange as string;
+
+        // Build WHERE clause based on filters
+        let whereConditions = [`supplier_link_id = $1`];
+        let queryParams = [req.supplierLinkId];
+        let paramIndex = 2;
+
+        if (poNumber) {
+            whereConditions.push(`po_number LIKE $${paramIndex}`);
+            queryParams.push(`%${poNumber}%`);
+            paramIndex++;
+        }
+
+        if (deliveryId) {
+            whereConditions.push(`delivery_id LIKE $${paramIndex}`);
+            queryParams.push(`%${deliveryId}%`);
+            paramIndex++;
+        }
+
+        // Handle date range filtering
+        if (dateRange) {
+            let dateFilter = '';
+            switch (dateRange) {
+                case 'today':
+                    dateFilter = `DATE(submitted_at) = DATE('now')`;
+                    break;
+                case 'week':
+                    dateFilter = `submitted_at >= DATE('now', 'weekday 0', '-6 days')`;
+                    break;
+                case 'month':
+                    dateFilter = `submitted_at >= DATE('now', 'start of month')`;
+                    break;
+            }
+            if (dateFilter) {
+                whereConditions.push(dateFilter);
+            }
+        }
+
+        const whereClause = whereConditions.join(' AND ');
+
         const result = await pool.query(
             `SELECT po_number, delivery_id, reference_number, validation_number, 
                     submitted_at, updated_at 
              FROM reference_submissions 
-             WHERE supplier_link_id = $1 
+             WHERE ${whereClause}
              ORDER BY submitted_at DESC`,
-            [req.supplierLinkId]
+            queryParams
         );
 
         res.json({ submissions: result.rows });

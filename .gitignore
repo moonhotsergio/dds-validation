@@ -71,3 +71,6 @@ test-server.js
 *.backup
 *.bak
 *.old
+
+# Reference folders (not for production)
+Supplier Portal Interface/

@@ -12,11 +12,11 @@ export const createRateLimiter = (windowMs: number, max: number, message?: strin
 
 export const generalLimiter = createRateLimiter(
     parseInt(process.env.RATE_LIMIT_WINDOW_MS || '3600000'), // 1 hour
-    parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100')
+    parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '1000')
 );
 
 export const strictLimiter = createRateLimiter(
     3600000, // 1 hour
-    5, // 5 requests per hour
+    100, // 100 requests per hour for development
     'Too many attempts, please try again later.'
 );
