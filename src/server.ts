@@ -49,12 +49,14 @@ app.get('/', (req, res) => {
 });
 
 app.get('/supplier/:linkId', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/supplier.html'));
+    res.sendFile(path.join(__dirname, '../public/supplier-v2.html'));
 });
 
 app.get('/customer', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/customer.html'));
 });
+
+
 
 // Error handling middleware
 app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
