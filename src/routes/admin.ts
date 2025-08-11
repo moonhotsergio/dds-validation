@@ -1,7 +1,7 @@
 import express from 'express';
-import { v4 as uuidv4 } from 'uuid';
 import pool from '../database/connection';
 import { sendOTP } from '../utils/email';
+import { createSupplierLink } from '../utils/id-generator';
 
 const router = express.Router();
 
@@ -27,21 +27,16 @@ router.post('/generate-link', async (req, res) => {
             // Use existing supplier link ID
             linkId = existingSupplier.rows[0].id;
         } else {
-            // Generate new unique link ID
-            linkId = uuidv4();
-            
-            // Create supplier link record
-            await pool.query(
-                `INSERT INTO supplier_links (id, supplier_identifier) VALUES ($1, $2)`,
-                [linkId, supplierEmail]
-            );
+            // Generate new unique link ID using new format
+            const supplierLinkInfo = await createSupplierLink(supplierEmail);
+            linkId = supplierLinkInfo.id;
         }
 
         const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3004';
         const uniqueUrl = `${baseUrl}/supplier/${linkId}`;
 
         // Create admin link record with explicit values
-        const adminLinkId = uuidv4();
+        const adminLinkId = crypto.randomUUID();
         const currentTime = new Date().toISOString();
         
         const result = await pool.query(
@@ -204,6 +199,68 @@ router.delete('/links/:id', async (req, res) => {
     } catch (error) {
         console.error('Error freezing link:', error);
         res.status(500).json({ error: 'Failed to freeze link' });
+    }
+});
+
+// Direct activation endpoint - bypasses OTP authentication
+router.post('/links/:id/activate', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { adminNotes } = req.body;
+
+        // Get the link details first
+        const linkResult = await pool.query(
+            `SELECT * FROM admin_supplier_links WHERE id = $1`,
+            [id]
+        );
+
+        if (linkResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Link not found' });
+        }
+
+        const link = linkResult.rows[0];
+        
+        // Check if link is already active
+        if (link.state === 'Active') {
+            return res.status(400).json({ error: 'Link is already active' });
+        }
+
+        // Extract supplier link ID from URL
+        const supplierLinkId = link.url.split('/').pop();
+        
+        // Update admin link state to Active
+        await pool.query(
+            `UPDATE admin_supplier_links SET state = 'Active', admin_notes = COALESCE($1, admin_notes) WHERE id = $2`,
+            [adminNotes, id]
+        );
+
+        // Activate the supplier link
+        await pool.query(
+            `UPDATE supplier_links SET is_active = true WHERE id = $1`,
+            [supplierLinkId]
+        );
+
+        // Create a direct activation record (for audit purposes)
+        await pool.query(
+            `INSERT INTO supplier_direct_activations (supplier_link_id, activated_by_admin, activated_at, admin_notes) 
+             VALUES ($1, 'admin', NOW(), $2)`,
+            [supplierLinkId, adminNotes || 'Directly activated by admin']
+        );
+
+        // Fetch the updated admin link
+        const updatedResult = await pool.query(
+            `SELECT * FROM admin_supplier_links WHERE id = $1`,
+            [id]
+        );
+
+        res.json({ 
+            message: 'Link activated successfully - OTP authentication bypassed',
+            link: updatedResult.rows[0],
+            supplierLinkId: supplierLinkId
+        });
+    } catch (error) {
+        console.error('Error activating link:', error);
+        res.status(500).json({ error: 'Failed to activate link' });
     }
 });
 

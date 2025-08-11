@@ -18,59 +18,6 @@ import {
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
 
-// Test bypass endpoint for development
-router.post('/test-login', async (req, res) => {
-    try {
-        const { supplierLinkId } = req.body;
-        
-        if (!supplierLinkId) {
-            return res.status(400).json({ error: 'Supplier link ID required' });
-        }
-
-        // Verify supplier link exists and is active
-        const supplierResult = await pool.query(
-            'SELECT id FROM supplier_links WHERE id = $1 AND is_active = true',
-            [supplierLinkId]
-        );
-
-        if (supplierResult.rows.length === 0) {
-            return res.status(404).json({ error: 'Invalid supplier link' });
-        }
-
-        // Create test session directly
-        const testEmail = 'test@example.com';
-        const jwtSecret = process.env.JWT_SECRET as string;
-        const sessionToken = jwt.sign(
-            { supplierLinkId, email: testEmail },
-            jwtSecret,
-            { expiresIn: '30d' }
-        );
-
-        const expiresAt = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)); // 30 days
-
-        // Store session
-        await pool.query(
-            'INSERT INTO supplier_sessions (supplier_link_id, session_token, email, expires_at) VALUES ($1, $2, $3, $4)',
-            [supplierLinkId, sessionToken, testEmail, expiresAt]
-        );
-
-        // Update last_used for supplier link
-        await pool.query(
-            'UPDATE supplier_links SET last_used = datetime("now") WHERE id = $1',
-            [supplierLinkId]
-        );
-
-        res.json({ 
-            token: sessionToken,
-            message: 'Test authentication successful',
-            email: testEmail
-        });
-    } catch (error) {
-        console.error('Error in test login:', error);
-        res.status(500).json({ error: 'Failed to create test session' });
-    }
-});
-
 // Generate and send OTP for supplier email verification
 router.post('/verify-email', strictLimiter, async (req, res) => {
     try {
@@ -112,7 +59,7 @@ router.post('/verify-email', strictLimiter, async (req, res) => {
 });
 
 // Validate OTP and create session
-router.post('/validate-otp', strictLimiter, async (req, res) => {
+router.post('/validate-otp', async (req, res) => {
     try {
         const { error, value } = otpValidationSchema.validate(req.body);
         if (error) {
@@ -123,7 +70,7 @@ router.post('/validate-otp', strictLimiter, async (req, res) => {
 
         // Verify OTP
         const otpResult = await pool.query(
-            'SELECT id FROM otp_tokens WHERE email = $1 AND otp_code = $2 AND supplier_link_id = $3 AND expires_at > NOW() AND used = false',
+            'SELECT * FROM otp_tokens WHERE email = $1 AND otp_code = $2 AND supplier_link_id = $3 AND expires_at > NOW() AND used = false',
             [email, otp, supplierLinkId]
         );
 
@@ -132,9 +79,12 @@ router.post('/validate-otp', strictLimiter, async (req, res) => {
         }
 
         // Mark OTP as used
-        await pool.query('UPDATE otp_tokens SET used = true WHERE id = $1', [otpResult.rows[0].id]);
+        await pool.query(
+            'UPDATE otp_tokens SET used = true WHERE id = $1',
+            [otpResult.rows[0].id]
+        );
 
-        // Create session token
+        // Create session
         const jwtSecret = process.env.JWT_SECRET as string;
         const sessionToken = jwt.sign(
             { supplierLinkId, email },
@@ -158,11 +108,54 @@ router.post('/validate-otp', strictLimiter, async (req, res) => {
 
         res.json({ 
             token: sessionToken,
-            message: 'Authentication successful' 
+            message: 'Authentication successful',
+            email: email
         });
     } catch (error) {
         console.error('Error validating OTP:', error);
         res.status(500).json({ error: 'Failed to validate OTP' });
+    }
+});
+
+// Check if supplier link has been directly activated by admin
+router.post('/check-admin-activation', async (req, res) => {
+    try {
+        const { supplierLinkId } = req.body;
+
+        if (!supplierLinkId) {
+            return res.status(400).json({ error: 'Supplier link ID required' });
+        }
+
+        // Check if there's a direct activation record
+        const activationResult = await pool.query(
+            'SELECT * FROM supplier_direct_activations WHERE supplier_link_id = $1',
+            [supplierLinkId]
+        );
+
+        // Check if the supplier link is active
+        const supplierResult = await pool.query(
+            'SELECT is_active FROM supplier_links WHERE id = $1',
+            [supplierLinkId]
+        );
+
+        if (supplierResult.rows.length > 0 && supplierResult.rows[0].is_active) {
+            // Supplier link is active - bypass OTP
+            res.json({ 
+                isActive: true,
+                isAdminActivated: activationResult.rows.length > 0,
+                activatedAt: activationResult.rows[0]?.activated_at || null,
+                adminNotes: activationResult.rows[0]?.admin_notes || null
+            });
+            return;
+        }
+
+        res.json({ 
+            isActive: false,
+            isAdminActivated: false 
+        });
+    } catch (error) {
+        console.error('Error checking admin activation:', error);
+        res.status(500).json({ error: 'Failed to check admin activation status' });
     }
 });
 
@@ -171,6 +164,7 @@ router.get('/submissions', authenticateSupplier, async (req: AuthRequest, res) =
     try {
         const poNumber = req.query.poNumber as string;
         const deliveryId = req.query.deliveryId as string;
+        const postcode = req.query.postcode as string;
         const dateRange = req.query.dateRange as string;
 
         // Build WHERE clause based on filters
@@ -187,6 +181,12 @@ router.get('/submissions', authenticateSupplier, async (req: AuthRequest, res) =
         if (deliveryId) {
             whereConditions.push(`delivery_id LIKE $${paramIndex}`);
             queryParams.push(`%${deliveryId}%`);
+            paramIndex++;
+        }
+
+        if (postcode) {
+            whereConditions.push(`delivery_postcode LIKE $${paramIndex}`);
+            queryParams.push(`%${postcode}%`);
             paramIndex++;
         }
 
@@ -212,7 +212,7 @@ router.get('/submissions', authenticateSupplier, async (req: AuthRequest, res) =
         const whereClause = whereConditions.join(' AND ');
 
         const result = await pool.query(
-            `SELECT po_number, delivery_id, reference_number, validation_number, 
+            `SELECT po_number, delivery_id, delivery_postcode, reference_number, validation_number, 
                     submitted_at, updated_at 
              FROM reference_submissions 
              WHERE ${whereClause}

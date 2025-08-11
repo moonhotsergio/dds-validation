@@ -810,6 +810,28 @@
         #submit-tab {
             display: block;
         }
+
+        /* Authentication Section Styles */
+        .auth-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e9ecef;
+        }
+
+        .auth-form {
+            margin-top: 16px;
+        }
+
+        .auth-form.hidden {
+            display: none;
+        }
+
+        .auth-section .section-header h3 {
+            color: #4a7c59;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -849,6 +871,33 @@
 
                     <!-- Forms Panel (Only when submit active) -->
                     <div id="forms-panel" class="forms-panel">
+                        <!-- Authentication Section -->
+                        <div id="auth-section" class="auth-section">
+                            <div class="section-header">
+                                <h3>Email Verification Required</h3>
+                                <p style="color: #6c757d; font-size: 14px; margin: 0;">Please verify your email to submit references</p>
+                            </div>
+                            
+                            <!-- Email Form -->
+                            <div id="email-form" class="auth-form">
+                                <div class="form-group">
+                                    <label for="email">Email Address:</label>
+                                    <input type="email" id="email" placeholder="Enter your email address" required>
+                                </div>
+                                <button class="btn" onclick="sendOTP()">Send Verification Code</button>
+                            </div>
+
+                            <!-- OTP Form -->
+                            <div id="otp-form" class="auth-form hidden">
+                                <div class="form-group">
+                                    <label for="otp">Verification Code:</label>
+                                    <input type="text" id="otp" placeholder="Enter 6-digit code" maxlength="6" required>
+                                </div>
+                                <button class="btn" onclick="verifyOTP()">Verify Code</button>
+                                <button class="btn btn-secondary" onclick="resendOTP()" style="margin-left: 12px;">Resend Code</button>
+                            </div>
+                        </div>
+
                         <!-- Purchase Order Section -->
                         <div class="purchase-order-section">
                             <button class="purchase-order-heading expanded" id="purchase-order-heading" onclick="togglePurchaseOrder()">
@@ -857,16 +906,19 @@
                             </button>
                             <div class="purchase-order-form" id="purchase-order-form">
                                 <div class="form-group">
-                                    <label>PO Number</label>
+                                    <label>PO Number (Optional if Delivery ID provided)</label>
                                     <input type="text" id="po-number" placeholder="Enter PO Number">
                                 </div>
                                 <div class="form-group">
-                                    <label>Delivery ID</label>
+                                    <label>Delivery ID (Optional if PO Number provided)</label>
                                     <input type="text" id="delivery-id" placeholder="Enter Delivery ID">
                                 </div>
                                 <div class="form-group">
                                     <label>Delivery Postcode</label>
                                     <input type="text" id="delivery-postcode" placeholder="Enter Postcode">
+                                </div>
+                                <div style="margin-top: 8px; font-size: 12px; color: #6c757d; font-style: italic;">
+                                    💡 <strong>Note:</strong> You must provide either a PO Number OR a Delivery ID (at least one is required)
                                 </div>
                             </div>
                         </div>
@@ -901,7 +953,7 @@
                     <div id="history-panel" class="history-panel hidden">
                         <!-- History Filters -->
                         <div class="history-filters" style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 12px; margin-bottom: 4px;">PO Number</label>
                                     <input type="text" id="po-filter" placeholder="Filter by PO" style="padding: 8px 12px; font-size: 14px;">
@@ -909,6 +961,10 @@
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 12px; margin-bottom: 4px;">Delivery ID</label>
                                     <input type="text" id="delivery-filter" placeholder="Filter by delivery" style="padding: 8px 12px; font-size: 14px;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 12px; margin-bottom: 4px;">Postcode</label>
+                                    <input type="text" id="postcode-filter" placeholder="Filter by postcode" style="padding: 8px 12px; font-size: 14px;">
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 12px; margin-bottom: 4px;">Date Range</label>
@@ -965,30 +1021,83 @@
                 return;
             }
             
-            // Simulate OTP sending
-            document.getElementById('email-form').classList.add('hidden');
-            document.getElementById('otp-form').classList.remove('hidden');
+            const supplierLinkId = getSupplierLinkId();
+            if (!supplierLinkId) {
+                alert('Invalid supplier link. No supplier ID found in URL.');
+                return;
+            }
+
+            // Send OTP request to API
+            fetch('/api/supplier/verify-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    email: email, 
+                    supplierLinkId: supplierLinkId 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Show OTP form
+                    document.getElementById('email-form').classList.add('hidden');
+                    document.getElementById('otp-form').classList.remove('hidden');
+                    alert('Verification code sent to your email');
+                } else {
+                    alert(data.error || 'Failed to send verification code');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending OTP:', error);
+                alert('Failed to send verification code. Please try again.');
+            });
         }
 
         function verifyOTP() {
+            const email = document.getElementById('email').value;
             const otp = document.getElementById('otp').value;
+            const supplierLinkId = getSupplierLinkId();
+            
             if (!otp || otp.length !== 6) {
-                alert('Please enter a valid 6-digit code');
+                alert('Please enter a valid 6-digit verification code');
                 return;
             }
-            
-            // Simulate verification
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('app-section').classList.remove('hidden');
+
+            // Verify OTP with API
+            fetch('/api/supplier/validate-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    email: email, 
+                    otp: otp, 
+                    supplierLinkId: supplierLinkId 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    // Store token and hide auth section
+                    authToken = data.token;
+                    localStorage.setItem('authToken', data.token);
+                    document.getElementById('auth-section').classList.add('hidden');
+                    alert('Authentication successful! You can now submit references.');
+                } else {
+                    alert(data.error || 'Invalid verification code');
+                }
+            })
+            .catch(error => {
+                console.error('Error verifying OTP:', error);
+                alert('Failed to verify code. Please try again.');
+            });
         }
 
         function resendOTP() {
-            alert('Verification code resent to your email');
-        }
-
-        function testLogin() {
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('app-section').classList.remove('hidden');
+            document.getElementById('email-form').classList.remove('hidden');
+            document.getElementById('otp-form').classList.add('hidden');
         }
 
         // Role switching
@@ -1231,9 +1340,15 @@
                 const deliveryId = document.getElementById('delivery-id')?.value?.trim() || '';
                 const postcode = document.getElementById('delivery-postcode')?.value?.trim() || '';
 
-                // Check if we have the required fields (both PO Number AND Delivery ID required)
-                if (!poNumber || !deliveryId) {
-                    alert('Please fill in both PO Number and Delivery ID');
+                // Check if we have at least one identifier (PO Number OR Delivery ID required)
+                if (!poNumber && !deliveryId) {
+                    alert('Please fill in either PO Number or Delivery ID (at least one is required)');
+                    return;
+                }
+
+                // Check if we have the required postcode
+                if (!postcode) {
+                    alert('Please fill in the Delivery Postcode');
                     return;
                 }
 
@@ -1293,7 +1408,7 @@
 
         // History functionality
         let historyFilters = {};
-        let authToken = localStorage.getItem('supplierToken');
+        let authToken = localStorage.getItem('authToken');
         
         // Extract supplier link ID from URL
         function getSupplierLinkId() {
@@ -1314,6 +1429,50 @@
             if (!supplierLinkId) {
                 alert('Invalid supplier link. No supplier ID found in URL.');
                 return false;
+            }
+
+            // Check if admin has directly activated this link
+            try {
+                console.log('Checking admin activation for supplier:', supplierLinkId);
+                const activationResponse = await fetch('/api/supplier/check-admin-activation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ supplierLinkId })
+                });
+
+                if (activationResponse.ok) {
+                    const activationData = await activationResponse.json();
+                    console.log('Activation check response:', activationData);
+                    if (activationData.isAdminActivated || activationData.isActive) {
+                        // Admin has directly activated this link OR link is active - bypass OTP
+                        console.log('Link is active - OTP bypassed');
+                        
+                        // Generate a valid authentication token for active links
+                        const token = btoa(JSON.stringify({
+                            supplierLinkId: supplierLinkId,
+                            isActive: true,
+                            bypassedAt: new Date().toISOString()
+                        }));
+                        
+                        // Store the token
+                        localStorage.setItem('authToken', token);
+                        console.log('Generated bypass token for active link');
+                        console.log('Token content:', JSON.stringify({
+                            supplierLinkId: supplierLinkId,
+                            isActive: true,
+                            bypassedAt: new Date().toISOString()
+                        }));
+                        console.log('Encoded token:', token);
+                        
+                        document.getElementById('auth-section').classList.add('hidden');
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.log('Could not check admin activation status:', error);
+                // Continue with normal OTP flow
             }
 
             // Validate supplier link
@@ -1337,35 +1496,12 @@
 
             // Check if we have a valid token
             if (!authToken) {
-                // Try to authenticate with the supplier ID
-                try {
-                    const response = await fetch('/api/supplier/test-login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ supplierLinkId })
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        authToken = data.token;
-                        localStorage.setItem('supplierToken', data.token);
-                        console.log('Supplier authenticated successfully');
-                        
-                        return true;
-                    } else {
-                        const errorData = await response.json();
-                        alert(`Authentication failed: ${errorData.error}`);
-                        return false;
-                    }
-                } catch (error) {
-                    console.error('Authentication error:', error);
-                    alert('Failed to authenticate supplier');
-                    return false;
-                }
+                // No valid token - user needs to authenticate via OTP
+                console.log('No valid authentication token found. Please use OTP verification.');
+                return false;
             } else {
                 // Already authenticated
+                return true;
             }
             
             return true;
@@ -1377,6 +1513,9 @@
             if (isAuthenticated) {
                 // Load history if authenticated
                 await loadHistory();
+            } else {
+                // Show authentication section if not authenticated
+                document.getElementById('auth-section').classList.remove('hidden');
             }
         });
         
@@ -1396,6 +1535,7 @@
                 const params = new URLSearchParams();
                 if (historyFilters.poNumber) params.append('poNumber', historyFilters.poNumber);
                 if (historyFilters.deliveryId) params.append('deliveryId', historyFilters.deliveryId);
+                if (historyFilters.postcode) params.append('postcode', historyFilters.postcode); // Added postcode filter
                 if (historyFilters.dateRange) params.append('dateRange', historyFilters.dateRange);
 
                 const response = await fetch(`/api/supplier/submissions?${params.toString()}`, {
@@ -1417,6 +1557,7 @@
                                 grouped[key] = {
                                     poNumber: submission.po_number,
                                     deliveryId: submission.delivery_id,
+                                    deliveryPostcode: submission.delivery_postcode,
                                     references: [],
                                     submittedAt: submission.submitted_at
                                 };
@@ -1438,7 +1579,7 @@
                             <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
                                 <div style="background: linear-gradient(135deg, #4a7c59, #6a9969); color: white; padding: 12px 16px; font-size: 14px; font-weight: 600;">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>PO: ${group.poNumber} | Delivery: ${group.deliveryId}</span>
+                                        <span>PO: ${group.poNumber || '-'} | Delivery: ${group.deliveryId || '-'} | Postcode: ${group.deliveryPostcode || '-'}</span>
                                         <small style="opacity: 0.8;">${group.references.length} ref${group.references.length !== 1 ? 's' : ''}</small>
                                     </div>
                                     <small style="opacity: 0.8;">Last updated: ${new Date(group.submittedAt).toLocaleString()}</small>
@@ -1475,6 +1616,7 @@
             historyFilters = {
                 poNumber: document.getElementById('po-filter').value,
                 deliveryId: document.getElementById('delivery-filter').value,
+                postcode: document.getElementById('postcode-filter').value, // Added postcode filter
                 dateRange: document.getElementById('date-filter').value
             };
             loadHistory();
@@ -1483,6 +1625,7 @@
         function clearHistoryFilters() {
             document.getElementById('po-filter').value = '';
             document.getElementById('delivery-filter').value = '';
+            document.getElementById('postcode-filter').value = ''; // Clear postcode filter
             document.getElementById('date-filter').value = '';
             historyFilters = {};
             loadHistory();

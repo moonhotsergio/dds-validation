@@ -55,10 +55,6 @@ app.get('/supplier/:linkId', (req, res) => {
 });
 
 app.get('/customer', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/customer.html'));
-});
-
-app.get('/customer-v2', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/customer-v2.html'));
 });
 

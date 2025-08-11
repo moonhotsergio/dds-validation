@@ -81,56 +81,89 @@ router.post('/request-access', async (req, res) => {
         const { poNumber, deliveryId, postcode, email } = value;
         const clientIp = req.ip || req.connection.remoteAddress;
 
-        // Check if references exist for this PO/Delivery (case-insensitive)
-        const searchQuery = deliveryId 
-            ? 'SELECT * FROM reference_submissions WHERE LOWER(po_number) = LOWER($1) AND LOWER(delivery_id) = LOWER($2)'
-            : 'SELECT * FROM reference_submissions WHERE LOWER(po_number) = LOWER($1)';
+        // Validate that we have either PO Number OR Delivery ID (not both required)
+        if ((!poNumber || poNumber.trim() === '') && (!deliveryId || deliveryId.trim() === '')) {
+            return res.status(400).json({ 
+                error: 'Either PO Number or Delivery ID is required' 
+            });
+        }
+
+        // Build search query based on available fields
+        let searchQuery: string;
+        let searchParams: any[];
         
-        const searchParams = deliveryId ? [poNumber, deliveryId] : [poNumber];
+        if (poNumber && deliveryId) {
+            // Both fields provided - search with both
+            searchQuery = 'SELECT * FROM reference_submissions WHERE LOWER(po_number) = LOWER($1) AND LOWER(delivery_id) = LOWER($2)';
+            searchParams = [poNumber.trim(), deliveryId.trim()];
+        } else if (poNumber) {
+            // Only PO Number provided
+            searchQuery = 'SELECT * FROM reference_submissions WHERE LOWER(po_number) = LOWER($1)';
+            searchParams = [poNumber.trim()];
+        } else {
+            // Only Delivery ID provided
+            searchQuery = 'SELECT * FROM reference_submissions WHERE LOWER(delivery_id) = LOWER($1)';
+            searchParams = [deliveryId.trim()];
+        }
+
         const referencesResult = await pool.query(searchQuery, searchParams);
 
         if (referencesResult.rows.length === 0) {
-            return res.status(404).json({ error: 'No references found for the provided PO/Delivery' });
+            return res.status(404).json({ 
+                error: 'No references found for the provided information' 
+            });
         }
 
         if (postcode) {
-            // For postcode verification, we would need to validate against delivery address
-            // This is a placeholder - in real implementation, you'd validate against delivery postcode
-            // For now, we'll assume validation passes and return references directly
+            // Postcode verification - validate against delivery postcode
+            const postcodeToCheck = postcode.trim().toUpperCase();
             
-            // Log access
+            // Check if any of the found references have a matching postcode
+            const matchingReferences = referencesResult.rows.filter((row: any) => {
+                const referencePostcode = (row.delivery_postcode || '').trim().toUpperCase();
+                return referencePostcode === postcodeToCheck;
+            });
+
+            if (matchingReferences.length === 0) {
+                return res.status(403).json({ 
+                    error: 'Postcode verification failed. The provided postcode does not match the delivery address.' 
+                });
+            }
+
+            // Log successful postcode access
             await pool.query(
                 'INSERT INTO customer_access_logs (po_number, delivery_id, access_method, accessed_at, ip_address) VALUES ($1, $2, $3, NOW(), $4)',
-                [poNumber, deliveryId || '', 'postcode', clientIp]
+                [poNumber || '', deliveryId || '', 'postcode', clientIp]
             );
 
             res.json({ 
-                references: referencesResult.rows.map((row: any) => ({
+                references: matchingReferences.map((row: any) => ({
                     poNumber: row.po_number,
                     deliveryId: row.delivery_id,
                     referenceNumber: row.reference_number,
                     validationNumber: row.validation_number,
-                    submittedAt: row.submitted_at
+                    submittedAt: row.submitted_at,
+                    deliveryPostcode: row.delivery_postcode
                 }))
             });
         } else if (email) {
-            // Generate access token
+            // Generate access token for email-based access
             const token = uuidv4();
             const expiresAt = new Date(Date.now() + (24 * 60 * 60 * 1000)); // 24 hours
 
             await pool.query(
                 'INSERT INTO access_tokens (token, po_number, delivery_id, expires_at) VALUES ($1, $2, $3, $4)',
-                [token, poNumber, deliveryId || '', expiresAt]
+                [token, poNumber || '', deliveryId || '', expiresAt]
             );
 
             // Send access email
             const accessUrl = `${req.protocol}://${req.get('host')}/api/customer/access/${token}`;
-            await sendAccessLink(email, poNumber, deliveryId || '', accessUrl);
+            await sendAccessLink(email, poNumber || '', deliveryId || '', accessUrl);
 
             // Log access attempt
             await pool.query(
                 'INSERT INTO customer_access_logs (po_number, delivery_id, access_method, accessed_by_email, accessed_at, ip_address) VALUES ($1, $2, $3, $4, NOW(), $5)',
-                [poNumber, deliveryId || '', 'email', email, clientIp]
+                [poNumber || '', deliveryId || '', 'email', email, clientIp]
             );
 
             res.json({ message: 'Access link sent to your email' });
@@ -418,20 +451,34 @@ router.get('/access/:token', async (req, res) => {
 router.get('/references/:identifier', async (req, res) => {
     try {
         const { identifier } = req.params;
-        const { deliveryId } = req.query;
+        const { deliveryId, searchType } = req.query;
 
-        // This endpoint assumes the user has already been authenticated via postcode
-        // In a real implementation, you'd validate the session or require additional auth
-
-        const searchQuery = deliveryId 
-            ? 'SELECT * FROM reference_submissions WHERE LOWER(po_number) = LOWER($1) AND LOWER(delivery_id) = LOWER($2)'
-            : 'SELECT * FROM reference_submissions WHERE LOWER(po_number) = LOWER($1)';
+        // Determine search type based on parameters
+        let searchQuery: string;
+        let searchParams: any[];
         
-        const searchParams = deliveryId ? [identifier, deliveryId] : [identifier];
+        if (deliveryId) {
+            // Both identifier and deliveryId provided - search by both
+            searchQuery = 'SELECT * FROM reference_submissions WHERE LOWER(po_number) = LOWER($1) AND LOWER(delivery_id) = LOWER($2)';
+            searchParams = [identifier, deliveryId];
+        } else if (searchType === 'delivery') {
+            // Search by delivery ID only
+            searchQuery = 'SELECT * FROM reference_submissions WHERE LOWER(delivery_id) = LOWER($1)';
+            searchParams = [identifier];
+        } else {
+            // Default: search by PO Number
+            searchQuery = 'SELECT * FROM reference_submissions WHERE LOWER(po_number) = LOWER($1)';
+            searchParams = [identifier];
+        }
+
         const referencesResult = await pool.query(searchQuery, searchParams);
 
         if (referencesResult.rows.length === 0) {
-            return res.status(404).json({ error: 'No references found' });
+            return res.status(404).json({ 
+                error: 'No references found for the provided information',
+                searchType: searchType || 'po_number',
+                identifier: identifier
+            });
         }
 
         res.json({ 
@@ -440,8 +487,11 @@ router.get('/references/:identifier', async (req, res) => {
                 deliveryId: row.delivery_id,
                 referenceNumber: row.reference_number,
                 validationNumber: row.validation_number,
-                submittedAt: row.submitted_at
-            }))
+                submittedAt: row.submitted_at,
+                deliveryPostcode: row.delivery_postcode
+            })),
+            searchType: searchType || 'po_number',
+            totalFound: referencesResult.rows.length
         });
     } catch (error) {
         console.error('Error fetching references:', error);

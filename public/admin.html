@@ -451,6 +451,22 @@
             transform: scale(1.05);
         }
 
+        .direct-activate-btn {
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .direct-activate-btn:hover {
+            background-color: #218838;
+        }
+
         .detail-view {
             display: none;
             width: 100%;
@@ -833,7 +849,8 @@
                         <button class="copy-btn" onclick="copyLink('${link.url || ''}')" title="Copy Link">📋</button>
                         <button class="copy-btn" onclick="showDetailView('${link.id || ''}')" title="View Details">👁️</button>
                         ${link.state === 'Pending' ? 
-                            `<button class="activate-btn" onclick="activateLink('${link.id || ''}')" title="Activate Link">✅</button>` : 
+                            `<button class="activate-btn" onclick="activateLink('${link.id || ''}')" title="Activate Link">✅</button>
+                             <button class="direct-activate-btn" onclick="directActivateLink('${link.id || ''}')" title="Direct Activate (Bypass OTP)">🚀</button>` : 
                             link.state === 'Active' ? 
                                 `<button class="freeze-btn" onclick="freezeLink('${link.id || ''}')" title="Freeze Link">❄️</button>` : 
                                 link.state === 'Frozen' ?
@@ -1014,6 +1031,35 @@
                 return;
             }
             await activateLink(currentLinkId);
+        }
+
+        async function directActivateLink(linkId) {
+            if (!linkId) {
+                console.error('directActivateLink called with undefined linkId');
+                alert('Error: Invalid link ID');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/links/${linkId}/activate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    loadLinks(); // Refresh the table
+                    alert('Link activated directly (bypassing OTP) successfully!');
+                    showMainView(); // Go back to main view
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error activating link directly:', error);
+                alert('Failed to activate link directly. Please try again.');
+            }
         }
 
         async function freezeLinkFromDetail() {

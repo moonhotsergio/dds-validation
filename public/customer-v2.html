@@ -969,8 +969,6 @@
                         </div>
                         <div class="submit-section">
                             <button type="submit" class="submit-btn">Access References</button>
-                            <button type="button" class="btn btn-secondary" onclick="testBypassPostcode()">Skip Postcode (Test)</button>
-                            <button type="button" class="btn btn-secondary" onclick="testDisplayReferences()">Test Display</button>
                         </div>
                     </form>
                 </div>
@@ -1302,64 +1300,6 @@
             
             // Clear forms
             document.getElementById('postcode-form').reset();
-        }
-
-        function testBypassPostcode() {
-            const poNumber = document.getElementById('po-number-postcode').value;
-            const deliveryId = document.getElementById('delivery-id-postcode').value;
-            
-            if (!poNumber) {
-                showAlert('Please enter a PO Number', 'error');
-                return;
-            }
-
-            // Set a valid postcode from sample data and submit
-            let testPostcode = 'SW1A 1AA'; // Default for po010
-            if (poNumber === 'po0100') {
-                testPostcode = 'M1 1AA';
-            } else if (poNumber === 'po0200') {
-                testPostcode = 'B1 1AA';
-            }
-            
-            document.getElementById('postcode').value = testPostcode;
-            
-            // Trigger the postcode form submission
-            const formData = {
-                poNumber: poNumber,
-                deliveryId: deliveryId,
-                postcode: testPostcode
-            };
-
-            submitAccessRequest(formData);
-        }
-
-        // Test function to simulate reference display
-        function testDisplayReferences() {
-            const testReferences = [
-                {
-                    poNumber: 'po010',
-                    deliveryId: 'del010',
-                    referenceNumber: 'rn123',
-                    validationNumber: '123',
-                    submittedAt: '2025-07-31T15:53:49.000Z'
-                },
-                {
-                    poNumber: 'po0100',
-                    deliveryId: 'del0100',
-                    referenceNumber: 'rn111',
-                    validationNumber: '111',
-                    submittedAt: '2025-07-31T15:53:49.000Z'
-                },
-                {
-                    poNumber: 'po0100',
-                    deliveryId: 'del0100',
-                    referenceNumber: 'rn222',
-                    validationNumber: '222',
-                    submittedAt: '2025-07-31T17:19:42.000Z'
-                }
-            ];
-            
-            displayReferences(testReferences);
         }
 
         async function submitAccessRequest(formData) {
