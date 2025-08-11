@@ -6,6 +6,7 @@ import path from 'path';
 import { generalLimiter } from './middleware/rateLimiter';
 import supplierRoutes from './routes/supplier';
 import customerRoutes from './routes/customer';
+import adminRoutes from './routes/admin';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 // API routes
 app.use('/api/supplier', supplierRoutes);
 app.use('/api/customer', customerRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -60,6 +62,9 @@ app.get('/customer-v2', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/customer-v2.html'));
 });
 
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/admin.html'));
+});
 
 // Error handling middleware
 app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

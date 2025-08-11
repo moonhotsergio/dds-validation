@@ -3,7 +3,7 @@
 ## Project Overview
 External Reference Number Portal for supplier-customer reference exchange with modern UI/UX design.
 
-## Current Status: ✅ COMPLETED + ✅ SUPPLIER ID MANAGEMENT COMPLETED
+## Current Status: ✅ COMPLETED + ✅ SUPPLIER ID MANAGEMENT COMPLETED + ✅ ADMIN LINK GENERATOR COMPLETED
 
 ### ✅ Completed Features
 
@@ -61,6 +61,22 @@ External Reference Number Portal for supplier-customer reference exchange with m
 - ✅ **USER EXPERIENCE IMPROVED**: Added "New Search" button for easy navigation back to search form
 - ✅ **USER EXPERIENCE IMPROVED**: Proper state management between search and results views
 
+#### 4. **Admin Link Generator Portal (admin.html)**
+- ✅ **ADMIN LINK GENERATOR COMPLETED**
+- ✅ Modern admin interface matching Figma designs
+- ✅ Link generation form with supplier details
+- ✅ Links table with status management (Active/Pending/Frozen)
+- ✅ Detail view for individual link management
+- ✅ Success confirmation modal with copy link functionality
+- ✅ Freeze/Unfreeze link functionality
+- ✅ Email notification to suppliers when links are generated
+- ✅ Responsive design with mobile optimization
+- ✅ Status badges with color coding
+- ✅ Copy to clipboard functionality
+- ✅ Backend API endpoints for link management
+- ✅ Database schema for admin-generated links
+- ✅ Integration with existing supplier validation system
+
 ### **Supplier Submit Button - FIXED:**
 - ✅ **BACKEND API**: Added new `/api/supplier/bulk-submit` endpoint for submitting multiple references
 - ✅ **VALIDATION SCHEMA**: Created `bulkReferencesSubmissionSchema` for proper data validation
@@ -77,27 +93,31 @@ External Reference Number Portal for supplier-customer reference exchange with m
 - ✅ **SUBMISSION DEBUGGING ADDED**: Added comprehensive logging and error handling to troubleshoot submission issues
 - ✅ **SUBMISSION DEBUGGING ADDED**: Added test submission button to populate form with sample data for testing
 
-#### 4. **Server Infrastructure**
+#### 5. **Server Infrastructure**
 - ✅ Express.js server with TypeScript
 - ✅ Security middleware (Helmet, CORS, Rate Limiting)
-- ✅ API routes for supplier and customer
+- ✅ API routes for supplier, customer, and admin
 - ✅ Static file serving
 - ✅ Environment variable configuration
 - ✅ Error handling middleware
 
-#### 5. **Database Integration**
+#### 6. **Database Integration**
 - ✅ SQLite database setup
 - ✅ PostgreSQL support (optional)
 - ✅ Migration system
 - ✅ Schema management
+- ✅ **NEW**: Admin supplier links table schema
 
-#### 6. **API Endpoints**
+#### 7. **API Endpoints**
 - ✅ Customer access request (`/api/customer/request-access`)
 - ✅ Reference download (`/api/customer/download-csv`)
 - ✅ Share link generation (`/api/customer/generate-link`)
 - ✅ Token-based access (`/api/customer/access/:token`)
 - ✅ Supplier submissions (`/api/supplier/submissions`)
 - ✅ Supplier bulk submit (`/api/supplier/bulk-submit`)
+- ✅ **NEW**: Admin link generation (`/api/admin/generate-link`)
+- ✅ **NEW**: Admin links management (`/api/admin/links`)
+- ✅ **NEW**: Admin link state updates (`/api/admin/links/:id/state`)
 
 ## Technical Implementation
 
@@ -127,18 +147,70 @@ dds-validation/
 ├── public/
 │   ├── customer-v2.html      # ✅ Modern customer portal
 │   ├── supplier-v2.html      # ✅ Modern supplier portal + 🔧 Simplified Supplier ID
+│   ├── admin.html            # ✅ NEW: Admin link generator portal
 │   ├── index.html            # ✅ Landing page
 │   └── assets/               # ✅ Static assets
 ├── src/
-│   ├── server.ts             # ✅ Main server file
-│   ├── routes/               # ✅ API routes (simplified)
+│   ├── server.ts             # ✅ Main server file + 🔧 Admin routes
+│   ├── routes/               # ✅ API routes (simplified) + 🔧 Admin routes
 │   ├── middleware/           # ✅ Security middleware
-│   ├── database/             # ✅ Database connections
-│   └── utils/                # ✅ Utility functions
+│   ├── database/             # ✅ Database connections + 🔧 Admin schema
+│   └── utils/                # ✅ Utility functions + 🔧 Email updates
 └── _plans-docs/             # ✅ Documentation
 ```
 
 ## Recent Changes Applied
+
+### 🔧 Admin Link Generator - COMPLETED
+
+#### **Admin Portal Features**
+1. **Link Generation Form**
+   - Supplier name and email input
+   - Valid until date selection
+   - Admin notes field
+   - Generate button with validation
+
+2. **Links Management Table**
+   - Shared with (email) column
+   - URL column with copy functionality
+   - Created on date
+   - Valid until date
+   - State column (Active/Pending/Frozen)
+   - Actions (copy link, view details)
+
+3. **Detail View**
+   - Complete link information display
+   - Freeze/Unfreeze functionality
+   - State management between Active/Frozen
+   - Back to main view navigation
+
+4. **Success Modal**
+   - Link generation confirmation
+   - Copy link functionality
+   - View details option
+   - Close window option
+
+#### **Backend Implementation**
+1. **Database Schema**
+   - `admin_supplier_links` table
+   - Columns: shared_with, url, created_on, state, valid_until, supplier_name, admin_notes
+
+2. **API Endpoints**
+   - `POST /api/admin/generate-link` - Generate new supplier link
+   - `GET /api/admin/links` - Get all generated links
+   - `GET /api/admin/links/:id` - Get specific link details
+   - `PATCH /api/admin/links/:id/state` - Update link state
+   - `DELETE /api/admin/links/:id` - Freeze link (soft delete)
+
+3. **Email Integration**
+   - Automatic email to suppliers when links are generated
+   - Professional email template with access link
+   - Fallback handling if email fails
+
+4. **Integration with Existing System**
+   - Creates supplier_links records for validation
+   - Links to existing supplier validation flow
+   - Maintains data consistency
 
 ### 🔧 Supplier ID Management - MOVED TO URL
 
@@ -169,8 +241,10 @@ dds-validation/
 - ✅ **Development Server**: Running on http://127.0.0.1:3004
 - ✅ **Customer Portal**: http://127.0.0.1:3004/customer
 - ✅ **Supplier Portal**: http://127.0.0.1:3004/supplier-v2
+- ✅ **Admin Portal**: http://127.0.0.1:3004/admin
 - ✅ **Health Check**: http://127.0.0.1:3004/health
 - 🔧 **Supplier ID in URL**: Clean, minimal approach operational
+- ✅ **Admin Link Generator**: Fully functional with email integration
 
 ## Next Steps (Future Enhancements)
 
@@ -223,6 +297,7 @@ SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 FROM_EMAIL=your-email@gmail.com
+BASE_URL=http://localhost:3004
 ```
 
 ## Development Commands
@@ -246,10 +321,12 @@ npm run migrate
 ## Notes
 - The project successfully implements a modern, responsive UI design
 - Both supplier and customer portals are fully functional
+- **NEW**: Admin portal for generating and managing supplier links is complete
 - Server is properly configured with security middleware
 - Database integration is working with SQLite
 - All API endpoints are implemented and tested
 - The design follows modern UX principles with smooth animations
 - 🔧 **MOVED TO URL**: Supplier ID management now follows a clean, minimal approach with ID in URL as requested
+- ✅ **ADMIN PORTAL**: Complete link generation and management system operational
 
-**Status**: ✅ **PRODUCTION READY** + 🔧 **SUPPLIER ID MOVED TO URL** - All core features implemented and tested, with supplier ID now in URL as requested.
+**Status**: ✅ **PRODUCTION READY** + 🔧 **SUPPLIER ID MOVED TO URL** + ✅ **ADMIN LINK GENERATOR COMPLETED** - All core features implemented and tested, with supplier ID now in URL as requested and admin portal fully functional.

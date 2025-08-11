@@ -1,5 +1,17 @@
 -- External Reference Number Portal Database Schema
 
+-- Admin-generated supplier links
+CREATE TABLE admin_supplier_links (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    shared_with VARCHAR(255) NOT NULL,
+    url VARCHAR(500) NOT NULL UNIQUE,
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    state VARCHAR(20) NOT NULL DEFAULT 'Pending' CHECK (state IN ('Active', 'Pending', 'Frozen')),
+    valid_until TIMESTAMP NOT NULL,
+    supplier_name VARCHAR(255),
+    admin_notes TEXT
+);
+
 -- Supplier access tokens
 CREATE TABLE supplier_links (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
