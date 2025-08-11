@@ -854,10 +854,6 @@
                             <button class="role-tab active" onclick="switchRole('supplier')">Supplier</button>
                             <div class="role-divider"></div>
                             <button class="role-tab" onclick="switchRole('customer')">Customer</button>
-                            <div class="role-divider"></div>
-                                                        <button class="role-tab refresh-btn" onclick="refreshAuthentication()" title="Refresh Authentication">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
                         </div>
                         
 
@@ -1110,9 +1106,9 @@
             if (role === 'customer') {
                 const supplierLinkId = getSupplierLinkId();
                 if (supplierLinkId) {
-                    window.location.href = `/customer-v2?fromSupplier=${supplierLinkId}`;
+                    window.location.href = `/customer?fromSupplier=${supplierLinkId}`;
                 } else {
-                    window.location.href = '/customer-v2';
+                    window.location.href = '/customer';
                 }
             }
         }
@@ -1604,14 +1600,6 @@
             }
         }
 
-        // Function to refresh authentication and reload data
-        async function refreshAuthentication() {
-            const isAuthenticated = await initializeSupplier();
-            if (isAuthenticated) {
-                await loadHistory();
-            }
-        }
-        
         function applyHistoryFilters() {
             historyFilters = {
                 poNumber: document.getElementById('po-filter').value,
