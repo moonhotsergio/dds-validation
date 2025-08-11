@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal - Interu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            line-height: 1.6; 
+            color: #000000; 
+            background: radial-gradient(circle, #dfeeda, #c0d9bd, #a2c6a3);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background image layer */
+        body::before {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 50vw;
+            height: 100vh;
+            background-image: url('/bg-image.png');
+            background-position: right bottom;
+            background-repeat: no-repeat;
+            background-size: 50vw auto;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .interface-container {
+            position: fixed;
+            top: 140px;
+            left: 60px;
+            z-index: 2;
+            transform: scale(1.2);
+            transform-origin: top left;
+        }
+
+        .wrapper-card {
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            padding: 20px 20px 20px 20px;
+            border: 1px solid #f3f3f3;
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
+            backdrop-filter: blur(10px);
+            transition: width 0.3s ease;
+            min-height: 600px;
+        }
+
+        /* Wrapper width based on content (including padding) */
+        .wrapper-card.no-references {
+            width: 460px; /* 420px content + 40px padding */
+        }
+
+        .wrapper-card.has-references {
+            width: 840px; /* 800px content + 40px padding */
+        }
+
+        .logo {
+            position: fixed;
+            top: 30px;
+            left: 60px;
+            z-index: 3;
+            height: 51px;
+            width: 167.414px;
+        }
+
+        .logo img {
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+            width: 167.414px;
+            height: 51px;
+            object-fit: contain;
+        }
+
+        /* Role Tabs */
+        .role-tabs {
+            display: flex;
+            gap: 11px;
+            margin-bottom: 20px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .role-tab {
+            flex: 1;
+            padding: 0;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 24px;
+            color: #00251c;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 24px;
+        }
+
+        .role-tab.active {
+            color: #00251c;
+            font-weight: 700;
+        }
+
+        .role-tab:not(.active) {
+            color: #868b90;
+            font-weight: 500;
+        }
+
+        .role-divider {
+            width: 1px;
+            height: 24px;
+            background: #d9d9d9;
+            flex-shrink: 0;
+        }
+
+
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #000000;
+            margin-bottom: 4px;
+            line-height: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #c3c6c8;
+            border-radius: 999px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            background: white;
+            transition: border-color 0.3s ease;
+            height: 36px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00993a;
+            box-shadow: 0 0 0 3px rgba(0, 153, 58, 0.1);
+        }
+
+        /* Access Method Section */
+        .access-method {
+            background: rgba(249,251,252,0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(7.25px);
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            margin-bottom: 15px;
+        }
+
+        .section-header h3 {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            color: #000000;
+            margin: 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Submit Button */
+        .submit-section {
+            margin-top: 20px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .submit-btn {
+            background: #000000;
+            color: rgba(255,255,255,0.8);
+            border: none;
+            padding: 9px 18px;
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 36px;
+            line-height: 20px;
+        }
+
+        .submit-btn:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            background: #00993a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px 4px;
+        }
+
+        .btn:hover {
+            background: #007a2e;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #00251c;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        /* References Display */
+        .references-section {
+            display: none;
+            width: 100%;
+        }
+
+        .references-section.visible {
+            display: block;
+        }
+
+        .reference-group {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .group-header {
+            background: linear-gradient(135deg, #4a7c59, #6a9969);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .group-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .group-subtitle {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .references-table {
+            background: white;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr auto;
+            gap: 15px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .table-row {
+            padding: 15px;
+            border-bottom: 1px solid #f1f3f4;
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .table-row:hover {
+            background: #f8f9fa;
+        }
+
+        .ref-number {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .val-number {
+            color: #28a745;
+        }
+
+        .submitted-time {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .copy-btn {
+            font-size: 0.8em;
+            padding: 5px 10px;
+        }
+
+        .reference-actions {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        /* Share Section */
+        .share-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .share-section.visible {
+            display: block;
+        }
+
+        .share-form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .generated-link {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            word-break: break-all;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .generated-link.visible {
+            display: block;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Utility Classes */
+        .hidden { 
+            display: none !important; 
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .interface-container {
+                transform: scale(1);
+                left: 20px;
+                top: 100px;
+            }
+            
+            .wrapper-card {
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Content Area (Two columns) */
+        .content-area {
+            display: flex;
+            gap: 20px;
+            align-items: stretch;
+            margin-top: 0;
+        }
+
+        /* Column 1: Order Details (when in two-column mode) */
+        .column-1 {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            margin-top: 0;
+            width: 420px;
+            padding: 24px;
+            background: transparent;
+            border-radius: 16px;
+            backdrop-filter: none;
+            border: none;
+            box-shadow: none;
+            overflow: hidden;
+            transition: width 0.3s ease;
+        }
+
+        /* Column 1 width based on active state - keep fixed width like supplier */
+        .column-1.forms-active {
+            width: 420px;
+        }
+
+
+
+        /* Header (Always visible in Column 1) */
+        .header {
+            margin-bottom: 20px;
+            margin-top: 0;
+        }
+
+        /* Access Panel (Only when access active) */
+        .access-panel {
+            display: block;
+        }
+
+        .access-panel.hidden {
+            display: none;
+        }
+
+        /* Order Details Panel */
+        .order-details-panel {
+            display: block;
+        }
+
+        .order-details-panel.hidden {
+            display: none;
+        }
+
+
+
+        /* Order Info Card - Exact Figma Design */
+        .order-info-card {
+            background: rgba(249,251,252,0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            padding: 20px 10px;
+            backdrop-filter: blur(7.25px);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: stretch;
+            justify-content: flex-start;
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .order-info-row {
+            display: flex;
+            flex-direction: row;
+            gap: 11px;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            position: relative;
+            flex-shrink: 0;
+            width: 100%;
+        }
+
+        .order-info-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            position: relative;
+            flex-shrink: 0;
+            color: #000000;
+            font-size: 18px;
+            white-space: nowrap;
+        }
+
+        .order-label {
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .order-value {
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        .order-divider {
+            background: #d9d9d9;
+            height: 22px;
+            flex-shrink: 0;
+            width: 1px;
+        }
+
+        .order-latest {
+            display: flex;
+            flex-direction: column;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 300;
+            justify-content: center;
+            line-height: 1.2;
+            position: relative;
+            flex-shrink: 0;
+            color: #000000;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .order-latest span {
+            display: block;
+            margin-bottom: 0;
+        }
+
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #f3f3f3;
+        }
+
+        .order-actions .btn {
+            background: #f8f9fa;
+            color: #00251c;
+            border: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .order-actions .btn:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        /* Content Area */
+        .content-area {
+            display: flex;
+            gap: 20px;
+            align-items: stretch;
+            margin-top: 0;
+        }
+
+        /* Column 2: Reference Panel */
+        .reference-panel {
+            width: 360px;
+            flex-shrink: 0;
+            height: auto;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255,255,255,0.6);
+            border-radius: 10px;
+            border: 1px solid #f3f3f3;
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
+            padding: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .reference-panel::before {
+            content: '';
+            position: absolute;
+            border: 1px solid #f3f3f3;
+            border-radius: 10px;
+            inset: 0;
+            pointer-events: none;
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
+        }
+
+        .reference-header {
+            position: relative;
+            height: 50px;
+            margin-bottom: 11px;
+            z-index: 1;
+        }
+
+        .reference-header h3 {
+            position: absolute;
+            left: 0;
+            top: 7px;
+            transform: translateY(-50%);
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            color: #000000;
+            margin: 0;
+            line-height: 14px;
+            width: 317px;
+        }
+
+        .reference-actions {
+            position: absolute;
+            left: 0;
+            top: 30px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .action-link {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #00993a;
+            text-decoration: none;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 14px;
+            padding-bottom: 6px;
+            padding-top: 0;
+            padding-left: 0;
+            padding-right: 0;
+            border-bottom: 0.7px solid #00993a;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .action-link::before {
+            content: '';
+            position: absolute;
+            border: 0.7px solid #00993a;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .action-link:hover {
+            color: #007a2e;
+        }
+
+        .action-link i {
+            font-size: 10px;
+            width: 10px;
+            height: 12px;
+        }
+
+        .reference-table-container {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Reference Cards */
+        .reference-card {
+            background: #f9fbfc;
+            border: 0.5px solid #000000;
+            border-radius: 10px;
+            padding: 20px 10px;
+            margin-bottom: 11px;
+            margin-top: 8px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            width: 100%;
+        }
+
+        .reference-card.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+
+        .reference-field {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+        .reference-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .reference-field-label {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #525961;
+            white-space: nowrap;
+            line-height: 14px;
+        }
+
+        .reference-field-value {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid #e4e4e4;
+            border-radius: 999px;
+            padding: 10px 12px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #767676;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+            height: 28px;
+            box-sizing: border-box;
+        }
+
+        .reference-field-value.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+
+        /* Table Styles - Exact Figma Design */
+        .reference-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 7.539px;
+            overflow: hidden;
+        }
+
+        .reference-table thead {
+            background: #f3f3f3;
+        }
+
+        .reference-table th {
+            padding: 6.597px 8px;
+            text-align: left;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            color: #5a5a5a;
+            font-size: 11px;
+            line-height: normal;
+            border-bottom: 0.942px solid #efefef;
+            height: 37.694px;
+            min-height: 37.694px;
+            max-height: 37.694px;
+        }
+
+        .reference-table td {
+            padding: 0 10px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 400;
+            color: #00251c;
+            font-size: 13.193px;
+            line-height: normal;
+            border-bottom: 0.942px solid #efefef;
+            height: 40px;
+            min-height: 37.694px;
+            position: relative;
+        }
+
+        .reference-table td::before {
+            content: '';
+            position: absolute;
+            border-bottom: 0.942px solid #efefef;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .reference-table tbody tr:nth-child(odd) {
+            background: #e5f5eb;
+        }
+
+        .reference-table tbody tr:nth-child(even) {
+            background: #ffffff;
+        }
+
+        .reference-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Submitted column with copy icon */
+        .reference-table td:last-child {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .reference-table .submitted-time {
+            color: #00251c;
+            font-size: 10px;
+            line-height: normal;
+            flex: 1;
+        }
+
+        .reference-table .copy-icon {
+            width: 10px;
+            height: 12px;
+            color: #00993a;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .reference-table .copy-icon:hover {
+            color: #007a2e;
+        }
+
+        /* Reference Cards */
+        .reference-card {
+            background: #f9fbfc;
+            border: 0.5px solid #000000;
+            border-radius: 10px;
+            padding: 20px 10px;
+            margin-bottom: 11px;
+            margin-top: 8px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            width: 100%;
+        }
+
+        .reference-card.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+
+        .reference-field {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+        .reference-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .reference-field-label {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #525961;
+            white-space: nowrap;
+            line-height: 14px;
+        }
+
+        .reference-field-value {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid #e4e4e4;
+            border-radius: 999px;
+            padding: 10px 12px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #767676;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+            height: 28px;
+            box-sizing: border-box;
+        }
+
+        .reference-field-value.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo -->
+    <div class="logo">
+        <img src="/Interu_Logo_white.svg" alt="Interu Logo" width="167.414" height="51">
+    </div>
+    
+    <div class="interface-container">
+        <!-- Main Wrapper Card -->
+        <div class="wrapper-card no-references" id="wrapper-card">
+
+            <!-- Access Panel (Only when access active) -->
+            <div id="access-panel" class="access-panel">
+                <!-- Role Tabs -->
+                <div class="role-tabs">
+                    <button class="role-tab" onclick="switchRole('supplier')">Supplier</button>
+                    <div class="role-divider"></div>
+                    <button class="role-tab active" onclick="switchRole('customer')">Customer</button>
+                </div>
+
+                <!-- Access Method Section -->
+                <div class="access-method">
+                    <div class="section-header">
+                        <h3>Access with Postcode Verification</h3>
+                    </div>
+                    <form id="postcode-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="po-number-postcode">PO Number</label>
+                                <input type="text" id="po-number-postcode" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="delivery-id-postcode">Delivery ID (Optional)</label>
+                                <input type="text" id="delivery-id-postcode">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="postcode">Delivery Postcode</label>
+                            <input type="text" id="postcode" placeholder="e.g., SW1A 1AA" required>
+                        </div>
+                        <div class="submit-section">
+                            <button type="submit" class="submit-btn">Access References</button>
+                            <button type="button" class="btn btn-secondary" onclick="testBypassPostcode()">Skip Postcode (Test)</button>
+                            <button type="button" class="btn btn-secondary" onclick="testDisplayReferences()">Test Display</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Content Area for Two Columns (when references shown) -->
+            <div class="content-area" id="content-area" style="display: none;">
+                <!-- Column 1: Order Details -->
+                <div class="column-1">
+                    <!-- Role Tabs -->
+                    <div class="role-tabs">
+                        <button class="role-tab" onclick="switchRole('supplier')">Supplier</button>
+                        <div class="role-divider"></div>
+                        <button class="role-tab active" onclick="switchRole('customer')">Customer</button>
+                    </div>
+
+                    <div class="order-info-card">
+                        <div class="order-info-row">
+                            <div class="order-info-item">
+                                <span class="order-label">PO:</span>
+                                <span class="order-value" id="po-display-column">po0100</span>
+                            </div>
+                            <div class="order-divider"></div>
+                            <div class="order-info-item">
+                                <span class="order-label">Delivery:</span>
+                                <span class="order-value" id="delivery-display-column">del0100</span>
+                            </div>
+                        </div>
+                        <div class="order-latest">
+                            <span id="latest-display-column">Latest: 31/07/2025, 17:19:42</span>
+                        </div>
+                    </div>
+
+                    <div class="order-actions">
+                        <button class="btn btn-secondary" onclick="newSearch()">
+                            <i class="fas fa-search"></i> New Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Column 2: Reference Panel -->
+                <div class="reference-panel" id="reference-panel">
+                    <div class="reference-header">
+                        <h3>Your Reference Numbers</h3>
+                        <div class="reference-actions">
+                            <a href="#" onclick="copyAllReferences()" class="action-link">
+                                <i class="fas fa-copy"></i> Copy all
+                            </a>
+                            <a href="#" onclick="downloadAllCSV()" class="action-link">
+                                <i class="fas fa-download"></i> Download All as CSV
+                            </a>
+                        </div>
+                    </div>
+                    <div class="reference-table-container">
+                        <table class="reference-table">
+                            <thead>
+                                <tr>
+                                    <th>Reference Number</th>
+                                    <th>Validation Number</th>
+                                    <th>Submitted</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reference-table-body">
+                                <!-- References will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alert-container"></div>
+
+    <script>
+        let currentData = null;
+
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        // Role switching
+        function switchRole(role) {
+            const tabs = document.querySelectorAll('.role-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update UI based on role
+            if (role === 'supplier') {
+                // Check if we came from a specific supplier link
+                const urlParams = new URLSearchParams(window.location.search);
+                const fromSupplier = urlParams.get('fromSupplier');
+                
+                if (fromSupplier) {
+                    // Go back to the specific supplier link
+                    window.location.href = `/supplier/${fromSupplier}`;
+                } else {
+                    // Fallback to a default supplier page or show error
+                    alert('No supplier link found. Please access the supplier portal directly.');
+                }
+            }
+        }
+
+
+
+        // Postcode form handler
+        document.getElementById('postcode-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                poNumber: document.getElementById('po-number-postcode').value,
+                deliveryId: document.getElementById('delivery-id-postcode').value,
+                postcode: document.getElementById('postcode').value.toUpperCase()
+            };
+
+            await submitAccessRequest(formData);
+        });
+
+        function displayReferences(references) {
+            const referencePanel = document.getElementById('reference-panel');
+            const accessPanel = document.getElementById('access-panel');
+            const wrapperCard = document.getElementById('wrapper-card');
+            const column1 = document.querySelector('.column-1');
+            
+            // Group references by PO/Delivery
+            const grouped = {};
+            references.forEach(ref => {
+                const key = `${ref.poNumber}-${ref.deliveryId}`;
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        poNumber: ref.poNumber,
+                        deliveryId: ref.deliveryId,
+                        references: [],
+                        latestSubmission: ref.submittedAt
+                    };
+                }
+                grouped[key].references.push({
+                    referenceNumber: ref.referenceNumber,
+                    validationNumber: ref.validationNumber,
+                    submittedAt: ref.submittedAt
+                });
+                
+                // Keep track of latest submission
+                if (new Date(ref.submittedAt) > new Date(grouped[key].latestSubmission)) {
+                    grouped[key].latestSubmission = ref.submittedAt;
+                }
+            });
+
+            // Update order details - show first group or combine multiple
+            const groups = Object.values(grouped);
+            if (groups.length > 0) {
+                if (groups.length === 1) {
+                    // Single PO/Delivery combination
+                    const group = groups[0];
+                    document.getElementById('po-display-column').textContent = group.poNumber;
+                    document.getElementById('delivery-display-column').textContent = group.deliveryId;
+                    document.getElementById('latest-display-column').textContent = `Latest: ${new Date(group.latestSubmission).toLocaleString()}`;
+                } else {
+                    // Multiple PO/Delivery combinations - show combined info
+                    const poNumbers = [...new Set(groups.map(g => g.poNumber))];
+                    const deliveryIds = [...new Set(groups.map(g => g.deliveryId))];
+                    const allLatest = groups.map(g => new Date(g.latestSubmission));
+                    const latest = new Date(Math.max(...allLatest));
+                    
+                    document.getElementById('po-display-column').textContent = poNumbers.join(', ');
+                    document.getElementById('delivery-display-column').textContent = deliveryIds.join(', ');
+                    document.getElementById('latest-display-column').textContent = `Latest: ${latest.toLocaleString()}`;
+                }
+            }
+
+            // Update reference panel
+            updateReferencePanel(references);
+
+            // Show panels and update layout
+            accessPanel.classList.add('hidden');
+            document.getElementById('content-area').style.display = 'flex';
+            referencePanel.style.display = 'block';
+            wrapperCard.classList.add('has-references');
+            wrapperCard.classList.remove('no-references');
+            if (column1) {
+                column1.classList.add('forms-active');
+            }
+        }
+
+        function updateReferencePanel(references) {
+            const tableBody = document.getElementById('reference-table-body');
+            
+            tableBody.innerHTML = '';
+            
+            references.forEach(ref => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ref.referenceNumber}</td>
+                    <td>${ref.validationNumber || '-'}</td>
+                    <td>
+                        <span class="submitted-time">${new Date(ref.submittedAt).toLocaleString()}</span>
+                        <i class="fas fa-copy copy-icon" onclick="copyToClipboard('${ref.referenceNumber}')" title="Copy Reference"></i>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function showShareOptions() {
+            // For now, just show an alert. In a real implementation, this would open a modal or form
+            alert('Share link functionality would be implemented here');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showAlert('Copied to clipboard', 'success');
+            }).catch(() => {
+                showAlert('Failed to copy to clipboard', 'error');
+            });
+        }
+
+        function newSearch() {
+            // Reset to initial state
+            const accessPanel = document.getElementById('access-panel');
+            const wrapperCard = document.getElementById('wrapper-card');
+            const column1 = document.querySelector('.column-1');
+            const contentArea = document.getElementById('content-area');
+            const referencePanel = document.getElementById('reference-panel');
+            
+            // Clear forms
+            document.getElementById('postcode-form').reset();
+            
+            // Reset wrapper card classes
+            wrapperCard.classList.remove('has-references');
+            wrapperCard.classList.add('no-references');
+            
+            // Reset column 1 classes
+            if (column1) {
+                column1.classList.remove('forms-active');
+            }
+            
+            // Hide content area and reference panel
+            contentArea.style.display = 'none';
+            referencePanel.style.display = 'none';
+            
+            // Show access panel
+            accessPanel.classList.remove('hidden');
+            
+            // Clear current data
+            currentData = null;
+        }
+
+        function copyAllReferences() {
+            if (!currentData || !currentData.references) return;
+            
+            const allRefs = currentData.references.map(ref => 
+                `${ref.referenceNumber}${ref.validationNumber ? ` (${ref.validationNumber})` : ''}`
+            ).join(', ');
+            
+            copyToClipboard(allRefs);
+        }
+
+        function downloadAllCSV() {
+            if (!currentData) return;
+            
+            const params = new URLSearchParams();
+            if (currentData.deliveryId) params.append('deliveryId', currentData.deliveryId);
+            
+            const url = `/api/customer/download-csv/${currentData.poNumber}?${params.toString()}`;
+            window.open(url, '_blank');
+        }
+
+        function showShareOptions() {
+            const shareSection = document.getElementById('share-section');
+            shareSection.classList.add('visible');
+        }
+
+        // Share form handler
+        document.getElementById('share-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentData) return;
+
+            const shareData = {
+                poNumber: currentData.poNumber,
+                deliveryId: currentData.deliveryId,
+                password: document.getElementById('share-password').value,
+                expiresInHours: parseInt(document.getElementById('share-expires').value)
+            };
+
+            try {
+                const response = await fetch('/api/customer/generate-link', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(shareData)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('link-url').textContent = data.shareUrl;
+                    document.getElementById('generated-link').classList.add('visible');
+                    showAlert('Shareable link generated successfully', 'success');
+                } else {
+                    showAlert(data.error || 'Failed to generate link', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error occurred', 'error');
+            }
+        });
+
+        function copyLink() {
+            const linkUrl = document.getElementById('link-url').textContent;
+            copyToClipboard(linkUrl);
+        }
+
+        function goBack() {
+            document.getElementById('order-details-panel').classList.add('hidden');
+            document.getElementById('reference-panel').style.display = 'none';
+            document.getElementById('content-area').style.display = 'none';
+            document.getElementById('access-panel').classList.remove('hidden');
+            document.getElementById('wrapper-card').classList.remove('has-references');
+            document.getElementById('wrapper-card').classList.add('no-references');
+            const column1 = document.querySelector('.column-1');
+            if (column1) {
+                column1.classList.remove('forms-active');
+            }
+            currentData = null;
+            
+            // Clear forms
+            document.getElementById('postcode-form').reset();
+        }
+
+        function testBypassPostcode() {
+            const poNumber = document.getElementById('po-number-postcode').value;
+            const deliveryId = document.getElementById('delivery-id-postcode').value;
+            
+            if (!poNumber) {
+                showAlert('Please enter a PO Number', 'error');
+                return;
+            }
+
+            // Set a valid postcode from sample data and submit
+            let testPostcode = 'SW1A 1AA'; // Default for po010
+            if (poNumber === 'po0100') {
+                testPostcode = 'M1 1AA';
+            } else if (poNumber === 'po0200') {
+                testPostcode = 'B1 1AA';
+            }
+            
+            document.getElementById('postcode').value = testPostcode;
+            
+            // Trigger the postcode form submission
+            const formData = {
+                poNumber: poNumber,
+                deliveryId: deliveryId,
+                postcode: testPostcode
+            };
+
+            submitAccessRequest(formData);
+        }
+
+        // Test function to simulate reference display
+        function testDisplayReferences() {
+            const testReferences = [
+                {
+                    poNumber: 'po010',
+                    deliveryId: 'del010',
+                    referenceNumber: 'rn123',
+                    validationNumber: '123',
+                    submittedAt: '2025-07-31T15:53:49.000Z'
+                },
+                {
+                    poNumber: 'po0100',
+                    deliveryId: 'del0100',
+                    referenceNumber: 'rn111',
+                    validationNumber: '111',
+                    submittedAt: '2025-07-31T15:53:49.000Z'
+                },
+                {
+                    poNumber: 'po0100',
+                    deliveryId: 'del0100',
+                    referenceNumber: 'rn222',
+                    validationNumber: '222',
+                    submittedAt: '2025-07-31T17:19:42.000Z'
+                }
+            ];
+            
+            displayReferences(testReferences);
+        }
+
+        async function submitAccessRequest(formData) {
+            try {
+                const response = await fetch('/api/customer/request-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.references) {
+                    currentData = { ...formData, references: data.references };
+                    displayReferences(data.references);
+                } else {
+                    showAlert(data.error || 'No references found', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error occurred', 'error');
+            }
+        }
+
+
+
+        // Check if accessing via token (from URL)
+        const urlParams = new URLSearchParams(window.location.search);
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts.includes('access') && pathParts[pathParts.length - 1]) {
+            // This is handled by the server-side HTML password prompt
+            // No need to load from token here since server handles it
+        } else if (urlParams.get('token') && urlParams.get('authorized')) {
+            const token = urlParams.get('token');
+            loadFromToken(token);
+        }
+
+        async function loadFromToken(token) {
+            try {
+                const response = await fetch(`/api/customer/access/${token}`);
+                const data = await response.json();
+                
+                if (response.ok && data.references) {
+                    displayReferences(data.references);
+                    // Set currentData for download/share functionality
+                    currentData = {
+                        poNumber: data.references[0]?.poNumber,
+                        deliveryId: data.references[0]?.deliveryId
+                    };
+                } else if (response.status === 401 && data.error === 'Password required') {
+                    const password = prompt('Enter password to access references:');
+                    if (password) {
+                        loadFromToken(token + '?password=' + encodeURIComponent(password));
+                    }
+                } else {
+                    showAlert(data.error || 'Failed to access references', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error occurred', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

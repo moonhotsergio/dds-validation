@@ -116,7 +116,7 @@
         .reference-panel {
             width: 360px;
             flex-shrink: 0;
-            height: auto;
+            height: 600px;
             align-self: stretch;
             display: flex;
             flex-direction: column;
@@ -314,11 +314,23 @@
             font-weight: 700;
         }
 
-        .role-tab:not(.active) {
+                .role-tab:not(.active) {
             color: #868b90;
             font-weight: 500;
         }
-
+        
+        .role-tab.refresh-btn {
+            background-color: #6c757d;
+            color: white;
+            min-width: 40px;
+            padding: 8px 12px;
+            flex: 0 0 auto;
+        }
+        
+        .role-tab.refresh-btn:hover {
+            background-color: #5a6268;
+        }
+        
         .role-divider {
             width: 1px;
             height: 24px;
@@ -582,10 +594,25 @@
             overflow-y: auto;
             padding-right: 12px;
             margin-top: 16px;
+            max-height: calc(600px - 60px); /* Account for header height */
         }
 
         .reference-panel .content::-webkit-scrollbar {
-            display: none;
+            width: 8px;
+        }
+
+        .reference-panel .content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .reference-panel .content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .reference-panel .content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
 
         /* Reference Cards */
@@ -675,20 +702,7 @@
             border-color: #ffcfcf;
         }
 
-        /* Custom Scrollbar */
-        .custom-scrollbar {
-            position: absolute;
-            right: 12px;
-            width: 4px;
-            background: #bcbcbc;
-            border-radius: 99px;
-            cursor: pointer;
-            transition: opacity 0.3s ease;
-        }
-
-        .custom-scrollbar:hover {
-            background: #999999;
-        }
+        /* Custom Scrollbar - REMOVED - now using native browser scrollbar */
 
         /* Utility Classes */
         .hidden { 
@@ -818,8 +832,14 @@
                             <button class="role-tab active" onclick="switchRole('supplier')">Supplier</button>
                             <div class="role-divider"></div>
                             <button class="role-tab" onclick="switchRole('customer')">Customer</button>
+                            <div class="role-divider"></div>
+                                                        <button class="role-tab refresh-btn" onclick="refreshAuthentication()" title="Refresh Authentication">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
                         </div>
+                        
 
+                        
                         <!-- Sub Tabs -->
                         <div class="sub-tabs">
                             <button class="sub-tab active" onclick="showTab('submit')">Submit References</button>
@@ -838,15 +858,15 @@
                             <div class="purchase-order-form" id="purchase-order-form">
                                 <div class="form-group">
                                     <label>PO Number</label>
-                                    <input type="text" value="235235">
+                                    <input type="text" id="po-number" placeholder="Enter PO Number">
                                 </div>
                                 <div class="form-group">
                                     <label>Delivery ID</label>
-                                    <input type="text" value="2ffff4">
+                                    <input type="text" id="delivery-id" placeholder="Enter Delivery ID">
                                 </div>
                                 <div class="form-group">
                                     <label>Delivery Postcode</label>
-                                    <input type="text" placeholder="--------">
+                                    <input type="text" id="delivery-postcode" placeholder="Enter Postcode">
                                 </div>
                             </div>
                         </div>
@@ -873,6 +893,7 @@
                         <!-- Submit Button -->
                         <div class="submit-section">
                             <button class="submit-btn" onclick="submitReferences()">Submit References</button>
+                            <button class="btn-add" onclick="testSubmission()" style="margin-left: 10px; background: #f0f0f0; padding: 8px 12px; border-radius: 6px;">Test Submission</button>
                         </div>
                     </div>
 
@@ -935,9 +956,6 @@
     <script>
         let references = [];
         let isPurchaseOrderExpanded = true;
-        let scrollbarHeight = 0;
-        let scrollbarTop = 0;
-        let isScrollbarVisible = false;
 
         // Authentication functions
         function sendOTP() {
@@ -981,7 +999,12 @@
             
             // Update UI based on role
             if (role === 'customer') {
-                window.location.href = '/customer.html';
+                const supplierLinkId = getSupplierLinkId();
+                if (supplierLinkId) {
+                    window.location.href = `/customer-v2?fromSupplier=${supplierLinkId}`;
+                } else {
+                    window.location.href = '/customer-v2';
+                }
             }
         }
 
@@ -1146,59 +1169,9 @@
                 wrapperCard.classList.remove('has-references');
                 wrapperCard.classList.add('no-references');
             }
-            
-            updateCustomScrollbar();
         }
 
-        // Custom scrollbar functionality
-        function updateCustomScrollbar() {
-            const referenceList = document.getElementById('reference-list');
-            const { scrollTop, scrollHeight, clientHeight } = referenceList;
-            
-            // Remove existing scrollbar
-            const existingScrollbar = document.querySelector('.custom-scrollbar');
-            if (existingScrollbar) {
-                existingScrollbar.remove();
-            }
-            
-            // Check if scrolling is needed
-            const needsScrollbar = scrollHeight > clientHeight;
-            isScrollbarVisible = needsScrollbar;
-            
-            if (needsScrollbar) {
-                // Calculate scrollbar height proportional to visible content ratio
-                const visibleRatio = clientHeight / scrollHeight;
-                const maxScrollbarHeight = 480 - 40; // Account for padding
-                const calculatedHeight = Math.max(30, maxScrollbarHeight * visibleRatio);
-                scrollbarHeight = calculatedHeight;
-                
-                // Calculate scrollbar position
-                const scrollRatio = scrollTop / (scrollHeight - clientHeight);
-                const maxScrollbarTop = maxScrollbarHeight - calculatedHeight;
-                scrollbarTop = 20 + (maxScrollbarTop * scrollRatio); // 20px top offset
-                
-                // Create scrollbar
-                const scrollbar = document.createElement('div');
-                scrollbar.className = 'custom-scrollbar';
-                scrollbar.style.height = `${scrollbarHeight}px`;
-                scrollbar.style.top = `${scrollbarTop}px`;
-                scrollbar.onclick = handleScrollbarClick;
-                
-                const referencePanel = document.querySelector('.reference-panel');
-                referencePanel.appendChild(scrollbar);
-            }
-        }
-
-        function handleScrollbarClick(e) {
-            const referenceList = document.getElementById('reference-list');
-            const rect = e.currentTarget.getBoundingClientRect();
-            const clickY = e.clientY - rect.top;
-            const scrollbarRatio = clickY / rect.height;
-            
-            const { scrollHeight, clientHeight } = referenceList;
-            const maxScrollTop = scrollHeight - clientHeight;
-            referenceList.scrollTop = maxScrollTop * scrollbarRatio;
-        }
+        // Custom scrollbar functionality - REMOVED - now using native browser scrollbar
 
         // Initialize the layout
         document.addEventListener('DOMContentLoaded', function() {
@@ -1214,15 +1187,7 @@
                 wrapperCard.classList.add('no-references');
             }
             
-            // Add scroll listener to reference list
-            const referenceList = document.getElementById('reference-list');
-            if (referenceList) {
-                referenceList.addEventListener('scroll', updateCustomScrollbar);
-                
-                // Add resize observer to handle content changes
-                const resizeObserver = new ResizeObserver(updateCustomScrollbar);
-                resizeObserver.observe(referenceList);
-            }
+            // Reference list is now handled by native browser scrolling
         });
 
         function addCSVFile() {
@@ -1230,26 +1195,199 @@
             alert('CSV file upload functionality');
         }
 
-        function submitReferences() {
-            const poNumber = document.querySelector('#purchase-order-form input[placeholder="PO-2024-001"]')?.value;
-            const deliveryId = document.querySelector('#purchase-order-form input[placeholder="DEL-12345"]')?.value;
-            const postcode = document.querySelector('#purchase-order-form input[placeholder="SW1A 1AA"]')?.value;
+        // Test submission function for debugging
+        function testSubmission() {
+            // Fill in test data
+            const purchaseOrderForm = document.getElementById('purchase-order-form');
+            const formInputs = purchaseOrderForm.querySelectorAll('input');
+            formInputs[0].value = 'TEST-PO-001'; // PO Number
+            formInputs[1].value = 'TEST-DEL-001'; // Delivery ID
+            formInputs[2].value = '12345'; // Delivery Postcode
             
-            if (!poNumber || !deliveryId || !postcode) {
-                alert('Please fill in all required fields');
-                return;
+            // Add a test reference if none exist
+            if (references.length === 0) {
+                references.push({
+                    id: Date.now().toString(),
+                    referenceNumber: 'TEST-REF-001',
+                    validationNumber: 'TEST-VAL-001'
+                });
+                updateReferenceDisplay();
             }
             
-            // Submit logic here
-            alert('References submitted successfully');
+            console.log('Test data prepared. You can now click Submit References to test the submission.');
+            alert('Test data prepared. You can now click Submit References to test the submission.');
+        }
+
+        // Working submit references function (restored from main branch)
+        async function submitReferences() {
+            try {
+                if (references.length === 0) {
+                    alert('Please add at least one reference before submitting');
+                    return;
+                }
+
+                // Get the form fields
+                const poNumber = document.getElementById('po-number')?.value?.trim() || '';
+                const deliveryId = document.getElementById('delivery-id')?.value?.trim() || '';
+                const postcode = document.getElementById('delivery-postcode')?.value?.trim() || '';
+
+                // Check if we have the required fields (both PO Number AND Delivery ID required)
+                if (!poNumber || !deliveryId) {
+                    alert('Please fill in both PO Number and Delivery ID');
+                    return;
+                }
+
+                // Submit each reference individually (like the working version)
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (const reference of references) {
+                    try {
+                        const response = await fetch('/api/supplier/submit', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${authToken}`
+                            },
+                            body: JSON.stringify({
+                                poNumber: poNumber,
+                                deliveryId: deliveryId,
+                                deliveryPostcode: postcode,
+                                referenceNumber: reference.referenceNumber,
+                                validationNumber: reference.validationNumber || ''
+                            })
+                        });
+
+                        if (response.ok) {
+                            successCount++;
+                        } else {
+                            const errorData = await response.json();
+                            console.error('Reference submission failed:', errorData);
+                            errorCount++;
+                        }
+                    } catch (error) {
+                        errorCount++;
+                    }
+                }
+
+                if (successCount > 0) {
+                    alert(`Successfully submitted ${successCount} reference(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+                    
+                    // Clear references and reset form
+                    references = [];
+                    updateReferenceDisplay();
+                    
+                    // Clear form fields
+                    if (document.getElementById('po-number')) document.getElementById('po-number').value = '';
+                    if (document.getElementById('delivery-id')) document.getElementById('delivery-id').value = '';
+                    if (document.getElementById('delivery-postcode')) document.getElementById('delivery-postcode').value = '';
+                } else {
+                    console.error('All references failed to submit. Check console for details.');
+                    alert(`Failed to submit references. ${errorCount} references failed. Check browser console for details.`);
+                }
+            } catch (error) {
+                console.error('Error submitting references:', error);
+                alert('Network error occurred. Please try again.');
+            }
         }
 
         // History functionality
         let historyFilters = {};
         let authToken = localStorage.getItem('supplierToken');
-        let supplierLinkId = window.location.pathname.split('/').pop();
+        
+        // Extract supplier link ID from URL
+        function getSupplierLinkId() {
+            const pathSegments = window.location.pathname.split('/');
+            
+            // Extract supplier ID from URL path
+            if (pathSegments.includes('supplier') && pathSegments.length > 2) {
+                return pathSegments[pathSegments.length - 1];
+            }
+            
+            return null;
+        }
 
+        // Initialize supplier authentication
+        async function initializeSupplier() {
+            let supplierLinkId = getSupplierLinkId();
+            
+            if (!supplierLinkId) {
+                alert('Invalid supplier link. No supplier ID found in URL.');
+                return false;
+            }
+
+            // Validate supplier link
+            try {
+                const response = await fetch('/api/supplier/validate-link', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ supplierLinkId })
+                });
+
+                if (!response.ok) {
+                    alert('Invalid or inactive supplier link.');
+                    return false;
+                }
+            } catch (error) {
+                alert('Failed to validate supplier link.');
+                return false;
+            }
+
+            // Check if we have a valid token
+            if (!authToken) {
+                // Try to authenticate with the supplier ID
+                try {
+                    const response = await fetch('/api/supplier/test-login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ supplierLinkId })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        authToken = data.token;
+                        localStorage.setItem('supplierToken', data.token);
+                        console.log('Supplier authenticated successfully');
+                        
+                        return true;
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Authentication failed: ${errorData.error}`);
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Authentication error:', error);
+                    alert('Failed to authenticate supplier');
+                    return false;
+                }
+            } else {
+                // Already authenticated
+            }
+            
+            return true;
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isAuthenticated = await initializeSupplier();
+            if (isAuthenticated) {
+                // Load history if authenticated
+                await loadHistory();
+            }
+        });
+        
         async function loadHistory() {
+            const currentSupplierLinkId = getSupplierLinkId();
+            if (!currentSupplierLinkId) {
+                const historyContent = document.getElementById('history-content');
+                historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Supplier Link ID not found. Please refresh the page.</p>';
+                return;
+            }
+
             try {
                 const historyContent = document.getElementById('history-content');
                 historyContent.innerHTML = '<div style="text-align: center; padding: 20px; color: #6c757d;">Loading...</div>';
@@ -1325,6 +1463,14 @@
             }
         }
 
+        // Function to refresh authentication and reload data
+        async function refreshAuthentication() {
+            const isAuthenticated = await initializeSupplier();
+            if (isAuthenticated) {
+                await loadHistory();
+            }
+        }
+        
         function applyHistoryFilters() {
             historyFilters = {
                 poNumber: document.getElementById('po-filter').value,
@@ -1341,6 +1487,8 @@
             historyFilters = {};
             loadHistory();
         }
+
+
     </script>
 </body>
 </html> 

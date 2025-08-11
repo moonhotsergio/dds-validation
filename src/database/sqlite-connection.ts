@@ -31,6 +31,8 @@ class SQLiteWrapper {
 
     private convertPostgresToSQLite(sql: string): string {
         return sql
+            // Convert PostgreSQL parameter placeholders to SQLite
+            .replace(/\$(\d+)/g, '?')
             // Convert UUID functions
             .replace(/gen_random_uuid\(\)/g, "lower(hex(randomblob(4)) || '-' || hex(randomblob(2)) || '-' || '4' || substr(hex(randomblob(2)), 2) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(6)))")
             // Convert NOW() to datetime('now')

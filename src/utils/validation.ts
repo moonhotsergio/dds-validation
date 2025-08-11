@@ -16,7 +16,7 @@ export const referenceSubmissionSchema = Joi.object({
     deliveryId: Joi.string().min(1).max(255).required(),
     deliveryPostcode: Joi.string().min(3).max(10).required(),
     referenceNumber: Joi.string().min(1).max(255).required(),
-    validationNumber: Joi.string().max(255).optional()
+    validationNumber: Joi.string().max(255).optional().allow('')
 });
 
 export const bulkSubmissionSchema = Joi.array().items(referenceSubmissionSchema).min(1).max(100);

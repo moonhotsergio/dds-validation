@@ -339,4 +339,33 @@ router.post('/bulk-upload', authenticateSupplier, upload.single('csvFile'), asyn
     }
 });
 
+// Validate supplier link endpoint
+router.post('/validate-link', async (req, res) => {
+    try {
+        const { supplierLinkId } = req.body;
+        
+        if (!supplierLinkId) {
+            return res.status(400).json({ error: 'Supplier link ID required' });
+        }
+
+        // Verify supplier link exists and is active
+        const supplierResult = await pool.query(
+            'SELECT id FROM supplier_links WHERE id = $1 AND is_active = true',
+            [supplierLinkId]
+        );
+
+        if (supplierResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Invalid or inactive supplier link' });
+        }
+
+        res.json({ 
+            message: 'Supplier link is valid',
+            supplierLinkId: supplierLinkId
+        });
+    } catch (error) {
+        console.error('Error validating supplier link:', error);
+        res.status(500).json({ error: 'Failed to validate supplier link' });
+    }
+});
+
 export default router;
