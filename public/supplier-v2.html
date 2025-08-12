@@ -1077,7 +1077,6 @@
             .then(data => {
                 if (data.token) {
                     // Store token and hide auth section
-                    authToken = data.token;
                     localStorage.setItem('authToken', data.token);
                     document.getElementById('auth-section').classList.add('hidden');
                     alert('Authentication successful! You can now submit references.');
@@ -1354,11 +1353,24 @@
 
                 for (const reference of references) {
                     try {
+                        const currentSupplierFromURL = getSupplierLinkId();
+                        
+                        // Get FRESH token from localStorage (not the stale global variable)
+                        const freshAuthToken = localStorage.getItem('authToken');
+                        console.log('🚀 Submitting for supplier:', currentSupplierFromURL);
+                        console.log('🚀 Using FRESH authToken:', freshAuthToken ? freshAuthToken.substring(0, 20) + '...' : 'NULL');
+                        
+                        if (!freshAuthToken) {
+                            console.error('🚨 No fresh auth token found in localStorage');
+                            showAlert('Authentication required. Please refresh the page.', 'error');
+                            return;
+                        }
+                        
                         const response = await fetch('/api/supplier/submit', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${authToken}`
+                                'Authorization': `Bearer ${freshAuthToken}`
                             },
                             body: JSON.stringify({
                                 poNumber: poNumber,
@@ -1404,7 +1416,7 @@
 
         // History functionality
         let historyFilters = {};
-        let authToken = localStorage.getItem('authToken');
+        // Don't cache authToken globally - always get fresh from localStorage
         
         // Extract supplier link ID from URL
         function getSupplierLinkId() {
@@ -1420,12 +1432,25 @@
 
         // Initialize supplier authentication
         async function initializeSupplier() {
-            let supplierLinkId = getSupplierLinkId();
+            // ALWAYS get fresh supplier ID from URL at runtime
+            const supplierLinkId = getSupplierLinkId();
+            console.log('🔄 initializeSupplier called for:', supplierLinkId);
+            console.log('🔄 Current URL:', window.location.href);
             
             if (!supplierLinkId) {
                 alert('Invalid supplier link. No supplier ID found in URL.');
                 return false;
             }
+
+            // Always clear cached data to prevent cross-contamination
+            const cachedSupplier = localStorage.getItem('currentSupplierLinkId');
+            if (cachedSupplier !== supplierLinkId) {
+                // Different supplier OR first time, clear ALL cached auth data
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentSupplierLinkId');
+                console.log('🧹 Cleared cached auth data for supplier change:', cachedSupplier, '->', supplierLinkId);
+            }
+            localStorage.setItem('currentSupplierLinkId', supplierLinkId);
 
             // Check if admin has directly activated this link
             try {
@@ -1446,14 +1471,29 @@
                         console.log('Link is active - OTP bypassed');
                         
                         // Generate a valid authentication token for active links
-                        const token = btoa(JSON.stringify({
-                            supplierLinkId: supplierLinkId,
+                        const currentSupplierFromURL = getSupplierLinkId(); // Get fresh from URL
+                        console.log('🔧 Generating token for supplier from URL:', currentSupplierFromURL);
+                        console.log('🔧 Input supplierLinkId variable:', supplierLinkId);
+                        
+                        if (currentSupplierFromURL !== supplierLinkId) {
+                            console.error('🚨 MISMATCH DETECTED during token generation!');
+                            console.error('URL supplier:', currentSupplierFromURL, 'vs variable:', supplierLinkId);
+                        }
+                        
+                        const tokenData = {
+                            supplierLinkId: currentSupplierFromURL, // Use fresh URL value
                             isActive: true,
                             bypassedAt: new Date().toISOString()
-                        }));
+                        };
+                        const token = btoa(JSON.stringify(tokenData));
+                        console.log('✅ Generated new bypass token for:', currentSupplierFromURL, tokenData);
                         
-                        // Store the token
+                        // Store the token (force overwrite any existing token)
+                        console.log('🔄 About to store new token in localStorage');
+                        console.log('🔄 Old token:', localStorage.getItem('authToken') ? localStorage.getItem('authToken').substring(0, 20) + '...' : 'NULL');
+                        localStorage.removeItem('authToken'); // Force remove old token
                         localStorage.setItem('authToken', token);
+                        console.log('🔄 New token stored:', localStorage.getItem('authToken').substring(0, 20) + '...');
                         console.log('Generated bypass token for active link');
                         console.log('Token content:', JSON.stringify({
                             supplierLinkId: supplierLinkId,
@@ -1491,7 +1531,8 @@
             }
 
             // Check if we have a valid token
-            if (!authToken) {
+            const currentAuthToken = localStorage.getItem('authToken');
+            if (!currentAuthToken) {
                 // No valid token - user needs to authenticate via OTP
                 console.log('No valid authentication token found. Please use OTP verification.');
                 return false;
@@ -1503,8 +1544,20 @@
             return true;
         }
 
-        // Initialize when page loads
+        // Force clear localStorage on every page load to prevent contamination
         document.addEventListener('DOMContentLoaded', async () => {
+            const currentSupplierFromURL = getSupplierLinkId();
+            const cachedSupplier = localStorage.getItem('currentSupplierLinkId');
+            
+            console.log('🔍 Page load - Current URL supplier:', currentSupplierFromURL);
+            console.log('🔍 Page load - Cached supplier:', cachedSupplier);
+            
+            // ALWAYS clear localStorage if different supplier or no cached supplier
+            if (!cachedSupplier || cachedSupplier !== currentSupplierFromURL) {
+                console.log('🧹 Clearing ALL localStorage due to supplier mismatch or missing cache');
+                localStorage.clear();
+            }
+            
             const isAuthenticated = await initializeSupplier();
             if (isAuthenticated) {
                 // Load history if authenticated
@@ -1520,6 +1573,14 @@
             if (!currentSupplierLinkId) {
                 const historyContent = document.getElementById('history-content');
                 historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Supplier Link ID not found. Please refresh the page.</p>';
+                return;
+            }
+
+            // Verify we have proper authentication before loading history
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                const historyContent = document.getElementById('history-content');
+                historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Authentication required. Please complete verification first.</p>';
                 return;
             }
 
@@ -1542,8 +1603,16 @@
 
                 const data = await response.json();
                 if (response.ok) {
+                    // Validate that all submissions belong to current supplier (extra safety check)
+                    const invalidSubmissions = data.submissions.filter(s => s.supplier_link_id && s.supplier_link_id !== currentSupplierLinkId);
+                    if (invalidSubmissions.length > 0) {
+                        console.error('Data integrity error: Found submissions for different suppliers:', invalidSubmissions);
+                        historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Data integrity error. Please refresh the page.</p>';
+                        return;
+                    }
+
                     if (data.submissions.length === 0) {
-                        historyContent.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 40px;">No submissions found.</p>';
+                        historyContent.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 40px;">No submissions found for this supplier.</p>';
                     } else {
                         // Group submissions by PO/Delivery
                         const grouped = {};

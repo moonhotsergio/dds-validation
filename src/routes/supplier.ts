@@ -238,6 +238,10 @@ router.post('/submit', authenticateSupplier, async (req: AuthRequest, res) => {
         const { poNumber, deliveryId, deliveryPostcode, referenceNumber, validationNumber } = value;
 
         // Always create new submission (allow multiple references per PO/Delivery)
+        console.log('🔥 SUBMISSION ENDPOINT: req.supplierLinkId =', req.supplierLinkId);
+        console.log('🔥 SUBMISSION ENDPOINT: req.email =', req.email);
+        console.log('🔥 SUBMISSION ENDPOINT: About to insert with supplier_link_id =', req.supplierLinkId);
+        
         await pool.query(
             `INSERT INTO reference_submissions 
              (supplier_link_id, po_number, delivery_id, delivery_postcode, reference_number, validation_number, submitted_by_email) 

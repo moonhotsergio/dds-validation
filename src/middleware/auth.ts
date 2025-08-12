@@ -32,7 +32,8 @@ export const authenticateSupplier = async (req: AuthRequest, res: Response, next
                 if (supplierResult.rows.length > 0 && supplierResult.rows[0].is_active) {
                     req.supplierLinkId = bypassData.supplierLinkId;
                     req.email = undefined; // Bypass tokens don't have email
-                    console.log('Bypass token validated for active supplier:', bypassData.supplierLinkId);
+                    console.log('✅ Bypass token validated for active supplier:', bypassData.supplierLinkId);
+                    console.log('✅ Setting req.supplierLinkId to:', req.supplierLinkId);
                     return next();
                 } else {
                     console.log('Supplier not active, bypass token rejected');
