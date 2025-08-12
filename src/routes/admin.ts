@@ -1,7 +1,14 @@
 import express from 'express';
 import pool from '../database/connection';
 import { sendOTP } from '../utils/email';
-import { createSupplierLink } from '../utils/id-generator';
+
+// Generate supplier link ID in XXXX-XXXX format
+function createSupplierLink(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const part1 = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    const part2 = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    return `${part1}-${part2}`;
+}
 
 const router = express.Router();
 
