@@ -606,8 +606,8 @@
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
                             <div class="direction-toggle" style="display: flex; border: 1px solid #e9ecef; border-radius: 4px; overflow: hidden; background: white;">
-                                <button type="button" id="sent-toggle" class="toggle-btn active" onclick="toggleDirection('sent')" style="flex: 1; padding: 6px 10px; font-size: 13px; border: none; background: #4a7c59; color: white; cursor: pointer; transition: all 0.2s ease;">Sent</button>
-                                <button type="button" id="received-toggle" class="toggle-btn" onclick="toggleDirection('received')" style="flex: 1; padding: 6px 10px; font-size: 13px; border: none; background: white; color: #4a7c59; cursor: pointer; transition: all 0.2s ease;">Received</button>
+                                <button type="button" id="sent-toggle" class="toggle-btn" onclick="toggleDirection('sent')" style="flex: 1; padding: 6px 10px; font-size: 13px; border: none; background: white; color: #4a7c59; cursor: pointer; transition: all 0.2s ease;">Sent</button>
+                                <button type="button" id="received-toggle" class="toggle-btn active" onclick="toggleDirection('received')" style="flex: 1; padding: 6px 10px; font-size: 13px; border: none; background: #4a7c59; color: white; cursor: pointer; transition: all 0.2s ease;">Received</button>
                             </div>
                         </div>
                         <div style="display: flex; gap: 6px;">
@@ -642,7 +642,8 @@
                 column1.classList.add('history-active');
             }
             
-            // Load initial data
+            // Initialize with received filter
+            historyFilters.direction = 'received';
             loadHistory();
         });
 
@@ -743,17 +744,17 @@
             if (direction === 'sent') {
                 sentBtn.classList.add('active');
                 receivedBtn.classList.remove('active');
-                sentBtn.style.background = '#4a7c59';
-                sentBtn.style.color = 'white';
-                receivedBtn.style.background = 'white';
-                receivedBtn.style.color = '#4a7c59';
+                sentBtn.style.background = 'white';
+                sentBtn.style.color = '#4a7c59';
+                receivedBtn.style.background = '#4a7c59';
+                receivedBtn.style.color = 'white';
             } else {
                 receivedBtn.classList.add('active');
                 sentBtn.classList.remove('active');
-                receivedBtn.style.background = '#4a7c59';
-                receivedBtn.style.color = 'white';
-                sentBtn.style.background = 'white';
-                sentBtn.style.color = '#4a7c59';
+                receivedBtn.style.background = 'white';
+                receivedBtn.style.color = '#4a7c59';
+                sentBtn.style.background = '#4a7c59';
+                sentBtn.style.color = 'white';
             }
             
             // Update the filter value
@@ -765,15 +766,15 @@
             const sentBtn = document.getElementById('sent-toggle');
             const receivedBtn = document.getElementById('received-toggle');
             
-            // Reset to sent as default
-            sentBtn.classList.add('active');
-            receivedBtn.classList.remove('active');
-            sentBtn.style.background = '#4a7c59';
-            sentBtn.style.color = 'white';
-            receivedBtn.style.background = 'white';
-            receivedBtn.style.color = '#4a7c59';
+            // Reset to received as default
+            receivedBtn.classList.add('active');
+            sentBtn.classList.remove('active');
+            sentBtn.style.background = 'white';
+            sentBtn.style.color = '#4a7c59';
+            receivedBtn.style.background = '#4a7c59';
+            receivedBtn.style.color = 'white';
             
-            historyFilters.direction = 'sent';
+            historyFilters.direction = 'received';
         }
 
         function formatDateConcise(timestamp) {
