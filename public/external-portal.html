@@ -525,7 +525,7 @@
             z-index: 10;
             height: 34px;
             width: 111.609px;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
         }
 
         .logo svg {
@@ -535,22 +535,32 @@
         }
 
         /* Custom scrollbar for history content */
-        .history-content-container::-webkit-scrollbar {
+        .history-section::-webkit-scrollbar {
             width: 8px;
         }
 
-        .history-content-container::-webkit-scrollbar-track {
+        .history-section::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 4px;
         }
 
-        .history-content-container::-webkit-scrollbar-thumb {
+        .history-section::-webkit-scrollbar-thumb {
             background: #c1c1c1;
             border-radius: 4px;
         }
 
-        .history-content-container::-webkit-scrollbar-thumb:hover {
+        .history-section::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
+        }
+
+        /* History section wrapper */
+        .history-section {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            padding: 16px;
+            height: calc(100vh - 400px);
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -606,7 +616,7 @@
                 </div>
 
                 <!-- History Content - Optimized with scrolling -->
-                <div class="history-content-container" style="height: calc(100vh - 400px); overflow-y: auto; padding-right: 8px;">
+                <div class="history-section">
                     <div id="history-content" class="submission-history">
                         <div class="loading">
                             <div class="spinner"></div>
