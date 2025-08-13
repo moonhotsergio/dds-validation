@@ -44,12 +44,14 @@
         }
 
         .interface-container {
-            position: fixed;
-            top: 40px;
-            left: 60px;
-            z-index: 2;
-            transform: scale(1.2);
-            transform-origin: top left;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4a7c59 0%, #6a9969 100%);
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
 
         .wrapper-card {
@@ -61,6 +63,8 @@
             width: 100%;
             max-width: 1200px;
             margin-top: 60px;
+            margin-bottom: 60px;
+            box-sizing: border-box;
         }
 
         /* Column 1: Header + Forms/History */
