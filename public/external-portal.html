@@ -626,7 +626,6 @@
         .overlay-body {
             flex: 1;
             padding: 24px;
-            overflow-y: auto;
         }
 
         .overlay-columns {
@@ -638,16 +637,20 @@
         .overlay-left-column {
             flex: 1;
             min-width: 0;
+            max-width: 50%;
         }
 
         .overlay-right-column {
-            width: 360px;
-            flex-shrink: 0;
+            flex: 1;
+            min-width: 0;
+            max-width: 50%;
             background: rgba(249, 251, 252, 0.6);
             border: 1px solid #c3c6c8;
             border-radius: 10px;
             padding: 20px;
             backdrop-filter: blur(7.25px);
+            display: flex;
+            flex-direction: column;
         }
 
         .overlay-left-column .purchase-order-section {
@@ -668,7 +671,7 @@
         }
 
         .overlay-left-column .reference-input-section {
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             padding: 20px;
             background: rgba(249, 251, 252, 0.6);
             border: 1px solid #c3c6c8;
@@ -734,8 +737,8 @@
         }
 
         .btn-add-reference {
-            background: #007bff;
-            color: white;
+            background: transparent;
+            color: #6c757d;
             border: none;
             padding: 8px 16px;
             border-radius: 6px;
@@ -751,13 +754,12 @@
         }
 
         .btn-add-reference:hover {
-            background: #0056b3;
-            transform: translateY(-1px);
+            color: #000000;
         }
 
         .btn-add-csv {
             background: transparent;
-            color: #868b90;
+            color: #6c757d;
             border: none;
             padding: 8px 16px;
             font-family: 'Inter', sans-serif;
@@ -779,7 +781,6 @@
             margin-top: 24px;
             padding-top: 16px;
             display: flex;
-            gap: 12px;
             justify-content: flex-start;
         }
 
@@ -803,26 +804,6 @@
             transform: translateY(-1px);
         }
 
-        .overlay-left-column .test-btn {
-            background: #f0f0f0;
-            color: #000000;
-            border: none;
-            padding: 9px 18px;
-            border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            height: 36px;
-            line-height: 20px;
-        }
-
-        .overlay-left-column .test-btn:hover {
-            background: #e0e0e0;
-            transform: translateY(-1px);
-        }
-
         .overlay-right-column .references-header {
             display: flex;
             justify-content: flex-end;
@@ -837,9 +818,14 @@
         }
 
         .overlay-right-column .references-content {
-            flex: 1;
+            flex: 0 1 auto;
             overflow-y: auto;
-            max-height: 400px;
+            overflow-x: hidden;
+            min-height: 300px;
+            max-height: 530px;
+            border: 1px solid #e0e0e0;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 10px;
         }
 
         .overlay-right-column .references-content::-webkit-scrollbar {
@@ -873,6 +859,8 @@
             flex-direction: column;
             gap: 11px;
             width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .overlay-reference-card.error {
@@ -882,11 +870,11 @@
 
         .overlay-reference-card .remove-btn {
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: 8px;
+            right: 8px;
             background: #c3c6c8;
             border: none;
-            border-radius: 499.5px;
+            border-radius: 50%;
             width: 20px;
             height: 20px;
             cursor: pointer;
@@ -896,7 +884,6 @@
             font-size: 12px;
             color: #000000;
             transition: background-color 0.3s ease;
-            padding: 9px 0;
             z-index: 1;
         }
 
@@ -1108,7 +1095,6 @@
 
                         <div class="submit-section">
                             <button class="submit-btn" onclick="submitOverlayReferences()">Submit References</button>
-                            <button class="test-btn" onclick="testOverlaySubmission()">Test Submission</button>
                         </div>
                     </div>
 
@@ -1397,7 +1383,7 @@
             
             referenceList.innerHTML = '';
             
-            overlayReferences.forEach(ref => {
+            overlayReferences.forEach((ref, index) => {
                 const card = document.createElement('div');
                 card.className = 'overlay-reference-card';
                 card.innerHTML = `
@@ -1434,25 +1420,6 @@
         function addOverlayCSVFile() {
             // CSV file upload logic
             alert('CSV file upload functionality coming soon!');
-        }
-
-        function testOverlaySubmission() {
-            // Fill in test data
-            document.getElementById('overlay-po-number').value = 'TEST-PO-001';
-            document.getElementById('overlay-delivery-id').value = 'TEST-DEL-001';
-            
-            // Add a test reference if none exist
-            if (overlayReferences.length === 0) {
-                overlayReferences.push({
-                    id: Date.now().toString(),
-                    referenceNumber: 'TEST-REF-001',
-                    validationNumber: 'TEST-VAL-001'
-                });
-                updateOverlayReferenceDisplay();
-            }
-            
-            console.log('Test data prepared. You can now click Submit References to test the submission.');
-            alert('Test data prepared. You can now click Submit References to test the submission.');
         }
 
         async function submitOverlayReferences() {
