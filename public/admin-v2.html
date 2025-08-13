@@ -555,6 +555,396 @@
             gap: 20px;
         }
 
+        /* Overlay Styles */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .overlay.hidden {
+            display: none;
+        }
+
+        .overlay-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .overlay-header {
+            background: linear-gradient(135deg, #4a7c59, #6a9969);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .overlay-header h2 {
+            margin: 0;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .overlay-body {
+            flex: 1;
+            padding: 24px;
+        }
+
+        .overlay-columns {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .overlay-left-column {
+            flex: 1;
+            min-width: 0;
+            max-width: 50%;
+        }
+
+        .overlay-right-column {
+            flex: 1;
+            min-width: 0;
+            max-width: 50%;
+            background: rgba(249, 251, 252, 0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(7.25px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .overlay-left-column .purchase-order-section {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(249, 251, 252, 0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            backdrop-filter: blur(7.25px);
+        }
+
+        .overlay-left-column .purchase-order-section h3 {
+            margin: 0 0 16px 0;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            color: #000000;
+        }
+
+        .overlay-left-column .reference-input-section {
+            margin-bottom: 16px;
+            padding: 20px;
+            background: rgba(249, 251, 252, 0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            backdrop-filter: blur(7.25px);
+        }
+
+        .overlay-left-column .reference-input-section h3 {
+            margin: 0 0 16px 0;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            color: #000000;
+        }
+
+        .overlay-left-column .note {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #6c757d;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .overlay-left-column .form-group {
+            margin-bottom: 16px;
+        }
+
+        .overlay-left-column .form-group label {
+            display: block;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #000000;
+            margin-bottom: 6px;
+            line-height: 14px;
+        }
+
+        .overlay-left-column .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #c3c6c8;
+            border-radius: 999px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            background: white;
+            transition: border-color 0.3s ease;
+            height: 36px;
+            box-sizing: border-box;
+        }
+
+        .overlay-left-column .form-group input:focus {
+            outline: none;
+            border-color: #00993a;
+            box-shadow: 0 0 0 3px rgba(0, 153, 58, 0.1);
+        }
+
+        .overlay-left-column .action-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .btn-add-reference {
+            background: transparent;
+            color: #6c757d;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
+        }
+
+        .btn-add-reference:hover {
+            color: #000000;
+        }
+
+        .btn-add-csv {
+            background: transparent;
+            color: #6c757d;
+            border: none;
+            padding: 8px 16px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
+        }
+
+        .btn-add-csv:hover {
+            color: #000000;
+        }
+
+        .overlay-left-column .submit-section {
+            margin-top: 24px;
+            padding-top: 16px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .overlay-left-column .submit-btn {
+            background: #000000;
+            color: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 9px 18px;
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 36px;
+            line-height: 20px;
+        }
+
+        .overlay-left-column .submit-btn:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        .overlay-right-column .references-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .overlay-right-column .references-count {
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            color: #868b90;
+        }
+
+        .overlay-right-column .references-content {
+            flex: 0 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 300px;
+            max-height: 530px;
+            border: 1px solid #e0e0e0;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 10px;
+        }
+
+        .overlay-right-column .references-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .overlay-right-column .references-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .overlay-right-column .references-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .overlay-right-column .references-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Overlay Reference Cards */
+        .overlay-reference-card {
+            background: #f9fbfc;
+            border: 0.5px solid #000000;
+            border-radius: 10px;
+            padding: 20px 10px;
+            margin-bottom: 11px;
+            margin-top: 8px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .overlay-reference-card.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+
+        .overlay-reference-card .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #c3c6c8;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #000000;
+            transition: background-color 0.3s ease;
+            z-index: 1;
+        }
+
+        .overlay-reference-card .remove-btn:hover {
+            background: #a8abae;
+        }
+
+        .overlay-reference-field {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+        .overlay-reference-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .overlay-reference-field-label {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #525961;
+            white-space: nowrap;
+            line-height: 14px;
+        }
+
+        .overlay-reference-field-value {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid #e4e4e4;
+            border-radius: 999px;
+            padding: 10px 12px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #767676;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+            height: 28px;
+            box-sizing: border-box;
+        }
+
+        .overlay-reference-field-value.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+
+        /* Responsive overlay */
+        @media (max-width: 1024px) {
+            .overlay-columns {
+                flex-direction: column;
+            }
+            
+            .overlay-right-column {
+                width: 100%;
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header {
@@ -706,11 +1096,79 @@
         </div>
     </div>
 
+    <!-- Submit References Overlay -->
+    <div id="submit-references-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2>Submit References to Organisation</h2>
+                <button class="close-btn" onclick="closeSubmitReferencesOverlay()">×</button>
+            </div>
+            
+            <div class="overlay-body">
+                <div class="overlay-columns">
+                    <!-- Left Column: Purchase Order Form -->
+                    <div class="overlay-left-column">
+                        <div class="purchase-order-section">
+                            <h3>Purchase Order Information</h3>
+                            <div class="form-group">
+                                <label>PO Number (Optional if Delivery ID provided)</label>
+                                <input type="text" id="admin-po-number" placeholder="Enter PO Number">
+                            </div>
+                            <div class="form-group">
+                                <label>Delivery ID (Optional if PO Number provided)</label>
+                                <input type="text" id="admin-delivery-id" placeholder="Enter Delivery ID">
+                            </div>
+                            <div class="note">
+                                💡 <strong>Note:</strong> You must provide either a PO Number OR a Delivery ID (at least one is required)
+                            </div>
+                        </div>
+
+                        <div class="reference-input-section">
+                            <h3>Add Reference Numbers</h3>
+                            <div class="form-group">
+                                <label>Reference Number</label>
+                                <input type="text" id="admin-reference-number" placeholder="------">
+                            </div>
+                            <div class="form-group">
+                                <label>Validation Number (Optional)</label>
+                                <input type="text" id="admin-validation-number" placeholder="-------">
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn-add-reference" onclick="addAdminReference()">
+                                    <i class="fas fa-plus"></i> Add Reference
+                                </button>
+                                <button class="btn-add-csv" onclick="addAdminCSVFile()">
+                                    <i class="fas fa-paperclip"></i> Add CSV File
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="submit-section">
+                            <button class="submit-btn" onclick="submitAdminReferences()">Submit References</button>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: References Display -->
+                    <div class="overlay-right-column">
+                        <div class="references-header">
+                            <span class="references-count" id="admin-references-count">0 References created</span>
+                        </div>
+                        <div class="references-content" id="admin-references-list">
+                            <!-- References will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentAdmin = null;
         let organisations = [];
         let connections = [];
         let selectedOrganisationId = null;
+        let currentConnectionId = null;
+        let adminReferences = [];
 
         // Check if admin is already logged in
         document.addEventListener('DOMContentLoaded', () => {
@@ -719,6 +1177,13 @@
             
             // Test API connectivity
             testAPIConnectivity();
+            
+            // Add click outside overlay to close functionality
+            document.getElementById('submit-references-overlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeSubmitReferencesOverlay();
+                }
+            });
         });
         
         // Test API connectivity
@@ -1160,9 +1625,174 @@
         
         // Submit references for a connection
         function submitReferences(connectionId) {
-            // TODO: Implement reference submission functionality
-            console.log('Submit references for connection:', connectionId);
-            alert('Reference submission functionality coming soon!');
+            console.log('Opening submit references overlay for connection:', connectionId);
+            currentConnectionId = connectionId;
+            showSubmitReferencesOverlay();
+        }
+        
+        // Show submit references overlay
+        function showSubmitReferencesOverlay() {
+            document.getElementById('submit-references-overlay').classList.remove('hidden');
+            resetAdminForm();
+        }
+        
+        // Close submit references overlay
+        function closeSubmitReferencesOverlay() {
+            document.getElementById('submit-references-overlay').classList.add('hidden');
+            adminReferences = [];
+            updateAdminReferenceDisplay();
+        }
+        
+        // Reset admin form
+        function resetAdminForm() {
+            document.getElementById('admin-po-number').value = '';
+            document.getElementById('admin-delivery-id').value = '';
+            document.getElementById('admin-reference-number').value = '';
+            document.getElementById('admin-validation-number').value = '';
+            adminReferences = [];
+            updateAdminReferenceDisplay();
+        }
+        
+        // Add admin reference
+        function addAdminReference() {
+            const refNumber = document.getElementById('admin-reference-number').value;
+            const valNumber = document.getElementById('admin-validation-number').value;
+            
+            if (!refNumber) {
+                alert('Please enter a reference number');
+                return;
+            }
+            
+            const newReference = {
+                id: Date.now().toString(),
+                referenceNumber: refNumber,
+                validationNumber: valNumber
+            };
+            
+            adminReferences.push(newReference);
+            updateAdminReferenceDisplay();
+            
+            // Clear inputs
+            document.getElementById('admin-reference-number').value = '';
+            document.getElementById('admin-validation-number').value = '';
+        }
+        
+        // Remove admin reference
+        function removeAdminReference(id) {
+            adminReferences = adminReferences.filter(ref => ref.id !== id);
+            updateAdminReferenceDisplay();
+        }
+        
+        // Update admin reference display
+        function updateAdminReferenceDisplay() {
+            const referenceList = document.getElementById('admin-references-list');
+            const referenceCount = document.getElementById('admin-references-count');
+            
+            referenceCount.textContent = `${adminReferences.length} References created`;
+            
+            referenceList.innerHTML = '';
+            
+            adminReferences.forEach((ref, index) => {
+                const card = document.createElement('div');
+                card.className = 'overlay-reference-card';
+                card.innerHTML = `
+                    <div class="overlay-reference-field">
+                        <span class="overlay-reference-field-label">Reference Number:</span>
+                        <div class="overlay-reference-field-value">
+                            ${ref.referenceNumber}
+                        </div>
+                    </div>
+                    <div class="overlay-reference-field">
+                        <span class="overlay-reference-field-label">Validation Number:</span>
+                        <div class="overlay-reference-field-value">
+                            ${ref.validationNumber || '-------'}
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeAdminReference('${ref.id}')">×</button>
+                `;
+                referenceList.appendChild(card);
+            });
+        }
+        
+        // Add admin CSV file
+        function addAdminCSVFile() {
+            // CSV file upload logic
+            alert('CSV file upload functionality coming soon!');
+        }
+        
+        // Submit admin references
+        async function submitAdminReferences() {
+            try {
+                if (adminReferences.length === 0) {
+                    alert('Please add at least one reference before submitting');
+                    return;
+                }
+
+                // Get the form fields
+                const poNumber = document.getElementById('admin-po-number')?.value?.trim() || '';
+                const deliveryId = document.getElementById('admin-delivery-id')?.value?.trim() || '';
+
+                // Check if we have at least one identifier (PO Number OR Delivery ID required)
+                if (!poNumber && !deliveryId) {
+                    alert('Please fill in either PO Number or Delivery ID (at least one is required)');
+                    return;
+                }
+
+                // Submit each reference individually
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (const reference of adminReferences) {
+                    try {
+                        const requestBody = {
+                            poNumber: poNumber,
+                            deliveryId: deliveryId,
+                            referenceNumber: reference.referenceNumber,
+                            validationNumber: reference.validationNumber || ''
+                        };
+                        
+                        console.log('Submitting admin reference:', requestBody);
+                        console.log('Using connection ID:', currentConnectionId);
+                        
+                        const response = await fetch(`/api/admin-v2/connections/${currentConnectionId}/submit`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(requestBody)
+                        });
+
+                        if (response.ok) {
+                            const responseData = await response.json();
+                            console.log('Admin reference submitted successfully:', responseData);
+                            successCount++;
+                        } else {
+                            const errorData = await response.json();
+                            console.error('Admin reference submission failed:', errorData);
+                            errorCount++;
+                        }
+                    } catch (error) {
+                        console.error('Error submitting admin reference:', error);
+                        errorCount++;
+                    }
+                }
+
+                if (successCount > 0) {
+                    alert(`Successfully submitted ${successCount} reference(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+                    
+                    // Close overlay and reset form
+                    closeSubmitReferencesOverlay();
+                    
+                    // Refresh connections to show updated data
+                    loadConnections();
+                } else {
+                    console.error('All admin references failed to submit. Check console for details.');
+                    alert(`Failed to submit references. ${errorCount} references failed. Check browser console for details.`);
+                }
+            } catch (error) {
+                console.error('Error submitting admin references:', error);
+                alert('Network error occurred. Please try again.');
+            }
         }
 
         // Show connection modal
@@ -1417,8 +2047,14 @@
         // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('connectionModal');
+            const submitOverlay = document.getElementById('submit-references-overlay');
+            
             if (event.target === modal) {
                 closeConnectionModal();
+            }
+            
+            if (event.target === submitOverlay) {
+                closeSubmitReferencesOverlay();
             }
         }
     </script>
