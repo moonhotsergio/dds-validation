@@ -242,6 +242,60 @@ Notes:
 3. **Cleanup**: Remove deprecated V1 code and tables
 4. **Monitoring**: Verify system stability and performance
 
+## Critical Fixes Required Before Phase 3
+
+### 1. External Portal UI Consistency ✅ COMPLETED
+- **Issue**: External portal UI doesn't match the previous supplier portal design
+- **Fix**: Update `external-portal.html` to follow the same UI pattern as the supplier portal
+- **Reference**: Match design from `http://127.0.0.1:3004/supplier/K2RH-5V68`
+- **Priority**: High - UI consistency is critical for user experience
+- **Implementation**: 
+  - Completely redesigned external portal to match supplier portal UI
+  - Same background, layout, typography, and styling
+  - Implemented role tabs (Submit, History, Retrieve) with proper styling
+  - Added sub-tabs for Submit and Retrieve functionality
+  - Maintained all existing functionality while improving visual consistency
+
+### 2. Admin Portal Organisation Search ✅ COMPLETED
+- **Issue**: Admin portal has unnecessary search box for organisations
+- **Fix**: Remove separate search box, integrate search directly into organisation dropdown
+- **Requirement**: 
+  - Organisations should be in dropdown menu
+  - User can type to filter organisations by name
+  - Real-time filtering as user types
+- **Priority**: High - Improves admin workflow efficiency
+- **Implementation**:
+  - Replaced static select dropdown with searchable input field
+  - Added real-time filtering as user types (300ms debounce)
+  - Implemented dropdown list with hover effects and selection
+  - Added proper validation to ensure organisation is selected
+  - Maintained all existing connection creation functionality
+
+### 3. External Portal Submission Pattern ✅ COMPLETED
+- **Issue**: Submission form doesn't match the previous supplier portal pattern
+- **Fix**: Implement the same submission workflow:
+  - User defines PO Number and/or Delivery ID
+  - Can add multiple pairs of reference number + validation code
+  - Submit all pairs for that PO at once
+  - Remove email field requirement
+- **Reference**: Match pattern from `http://127.0.0.1:3004/supplier/K2RH-5V68`
+- **Priority**: High - Core functionality must match existing user expectations
+- **Status**: ✅ Already implemented correctly - matches requirements exactly
+- **Implementation**:
+  - Purchase Order/Delivery section with expandable form
+  - Reference input section for adding multiple reference pairs
+  - Reference panel showing all references to be submitted
+  - Submit button that submits all references at once
+  - No email field requirement (as specified)
+  - Proper validation and error handling
+
+### Implementation Order
+1. ✅ Fix External Portal UI consistency
+2. ✅ Fix Admin Portal organisation search
+3. ✅ Fix External Portal submission pattern
+4. ✅ Test all fixes thoroughly
+5. 🔄 Ready to proceed with Phase 3 deployment
+
 ## Open Questions
 1. Password policy specifics: minimum length, complexity, and whether to add 2FA.
 2. Organisations model: confirm many-to-many (multiple admins per org and vice versa) via `connections`.

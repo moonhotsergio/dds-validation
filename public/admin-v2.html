@@ -99,6 +99,62 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
+        /* Searchable Dropdown Styles */
+        .searchable-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .searchable-dropdown input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .searchable-dropdown input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item.selected {
+            background-color: #667eea;
+            color: white;
+        }
+
         .btn-secondary {
             background: #6c757d;
         }
@@ -453,9 +509,10 @@
                     <form id="createConnectionForm">
                         <div class="form-group">
                             <label for="organisationSelect">Select Organisation</label>
-                            <select id="organisationSelect" name="organisationId" required style="width: 100%; padding: 12px 15px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem;">
-                                <option value="">Choose an organisation...</option>
-                            </select>
+                            <div class="searchable-dropdown">
+                                <input type="text" id="organisationSelect" placeholder="Type to search organisations..." autocomplete="off">
+                                <div id="organisationDropdown" class="dropdown-list" style="display: none;"></div>
+                            </div>
                         </div>
                         
                         <button type="submit" class="btn" id="createConnectionBtn">
@@ -465,12 +522,7 @@
                 </div>
 
                 <div class="card">
-                    <h3><i class="fas fa-search"></i> Search Organisations</h3>
-                    <div class="form-group">
-                        <label for="searchOrganisations">Search by name</label>
-                        <input type="text" id="searchOrganisations" placeholder="Type to search organisations...">
-                    </div>
-                    
+                    <h3><i class="fas fa-list"></i> Available Organisations</h3>
                     <div id="organisationsList">
                         <div class="loading">
                             <div class="spinner"></div>
@@ -634,29 +686,97 @@
 
         // Update organisation select dropdown
         function updateOrganisationSelect(orgs) {
-            const select = document.getElementById('organisationSelect');
-            select.innerHTML = '<option value="">Choose an organisation...</option>';
+            const input = document.getElementById('organisationSelect');
+            const dropdown = document.getElementById('organisationDropdown');
             
-            orgs.forEach(org => {
-                const option = document.createElement('option');
-                option.value = org.id;
-                option.textContent = org.name;
-                select.appendChild(option);
-            });
+            // Clear previous value
+            input.value = '';
+            selectedOrganisationId = null;
+            
+            // Store organisations for filtering
+            window.availableOrganisations = orgs;
         }
 
         // Search organisations
         let searchTimeout;
-        document.getElementById('searchOrganisations').addEventListener('input', (e) => {
+        let selectedOrganisationId = null;
+        
+        document.getElementById('organisationSelect').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            const dropdown = document.getElementById('organisationDropdown');
+            
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                loadOrganisations(e.target.value);
+                if (searchTerm.length === 0) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                
+                // Filter organisations
+                const filtered = window.availableOrganisations.filter(org => 
+                    org.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                
+                // Show dropdown with filtered results
+                showOrganisationDropdown(filtered);
             }, 300);
+        });
+
+        // Show organisation dropdown
+        function showOrganisationDropdown(organisations) {
+            const dropdown = document.getElementById('organisationDropdown');
+            const input = document.getElementById('organisationSelect');
+            
+            if (organisations.length === 0) {
+                dropdown.innerHTML = '<div class="dropdown-item">No organisations found</div>';
+            } else {
+                dropdown.innerHTML = organisations.map(org => `
+                    <div class="dropdown-item" data-id="${org.id}" data-name="${org.name}">
+                        ${org.name}
+                    </div>
+                `).join('');
+            }
+            
+            dropdown.style.display = 'block';
+            
+            // Add click handlers to dropdown items
+            dropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                if (item.dataset.id) {
+                    item.addEventListener('click', () => {
+                        selectOrganisation(item.dataset.id, item.dataset.name);
+                    });
+                }
+            });
+        }
+
+        // Select organisation from dropdown
+        function selectOrganisation(id, name) {
+            const input = document.getElementById('organisationSelect');
+            const dropdown = document.getElementById('organisationDropdown');
+            
+            input.value = name;
+            selectedOrganisationId = id;
+            dropdown.style.display = 'none';
+        }
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('organisationDropdown');
+            const input = document.getElementById('organisationSelect');
+            
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
         });
 
         // Create connection
         document.getElementById('createConnectionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            if (!selectedOrganisationId) {
+                showAlert('loginAlert', 'Please select an organisation', 'error');
+                return;
+            }
             
             const createBtn = document.getElementById('createConnectionBtn');
             const originalText = createBtn.innerHTML;
@@ -665,9 +785,8 @@
             createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
             
             try {
-                const formData = new FormData(e.target);
                 const data = {
-                    organisationId: formData.get('organisationId')
+                    organisationId: selectedOrganisationId
                 };
                 
                 const response = await fetch('/api/admin-v2/connections', {
@@ -682,12 +801,13 @@
                 
                 if (response.ok) {
                     showAlert('loginAlert', 'Connection created successfully!', 'success');
-                    e.target.reset();
+                    // Reset form
+                    document.getElementById('organisationSelect').value = '';
+                    selectedOrganisationId = null;
                     loadConnections();
                 } else {
                     throw new Error(result.error || 'Failed to create connection');
                 }
-                
             } catch (error) {
                 showAlert('loginAlert', error.message, 'error');
             } finally {

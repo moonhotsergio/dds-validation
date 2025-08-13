@@ -3,335 +3,609 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>External Portal - DDS Validation</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>External Portal - Interu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        * {
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            line-height: 1.6; 
+            color: #000000; 
+            background: radial-gradient(circle, #dfeeda, #c0d9bd, #a2c6a3);
+            min-height: 100vh;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
+        /* Background image layer */
+        body::before {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 50vw;
+            height: 100vh;
+            background-image: url('/bg-image.png');
+            background-position: right bottom;
+            background-repeat: no-repeat;
+            background-size: 50vw auto;
+            z-index: 1;
+            pointer-events: none;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        .interface-container {
+            position: fixed;
+            top: 140px;
+            left: 60px;
+            z-index: 2;
+            transform: scale(1.2);
+            transform-origin: top left;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
+        .wrapper-card {
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            padding: 20px 20px 20px 20px;
+            border: 1px solid #f3f3f3;
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
+            backdrop-filter: blur(10px);
+            transition: width 0.3s ease;
+            min-height: 600px;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .portal-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-
-        .tabs {
+        /* Column 1: Header + Forms/History */
+        .column-1 {
             display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            flex-direction: column;
+            flex-shrink: 0;
+            margin-top: 0;
         }
 
-        .tab {
-            flex: 1;
-            padding: 15px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            background: none;
-            font-size: 1rem;
-            font-weight: 500;
+        /* Column 1 width based on active state */
+        .column-1.forms-active {
+            width: 420px;
         }
 
-        .tab.active {
-            background: white;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
+        .column-1.history-active {
+            width: 100%;
         }
 
-        .tab:hover:not(.active) {
-            background: #e9ecef;
+        /* Header (Always visible in Column 1) */
+        .header {
+            margin-bottom: 20px;
+            margin-top: 0;
         }
 
-        .tab-content {
-            display: none;
-            padding: 30px;
-        }
-
-        .tab-content.active {
+        /* Forms Panel (Only when submit active) */
+        .forms-panel {
             display: block;
         }
 
-        .form-group {
+        .forms-panel.hidden {
+            display: none;
+        }
+
+        /* History Panel (Only when history active) */
+        .history-panel {
+            display: block;
+        }
+
+        .history-panel.hidden {
+            display: none;
+        }
+
+        /* Role Tabs */
+        .role-tabs {
+            display: flex;
+            gap: 11px;
+            margin-bottom: 16px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .role-tab {
+            flex: 1;
+            padding: 0;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 24px;
+            color: #00251c;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 24px;
+        }
+
+        .role-tab.active {
+            color: #00251c;
+            font-weight: 700;
+        }
+
+        .role-tab:not(.active) {
+            color: #868b90;
+            font-weight: 500;
+        }
+        
+        .role-tab.refresh-btn {
+            background-color: #6c757d;
+            color: white;
+            min-width: 40px;
+            padding: 8px 12px;
+            flex: 0 0 auto;
+        }
+        
+        .role-tab.refresh-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .role-divider {
+            width: 1px;
+            height: 24px;
+            background: #d9d9d9;
+            flex-shrink: 0;
+        }
+
+        /* Sub Tabs */
+        .sub-tabs {
+            display: flex;
+            gap: 0;
             margin-bottom: 20px;
+            height: 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #868b90;
+        }
+
+        .sub-tab {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            font-size: 14.765px;
+            color: #000000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sub-tab.active {
+            background: #b6ffe1;
+            color: #000000;
+        }
+
+        /* Purchase Order Section */
+        .purchase-order-section {
+            border-bottom: 1px solid #f3f3f3;
+            padding: 20px 0;
+        }
+
+        .purchase-order-heading {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            padding: 0;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            color: #000000;
+        }
+
+        .purchase-order-heading .icon {
+            width: 12px;
+            height: 12px;
+            transition: transform 0.2s ease;
+            transform: rotate(90deg);
+        }
+
+        .purchase-order-heading.expanded .icon {
+            transform: rotate(0deg);
+        }
+
+        .purchase-order-form {
+            margin-top: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            animation: slideIn 0.2s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 11px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #495057;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #000000;
+            margin-bottom: 4px;
+            line-height: 14px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 10px 12px;
+            border: 1px solid #c3c6c8;
+            border-radius: 999px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            background: white;
             transition: border-color 0.3s ease;
+            height: 36px;
+            box-sizing: border-box;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #00993a;
+            box-shadow: 0 0 0 3px rgba(0, 153, 58, 0.1);
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        /* Reference Input Section */
+        .reference-input-section {
+            margin-top: 5px;
+            background: rgba(249,251,252,0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(7.25px);
         }
 
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .section-header {
+            margin-bottom: 5px;
+        }
+
+        .section-header h3 {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            color: #000000;
+            margin: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .btn-add {
+            background: transparent;
+            color: #868b90;
             border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 8px 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        .btn-add:hover {
+            color: #000000;
         }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        /* Submit Button */
+        .submit-section {
+            margin-top: 20px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: flex-end;
         }
 
-        .table-container {
-            margin-top: 30px;
-            overflow-x: auto;
+        .submit-btn {
+            background: #000000;
+            color: rgba(255,255,255,0.8);
+            border: none;
+            padding: 9px 18px;
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 36px;
+            line-height: 20px;
         }
 
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
+        .submit-btn:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        /* Reference Cards */
+        .reference-card {
             background: white;
+            border: 1px solid #e9ecef;
             border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
         }
 
-        .data-table th,
-        .data-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e9ecef;
+        .reference-field {
+            flex: 1;
+            margin-right: 12px;
         }
 
-        .data-table th {
-            background: #f8f9fa;
+        .reference-field-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .reference-field-value {
             font-weight: 600;
             color: #495057;
         }
 
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-sent {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-received {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .remove-btn:hover {
+            background: #c82333;
         }
 
+        /* Reference Panel */
+        #reference-panel {
+            display: none;
+            margin-top: 20px;
+            background: rgba(249,251,252,0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(7.25px);
+        }
+
+        #reference-panel.show {
+            display: block;
+        }
+
+        /* History Panel */
+        .history-panel {
+            background: rgba(255,255,255,0.6);
+            border-radius: 10px;
+            border: 1px solid #f3f3f3;
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25);
+            height: auto;
+            width: 100%;
+            padding: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-panel .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .history-panel .count {
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            color: #868b90;
+        }
+
+        .history-panel .content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 12px;
+            margin-top: 16px;
+            max-height: calc(600px - 60px);
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .container {
+            .main-wrapper {
                 padding: 10px;
             }
             
-            .header h1 {
-                font-size: 2rem;
+            .gradient-container {
+                min-height: 95vh;
+                border-width: 6px;
+                border-radius: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-wrapper {
+                padding: 5px;
+            }
+            
+            .gradient-container {
+                min-height: 98vh;
+                border-width: 4px;
+                border-radius: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-external-link-alt"></i> External Portal</h1>
-            <p>Submit and retrieve reference numbers</p>
-        </div>
+    <div class="interface-container">
+        <div class="wrapper-card">
+            <!-- Column 1: Forms and History -->
+            <div class="column-1 forms-active">
+                <!-- Header -->
+                <div class="header">
+                    <div class="role-tabs">
+                        <button class="role-tab active" onclick="switchToForms()">
+                            Submit
+                        </button>
+                        <button class="role-tab" onclick="switchToHistory()">
+                            History
+                        </button>
+                        <div class="role-divider"></div>
+                        <button class="role-tab" onclick="switchToRetrieve()">
+                            Retrieve
+                        </button>
+                        <button class="role-tab refresh-btn" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
 
-        <div class="portal-card">
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('submit')">
-                    <i class="fas fa-upload"></i> Submit
-                </button>
-                <button class="tab" onclick="switchTab('retrieve')">
-                    <i class="fas fa-download"></i> Retrieve
-                </button>
-            </div>
+                <!-- Forms Panel -->
+                <div class="forms-panel">
+                    <div class="sub-tabs">
+                        <button class="sub-tab active" onclick="switchSubTab('submit')">
+                            Submit
+                        </button>
+                        <button class="sub-tab" onclick="switchSubTab('retrieve')">
+                            Retrieve
+                        </button>
+                    </div>
 
-            <!-- Submit Tab -->
-            <div id="submit" class="tab-content active">
-                <h2 style="margin-bottom: 20px; color: #495057;">
-                    <i class="fas fa-upload"></i> Submit Reference
-                </h2>
-                
-                <div id="submitAlert" style="display: none;"></div>
-                
-                <form id="submitForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="poNumber">PO Number (Optional)</label>
-                            <input type="text" id="poNumber" name="poNumber" placeholder="Enter PO number">
+                    <!-- Submit Tab Content -->
+                    <div id="submit-content" class="tab-content">
+                        <div class="purchase-order-section">
+                            <button class="purchase-order-heading expanded" onclick="togglePurchaseOrder()">
+                                <i class="fas fa-chevron-down icon"></i>
+                                Purchase Order / Delivery Information
+                            </button>
+                            
+                            <div class="purchase-order-form">
+                                <div class="form-group">
+                                    <label for="po-number">PO Number (Optional)</label>
+                                    <input type="text" id="po-number" placeholder="Enter PO number">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="delivery-id">Delivery ID (Optional)</label>
+                                    <input type="text" id="delivery-id" placeholder="Enter delivery ID">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="deliveryId">Delivery ID (Optional)</label>
-                            <input type="text" id="deliveryId" name="deliveryId" placeholder="Enter delivery ID">
+
+                        <!-- Reference Input Section -->
+                        <div class="reference-input-section">
+                            <div class="section-header">
+                                <h3>Reference Information</h3>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reference-number">Reference Number *</label>
+                                <input type="text" id="reference-number" placeholder="Enter reference number" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="validation-number">Validation Number (Optional)</label>
+                                <input type="text" id="validation-number" placeholder="Enter validation number">
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn-add" onclick="addReference()">
+                                    <i class="fas fa-plus"></i>
+                                    Add Reference
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Reference Panel -->
+                        <div id="reference-panel">
+                            <div class="section-header">
+                                <h3>References to Submit</h3>
+                            </div>
+                            <div id="reference-list"></div>
+                        </div>
+
+                        <!-- Submit Section -->
+                        <div class="submit-section">
+                            <button class="submit-btn" onclick="submitReferences()">
+                                Submit References
+                            </button>
                         </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="referenceNumber">Reference Number *</label>
-                        <input type="text" id="referenceNumber" name="referenceNumber" required placeholder="Enter reference number">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="validationNumber">Validation Number (Optional)</label>
-                        <input type="text" id="validationNumber" name="validationNumber" placeholder="Enter validation number">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">Email (Optional)</label>
-                        <input type="email" id="email" name="email" placeholder="Enter your email">
-                    </div>
-                    
-                    <button type="submit" class="btn" id="submitBtn">
-                        <i class="fas fa-paper-plane"></i> Submit Reference
-                    </button>
-                </form>
 
-                <div class="table-container">
-                    <h3 style="margin-bottom: 20px; color: #495057;">
-                        <i class="fas fa-history"></i> Your References
-                    </h3>
-                    <div id="submitHistory">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            Loading your references...
+                    <!-- Retrieve Tab Content -->
+                    <div id="retrieve-content" class="tab-content" style="display: none;">
+                        <div class="table-container">
+                            <h3 style="margin-bottom: 20px; color: #495057;">
+                                <i class="fas fa-inbox"></i> References Sent by Admin
+                            </h3>
+                            <div id="retrieveData">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                    Loading references...
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Retrieve Tab -->
-            <div id="retrieve" class="tab-content">
-                <h2 style="margin-bottom: 20px; color: #495057;">
-                    <i class="fas fa-download"></i> Retrieve References
-                </h2>
-                
-                <div id="retrieveAlert" style="display: none;"></div>
-                
-                <div class="table-container">
-                    <h3 style="margin-bottom: 20px; color: #495057;">
-                        <i class="fas fa-inbox"></i> References Sent by Admin
-                    </h3>
-                    <div id="retrieveData">
+                <!-- History Panel -->
+                <div class="history-panel hidden">
+                    <div class="header">
+                        <h3>Your References</h3>
+                        <span class="count" id="reference-count">0 References</span>
+                    </div>
+                    <div class="content" id="history-content">
                         <div class="loading">
                             <div class="spinner"></div>
-                            Loading references...
+                            Loading history...
                         </div>
                     </div>
                 </div>
@@ -340,226 +614,310 @@
     </div>
 
     <script>
-        // Get connection token from URL
+        let references = [];
         const connectionToken = window.location.pathname.split('/').pop();
-        
-        // Tab switching
-        function switchTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
+
+        // Tab switching functions
+        function switchToForms() {
+            document.querySelector('.column-1').classList.add('forms-active');
+            document.querySelector('.column-1').classList.remove('history-active');
+            document.querySelector('.forms-panel').classList.remove('hidden');
+            document.querySelector('.history-panel').classList.add('hidden');
+        }
+
+        function switchToHistory() {
+            document.querySelector('.column-1').classList.remove('forms-active');
+            document.querySelector('.column-1').classList.add('history-active');
+            document.querySelector('.forms-panel').classList.add('hidden');
+            document.querySelector('.history-panel').classList.remove('hidden');
+            loadSubmitHistory();
+        }
+
+        function switchToRetrieve() {
+            // This will be handled by the sub-tab switching
+            switchSubTab('retrieve');
+        }
+
+        function switchSubTab(tabName) {
+            // Hide all sub-tab contents
+            document.getElementById('submit-content').style.display = 'none';
+            document.getElementById('retrieve-content').style.display = 'none';
             
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
+            // Remove active class from all sub-tabs
+            document.querySelectorAll('.sub-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Show selected tab content
-            document.getElementById(tabName).classList.add('active');
-            
-            // Add active class to selected tab
-            event.target.classList.add('active');
-            
-            // Load data for the selected tab
+            // Show selected sub-tab content
             if (tabName === 'submit') {
-                loadSubmitHistory();
+                document.getElementById('submit-content').style.display = 'block';
+                document.querySelector('.sub-tab:first-child').classList.add('active');
             } else if (tabName === 'retrieve') {
+                document.getElementById('retrieve-content').style.display = 'block';
+                document.querySelector('.sub-tab:last-child').classList.add('active');
                 loadRetrieveData();
             }
         }
 
-        // Submit form
-        document.getElementById('submitForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        function togglePurchaseOrder() {
+            const heading = document.querySelector('.purchase-order-heading');
+            const form = document.querySelector('.purchase-order-form');
             
-            const submitBtn = document.getElementById('submitBtn');
-            const originalText = submitBtn.innerHTML;
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-            
-            try {
-                const formData = new FormData(e.target);
-                const data = {
-                    poNumber: formData.get('poNumber') || null,
-                    deliveryId: formData.get('deliveryId') || null,
-                    referenceNumber: formData.get('referenceNumber'),
-                    validationNumber: formData.get('validationNumber') || null,
-                    email: formData.get('email') || null
-                };
-                
-                // Validate that at least one of PO Number or Delivery ID is provided
-                if (!data.poNumber && !data.deliveryId) {
-                    throw new Error('Either PO Number or Delivery ID must be provided');
-                }
-                
-                const response = await fetch(`/api/external/${connectionToken}/submit`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    showAlert('submitAlert', 'Reference submitted successfully!', 'success');
-                    e.target.reset();
-                    loadSubmitHistory(); // Refresh the history
-                } else {
-                    throw new Error(result.error || 'Failed to submit reference');
-                }
-                
-            } catch (error) {
-                showAlert('submitAlert', error.message, 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+            if (heading.classList.contains('expanded')) {
+                heading.classList.remove('expanded');
+                form.style.display = 'none';
+            } else {
+                heading.classList.add('expanded');
+                form.style.display = 'flex';
             }
-        });
+        }
 
-        // Load submit history
+        function addReference() {
+            const refNumber = document.getElementById('reference-number').value.trim();
+            const valNumber = document.getElementById('validation-number').value.trim();
+            
+            if (!refNumber) {
+                alert('Please enter a reference number');
+                return;
+            }
+            
+            const newReference = {
+                id: Date.now().toString(),
+                referenceNumber: refNumber,
+                validationNumber: valNumber
+            };
+            
+            references.push(newReference);
+            updateReferenceDisplay();
+            
+            // Clear inputs
+            document.getElementById('reference-number').value = '';
+            document.getElementById('validation-number').value = '';
+            
+            // Show reference panel if it was hidden
+            const referencePanel = document.getElementById('reference-panel');
+            referencePanel.style.display = 'block';
+        }
+
+        function removeReference(id) {
+            references = references.filter(ref => ref.id !== id);
+            updateReferenceDisplay();
+            
+            // Hide reference panel if no references left
+            if (references.length === 0) {
+                const referencePanel = document.getElementById('reference-panel');
+                referencePanel.style.display = 'none';
+            }
+        }
+
+        function updateReferenceDisplay() {
+            const referenceList = document.getElementById('reference-list');
+            const referencePanel = document.getElementById('reference-panel');
+            
+            referenceList.innerHTML = '';
+            
+            references.forEach(ref => {
+                const card = document.createElement('div');
+                card.className = 'reference-card';
+                card.innerHTML = `
+                    <div class="reference-field">
+                        <span class="reference-field-label">Reference Number:</span>
+                        <div class="reference-field-value">${ref.referenceNumber}</div>
+                    </div>
+                    <div class="reference-field">
+                        <span class="reference-field-label">Validation Number:</span>
+                        <div class="reference-field-value">${ref.validationNumber || '-------'}</div>
+                    </div>
+                    <button class="remove-btn" onclick="removeReference('${ref.id}')">×</button>
+                `;
+                referenceList.appendChild(card);
+            });
+            
+            // Show/hide reference panel
+            if (references.length > 0) {
+                referencePanel.style.display = 'block';
+            } else {
+                referencePanel.style.display = 'none';
+            }
+        }
+
+        async function submitReferences() {
+            try {
+                if (references.length === 0) {
+                    alert('Please add at least one reference before submitting');
+                    return;
+                }
+
+                // Get the form fields
+                const poNumber = document.getElementById('po-number')?.value?.trim() || '';
+                const deliveryId = document.getElementById('delivery-id')?.value?.trim() || '';
+
+                // Check if we have at least one identifier (PO Number OR Delivery ID required)
+                if (!poNumber && !deliveryId) {
+                    alert('Please fill in either PO Number or Delivery ID (at least one is required)');
+                    return;
+                }
+
+                // Submit each reference individually
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (const reference of references) {
+                    try {
+                        const response = await fetch(`/api/external/${connectionToken}/submit`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                poNumber: poNumber,
+                                deliveryId: deliveryId,
+                                referenceNumber: reference.referenceNumber,
+                                validationNumber: reference.validationNumber || ''
+                            })
+                        });
+
+                        if (response.ok) {
+                            successCount++;
+                        } else {
+                            const errorData = await response.json();
+                            console.error('Reference submission failed:', errorData);
+                            errorCount++;
+                        }
+                    } catch (error) {
+                        errorCount++;
+                    }
+                }
+
+                if (successCount > 0) {
+                    alert(`Successfully submitted ${successCount} reference(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+                    
+                    // Clear references and reset form
+                    references = [];
+                    updateReferenceDisplay();
+                    
+                    // Clear form fields
+                    if (document.getElementById('po-number')) document.getElementById('po-number').value = '';
+                    if (document.getElementById('delivery-id')) document.getElementById('delivery-id').value = '';
+                } else {
+                    console.error('All references failed to submit. Check console for details.');
+                    alert(`Failed to submit references. ${errorCount} references failed. Check browser console for details.`);
+                }
+            } catch (error) {
+                console.error('Error submitting references:', error);
+                alert('Network error occurred. Please try again.');
+            }
+        }
+
         async function loadSubmitHistory() {
             try {
+                const historyContent = document.getElementById('history-content');
+                historyContent.innerHTML = '<div class="loading">Loading...</div>';
+
                 const response = await fetch(`/api/external/${connectionToken}/history`);
-                const result = await response.json();
+                const data = await response.json();
                 
                 if (response.ok) {
-                    displaySubmitHistory(result.references);
+                    if (data.references.length === 0) {
+                        historyContent.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 40px;">No submissions found.</p>';
+                    } else {
+                        // Group submissions by PO/Delivery
+                        const grouped = {};
+                        data.references.forEach(reference => {
+                            const key = `${reference.po_number}-${reference.delivery_id}`;
+                            if (!grouped[key]) {
+                                grouped[key] = {
+                                    poNumber: reference.po_number,
+                                    deliveryId: reference.delivery_id,
+                                    references: [],
+                                    submittedAt: reference.submitted_at
+                                };
+                            }
+                            grouped[key].references.push({
+                                referenceNumber: reference.reference_number,
+                                validationNumber: reference.validation_number,
+                                submittedAt: reference.submitted_at
+                            });
+                        });
+
+                        // Generate HTML for grouped submissions
+                        historyContent.innerHTML = Object.values(grouped).map(group => `
+                            <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
+                                <div style="background: linear-gradient(135deg, #4a7c59, #6a9969); color: white; padding: 12px 16px; font-size: 14px; font-weight: 600;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>PO: ${group.poNumber || '-'} | Delivery: ${group.deliveryId || '-'}</span>
+                                        <small style="opacity: 0.8;">${group.references.length} ref${group.references.length !== 1 ? 's' : ''}</small>
+                                    </div>
+                                    <small style="opacity: 0.8;">Last updated: ${new Date(group.submittedAt).toLocaleString()}</small>
+                                </div>
+                                <div style="padding: 12px;">
+                                    ${group.references.map(ref => `
+                                        <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; padding: 8px; border-bottom: 1px solid #f1f3f4; align-items: center; font-size: 14px;">
+                                            <div style="font-weight: 600; color: #4a7c59;">${ref.referenceNumber}</div>
+                                            <div style="color: #28a745;">${ref.validationNumber || '-'}</div>
+                                            <div style="color: #6c757d; font-size: 12px;">${new Date(ref.submittedAt).toLocaleString()}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('');
+                    }
                 } else {
-                    throw new Error(result.error || 'Failed to load history');
+                    historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Failed to load history. Please try again.</p>';
                 }
             } catch (error) {
-                document.getElementById('submitHistory').innerHTML = `
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
-                    </div>
-                `;
+                historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Network error occurred.</p>';
             }
         }
 
-        // Load retrieve data
         async function loadRetrieveData() {
             try {
+                const retrieveData = document.getElementById('retrieveData');
+                retrieveData.innerHTML = '<div class="loading">Loading...</div>';
+
                 const response = await fetch(`/api/external/${connectionToken}/retrieve`);
-                const result = await response.json();
+                const data = await response.json();
                 
                 if (response.ok) {
-                    displayRetrieveData(result.references);
+                    if (data.references.length === 0) {
+                        retrieveData.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 40px;">No references found.</p>';
+                    } else {
+                        // Generate HTML for retrieve data
+                        retrieveData.innerHTML = data.references.map(ref => `
+                            <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; padding: 16px;">
+                                <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center; font-size: 14px;">
+                                    <div style="font-weight: 600; color: #4a7c59;">${ref.reference_number}</div>
+                                    <div style="color: #28a745;">${ref.validation_number || '-'}</div>
+                                    <div style="color: #6c757d; font-size: 12px;">${new Date(ref.submitted_at).toLocaleString()}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
                 } else {
-                    throw new Error(result.error || 'Failed to load references');
+                    retrieveData.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Failed to load references. Please try again.</p>';
                 }
             } catch (error) {
-                document.getElementById('retrieveData').innerHTML = `
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
-                    </div>
-                `;
+                retrieveData.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Network error occurred.</p>';
             }
         }
 
-        // Display submit history
-        function displaySubmitHistory(references) {
-            if (!references || references.length === 0) {
-                document.getElementById('submitHistory').innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-info-circle"></i> No references submitted yet.
-                    </div>
-                `;
-                return;
+        function refreshData() {
+            if (document.querySelector('.column-1').classList.contains('history-active')) {
+                loadSubmitHistory();
+            } else if (document.getElementById('retrieve-content').style.display !== 'none') {
+                loadRetrieveData();
+            }
+        }
+
+        // Initialize the layout
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state
+            const column1 = document.querySelector('.column-1');
+            if (column1) {
+                column1.classList.add('forms-active');
             }
             
-            const table = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>PO Number</th>
-                            <th>Delivery ID</th>
-                            <th>Reference</th>
-                            <th>Validation</th>
-                            <th>Submitted</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${references.map(ref => `
-                            <tr>
-                                <td>${ref.po_number || '-'}</td>
-                                <td>${ref.delivery_id || '-'}</td>
-                                <td>${ref.reference_number}</td>
-                                <td>${ref.validation_number || '-'}</td>
-                                <td>${new Date(ref.submitted_at).toLocaleDateString()}</td>
-                                <td><span class="status-badge status-sent">Sent</span></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-            
-            document.getElementById('submitHistory').innerHTML = table;
-        }
-
-        // Display retrieve data
-        function displayRetrieveData(references) {
-            if (!references || references.length === 0) {
-                document.getElementById('retrieveData').innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-info-circle"></i> No references received from admin yet.
-                    </div>
-                `;
-                return;
-            }
-            
-            const table = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>PO Number</th>
-                            <th>Delivery ID</th>
-                            <th>Reference</th>
-                            <th>Validation</th>
-                            <th>Received</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${references.map(ref => `
-                            <tr>
-                                <td>${ref.po_number || '-'}</td>
-                                <td>${ref.delivery_id || '-'}</td>
-                                <td>${ref.reference_number}</td>
-                                <td>${ref.validation_number || '-'}</td>
-                                <td>${new Date(ref.submitted_at).toLocaleDateString()}</td>
-                                <td><span class="status-badge status-received">Received</span></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-            
-            document.getElementById('retrieveData').innerHTML = table;
-        }
-
-        // Show alert
-        function showAlert(elementId, message, type) {
-            const alertDiv = document.getElementById(elementId);
-            alertDiv.innerHTML = `
-                <div class="alert alert-${type}">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}
-                </div>
-            `;
-            alertDiv.style.display = 'block';
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                alertDiv.style.display = 'none';
-            }, 5000);
-        }
-
-        // Load initial data
-        document.addEventListener('DOMContentLoaded', () => {
+            // Load initial data
             loadSubmitHistory();
         });
     </script>
