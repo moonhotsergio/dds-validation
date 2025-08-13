@@ -525,6 +525,439 @@
             color: #6c757d;
         }
 
+        /* Add New Button Styles */
+        .add-new-btn {
+            background: #1A2B2B;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 36px;
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+
+        .add-new-btn:hover {
+            background: #2A3B3B;
+            transform: translateY(-1px);
+        }
+
+        .add-new-btn i {
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        /* Overlay Styles */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .overlay.hidden {
+            display: none;
+        }
+
+        .overlay-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .overlay-header {
+            background: linear-gradient(135deg, #4a7c59, #6a9969);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .overlay-header h2 {
+            margin: 0;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .overlay-body {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .overlay-columns {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .overlay-left-column {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .overlay-right-column {
+            width: 360px;
+            flex-shrink: 0;
+            background: rgba(249, 251, 252, 0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(7.25px);
+        }
+
+        .overlay-left-column .purchase-order-section {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(249, 251, 252, 0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            backdrop-filter: blur(7.25px);
+        }
+
+        .overlay-left-column .purchase-order-section h3 {
+            margin: 0 0 16px 0;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            color: #000000;
+        }
+
+        .overlay-left-column .reference-input-section {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(249, 251, 252, 0.6);
+            border: 1px solid #c3c6c8;
+            border-radius: 10px;
+            backdrop-filter: blur(7.25px);
+        }
+
+        .overlay-left-column .reference-input-section h3 {
+            margin: 0 0 16px 0;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            color: #000000;
+        }
+
+        .overlay-left-column .note {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #6c757d;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .overlay-left-column .form-group {
+            margin-bottom: 16px;
+        }
+
+        .overlay-left-column .form-group label {
+            display: block;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #000000;
+            margin-bottom: 6px;
+            line-height: 14px;
+        }
+
+        .overlay-left-column .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #c3c6c8;
+            border-radius: 999px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            background: white;
+            transition: border-color 0.3s ease;
+            height: 36px;
+            box-sizing: border-box;
+        }
+
+        .overlay-left-column .form-group input:focus {
+            outline: none;
+            border-color: #00993a;
+            box-shadow: 0 0 0 3px rgba(0, 153, 58, 0.1);
+        }
+
+        .overlay-left-column .action-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .btn-add-reference {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
+        }
+
+        .btn-add-reference:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .btn-add-csv {
+            background: transparent;
+            color: #868b90;
+            border: none;
+            padding: 8px 16px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
+        }
+
+        .btn-add-csv:hover {
+            color: #000000;
+        }
+
+        .overlay-left-column .submit-section {
+            margin-top: 24px;
+            padding-top: 16px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-start;
+        }
+
+        .overlay-left-column .submit-btn {
+            background: #000000;
+            color: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 9px 18px;
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 36px;
+            line-height: 20px;
+        }
+
+        .overlay-left-column .submit-btn:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        .overlay-left-column .test-btn {
+            background: #f0f0f0;
+            color: #000000;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 36px;
+            line-height: 20px;
+        }
+
+        .overlay-left-column .test-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        .overlay-right-column .references-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .overlay-right-column .references-count {
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            color: #868b90;
+        }
+
+        .overlay-right-column .references-content {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .overlay-right-column .references-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .overlay-right-column .references-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .overlay-right-column .references-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .overlay-right-column .references-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Overlay Reference Cards */
+        .overlay-reference-card {
+            background: #f9fbfc;
+            border: 0.5px solid #000000;
+            border-radius: 10px;
+            padding: 20px 10px;
+            margin-bottom: 11px;
+            margin-top: 8px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            width: 100%;
+        }
+
+        .overlay-reference-card.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+
+        .overlay-reference-card .remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #c3c6c8;
+            border: none;
+            border-radius: 499.5px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #000000;
+            transition: background-color 0.3s ease;
+            padding: 9px 0;
+            z-index: 1;
+        }
+
+        .overlay-reference-card .remove-btn:hover {
+            background: #a8abae;
+        }
+
+        .overlay-reference-field {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+        .overlay-reference-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .overlay-reference-field-label {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #525961;
+            white-space: nowrap;
+            line-height: 14px;
+        }
+
+        .overlay-reference-field-value {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid #e4e4e4;
+            border-radius: 999px;
+            padding: 10px 12px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 14px;
+            color: #767676;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+            height: 28px;
+            box-sizing: border-box;
+        }
+
+        .overlay-reference-field-value.error {
+            background: #fff8f8;
+            border-color: #ffcfcf;
+        }
+
+        /* Responsive overlay */
+        @media (max-width: 1024px) {
+            .overlay-columns {
+                flex-direction: column;
+            }
+            
+            .overlay-right-column {
+                width: 100%;
+            }
+        }
+
         /* Logo Styles */
         .logo {
             position: relative;
@@ -582,9 +1015,15 @@
             <!-- Column 1: Forms and History -->
             <div class="column-1 history-active">
                 <!-- Header -->
-                <div class="header">
-                    <h2 style="color: #4a7c59; margin: 0; font-size: 24px; font-family: 'IBM Plex Sans Condensed', sans-serif;">External Portal</h2>
-                    <p style="color: #6c757d; margin: 8px 0 0 0; font-size: 14px;">View your submission history</p>
+                <div class="header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h2 style="color: #4a7c59; margin: 0; font-size: 24px; font-family: 'IBM Plex Sans Condensed', sans-serif;">External Portal</h2>
+                        <p style="color: #6c757d; margin: 8px 0 0 0; font-size: 14px;">View your submission history</p>
+                    </div>
+                    <button class="add-new-btn" onclick="handleAddNew()">
+                        <i class="fas fa-plus"></i>
+                        Send new
+                    </button>
                 </div>
 
                 <!-- History Filters - Simple and Consistent -->
@@ -620,9 +1059,85 @@
         </div>
     </div>
 
+    <!-- Add New Overlay -->
+    <div id="add-new-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2>Add New Purchase Order</h2>
+                <button class="close-btn" onclick="closeAddNewOverlay()">×</button>
+            </div>
+            
+            <div class="overlay-body">
+                <div class="overlay-columns">
+                    <!-- Left Column: Purchase Order Form -->
+                    <div class="overlay-left-column">
+                        <div class="purchase-order-section">
+                            <h3>Purchase Order Information</h3>
+                            <div class="form-group">
+                                <label>PO Number (Optional if Delivery ID provided)</label>
+                                <input type="text" id="overlay-po-number" placeholder="Enter PO Number">
+                            </div>
+                            <div class="form-group">
+                                <label>Delivery ID (Optional if PO Number provided)</label>
+                                <input type="text" id="overlay-delivery-id" placeholder="Enter Delivery ID">
+                            </div>
+                            <div class="note">
+                                💡 <strong>Note:</strong> You must provide either a PO Number OR a Delivery ID (at least one is required)
+                            </div>
+                        </div>
+
+                        <div class="reference-input-section">
+                            <h3>Add Reference Numbers</h3>
+                            <div class="form-group">
+                                <label>Reference Number</label>
+                                <input type="text" id="overlay-reference-number" placeholder="------">
+                            </div>
+                            <div class="form-group">
+                                <label>Validation Number (Optional)</label>
+                                <input type="text" id="overlay-validation-number" placeholder="-------">
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn-add-reference" onclick="addOverlayReference()">
+                                    <i class="fas fa-plus"></i> Add Reference
+                                </button>
+                                <button class="btn-add-csv" onclick="addOverlayCSVFile()">
+                                    <i class="fas fa-paperclip"></i> Add CSV File
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="submit-section">
+                            <button class="submit-btn" onclick="submitOverlayReferences()">Submit References</button>
+                            <button class="test-btn" onclick="testOverlaySubmission()">Test Submission</button>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: References Display -->
+                    <div class="overlay-right-column">
+                        <div class="references-header">
+                            <span class="references-count" id="overlay-references-count">0 References created</span>
+                        </div>
+                        <div class="references-content" id="overlay-references-list">
+                            <!-- References will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const connectionToken = window.location.pathname.split('/').pop();
         let historyFilters = {};
+
+        // Debug connection token
+        console.log('URL pathname:', window.location.pathname);
+        console.log('Extracted connection token:', connectionToken);
+        
+        // Validate connection token format
+        if (!connectionToken || connectionToken === 'external-portal.html') {
+            console.error('Invalid connection token. Please check the URL.');
+        }
 
         // Initialize the layout
         document.addEventListener('DOMContentLoaded', function() {
@@ -632,10 +1147,31 @@
                 column1.classList.add('history-active');
             }
             
+            // Test API connectivity
+            testAPIConnectivity();
+            
             // Initialize with received filter
             historyFilters.direction = 'received';
             loadHistory();
+
+            // Add click outside overlay to close functionality
+            document.getElementById('add-new-overlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAddNewOverlay();
+                }
+            });
         });
+
+        async function testAPIConnectivity() {
+            try {
+                console.log('Testing API connectivity...');
+                const response = await fetch(`/api/external/${connectionToken}/info`);
+                const data = await response.json();
+                console.log('API connectivity test successful:', data);
+            } catch (error) {
+                console.error('API connectivity test failed:', error);
+            }
+        }
 
         async function loadHistory() {
             try {
@@ -652,7 +1188,15 @@
                 const response = await fetch(`/api/external/${connectionToken}/history?${params.toString()}`);
                 const data = await response.json();
                 
+                console.log('History API response:', data);
+                
                 if (response.ok) {
+                    if (!data.references) {
+                        console.error('API response missing references array:', data);
+                        historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Invalid API response format.</p>';
+                        return;
+                    }
+                    
                     if (data.references.length === 0) {
                         historyContent.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 40px;">No submissions found.</p>';
                     } else {
@@ -798,6 +1342,192 @@
                 return `${Math.floor(diffInSeconds / 2592000)}mo ago`;
             }
             return `${Math.floor(diffInSeconds / 31536000)}y ago`;
+        }
+
+        function handleAddNew() {
+            // Show the add new overlay
+            document.getElementById('add-new-overlay').classList.remove('hidden');
+            // Reset form fields
+            resetOverlayForm();
+        }
+
+        function closeAddNewOverlay() {
+            document.getElementById('add-new-overlay').classList.add('hidden');
+            // Clear references when closing
+            overlayReferences = [];
+            updateOverlayReferenceDisplay();
+        }
+
+        // Overlay functionality
+        let overlayReferences = [];
+
+        function addOverlayReference() {
+            const refNumber = document.getElementById('overlay-reference-number').value;
+            const valNumber = document.getElementById('overlay-validation-number').value;
+            
+            if (!refNumber) {
+                alert('Please enter a reference number');
+                return;
+            }
+            
+            const newReference = {
+                id: Date.now().toString(),
+                referenceNumber: refNumber,
+                validationNumber: valNumber
+            };
+            
+            overlayReferences.push(newReference);
+            updateOverlayReferenceDisplay();
+            
+            // Clear inputs
+            document.getElementById('overlay-reference-number').value = '';
+            document.getElementById('overlay-validation-number').value = '';
+        }
+
+        function removeOverlayReference(id) {
+            overlayReferences = overlayReferences.filter(ref => ref.id !== id);
+            updateOverlayReferenceDisplay();
+        }
+
+        function updateOverlayReferenceDisplay() {
+            const referenceList = document.getElementById('overlay-references-list');
+            const referenceCount = document.getElementById('overlay-references-count');
+            
+            referenceCount.textContent = `${overlayReferences.length} References created`;
+            
+            referenceList.innerHTML = '';
+            
+            overlayReferences.forEach(ref => {
+                const card = document.createElement('div');
+                card.className = 'overlay-reference-card';
+                card.innerHTML = `
+                    <div class="overlay-reference-field">
+                        <span class="overlay-reference-field-label">Reference Number:</span>
+                        <div class="overlay-reference-field-value">
+                            ${ref.referenceNumber}
+                        </div>
+                    </div>
+                    <div class="overlay-reference-field">
+                        <span class="overlay-reference-field-label">Validation Number:</span>
+                        <div class="overlay-reference-field-value">
+                            ${ref.validationNumber || '-------'}
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeOverlayReference('${ref.id}')">×</button>
+                `;
+                referenceList.appendChild(card);
+            });
+        }
+
+        function resetOverlayForm() {
+            // Clear form fields
+            document.getElementById('overlay-po-number').value = '';
+            document.getElementById('overlay-delivery-id').value = '';
+            document.getElementById('overlay-reference-number').value = '';
+            document.getElementById('overlay-validation-number').value = '';
+            
+            // Clear references
+            overlayReferences = [];
+            updateOverlayReferenceDisplay();
+        }
+
+        function addOverlayCSVFile() {
+            // CSV file upload logic
+            alert('CSV file upload functionality coming soon!');
+        }
+
+        function testOverlaySubmission() {
+            // Fill in test data
+            document.getElementById('overlay-po-number').value = 'TEST-PO-001';
+            document.getElementById('overlay-delivery-id').value = 'TEST-DEL-001';
+            
+            // Add a test reference if none exist
+            if (overlayReferences.length === 0) {
+                overlayReferences.push({
+                    id: Date.now().toString(),
+                    referenceNumber: 'TEST-REF-001',
+                    validationNumber: 'TEST-VAL-001'
+                });
+                updateOverlayReferenceDisplay();
+            }
+            
+            console.log('Test data prepared. You can now click Submit References to test the submission.');
+            alert('Test data prepared. You can now click Submit References to test the submission.');
+        }
+
+        async function submitOverlayReferences() {
+            try {
+                if (overlayReferences.length === 0) {
+                    alert('Please add at least one reference before submitting');
+                    return;
+                }
+
+                // Get the form fields
+                const poNumber = document.getElementById('overlay-po-number')?.value?.trim() || '';
+                const deliveryId = document.getElementById('overlay-delivery-id')?.value?.trim() || '';
+
+                // Check if we have at least one identifier (PO Number OR Delivery ID required)
+                if (!poNumber && !deliveryId) {
+                    alert('Please fill in either PO Number or Delivery ID (at least one is required)');
+                    return;
+                }
+
+                // Submit each reference individually
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (const reference of overlayReferences) {
+                    try {
+                        const requestBody = {
+                            poNumber: poNumber,
+                            deliveryId: deliveryId,
+                            referenceNumber: reference.referenceNumber,
+                            validationNumber: reference.validationNumber || ''
+                        };
+                        
+                        console.log('Submitting reference:', requestBody);
+                        console.log('Using connection token:', connectionToken);
+                        
+                        const response = await fetch(`/api/external/${connectionToken}/submit`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(requestBody)
+                        });
+
+                        if (response.ok) {
+                            const responseData = await response.json();
+                            console.log('Reference submitted successfully:', responseData);
+                            successCount++;
+                        } else {
+                            const errorData = await response.json();
+                            console.error('Reference submission failed:', errorData);
+                            errorCount++;
+                        }
+                    } catch (error) {
+                        errorCount++;
+                    }
+                }
+
+                if (successCount > 0) {
+                    alert(`Successfully submitted ${successCount} reference(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+                    
+                    // Close overlay and reset form
+                    closeAddNewOverlay();
+                    
+                    // Refresh history if on history tab
+                    if (document.querySelector('.column-1').classList.contains('history-active')) {
+                        loadHistory();
+                    }
+                } else {
+                    console.error('All references failed to submit. Check console for details.');
+                    alert(`Failed to submit references. ${errorCount} references failed. Check browser console for details.`);
+                }
+            } catch (error) {
+                console.error('Error submitting references:', error);
+                alert('Network error occurred. Please try again.');
+            }
         }
     </script>
 </body>
