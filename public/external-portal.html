@@ -1207,27 +1207,38 @@
                         });
 
                         // Generate HTML for grouped submissions
-                        historyContent.innerHTML = Object.values(grouped).map(group => `
-                            <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
-                                <div style="background: linear-gradient(135deg, #4a7c59, #6a9969); color: white; padding: 8px 12px; font-size: 13px; font-weight: 600;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>PO: ${group.poNumber || '-'} | Delivery: ${group.deliveryId || '-'} | ${group.references.length} ref${group.references.length !== 1 ? 's' : ''} | Updated: ${formatDateConcise(group.submittedAt)}</span>
-                                    </div>
-                                </div>
-                                <div style="padding: 8px;">
-                                    ${group.references.map(ref => `
-                                        <div style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 8px; padding: 6px; border-bottom: 1px solid #f1f3f4; align-items: center; font-size: 13px;">
-                                            <div style="font-weight: 600; color: #4a7c59;">${ref.referenceNumber}</div>
-                                            <div style="color: #28a745;">${ref.validationNumber || '-'}</div>
-                                            <div style="color: #6c757d; font-size: 11px;">${formatDateConcise(ref.submittedAt)}</div>
-                                            <div style="color: ${ref.direction === 'sent' ? '#dc3545' : '#007bff'}; font-weight: 600; font-size: 11px; text-transform: uppercase;">
-                                                ${ref.direction === 'sent' ? 'Sent' : 'Received'}
+                        historyContent.innerHTML = Object.values(grouped).map(group => {
+                            const groupKey = `${group.poNumber || 'no-po'}-${group.deliveryId || 'no-delivery'}`;
+                            return `
+                                <div data-group-key="${groupKey}" style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
+                                    <div style="background: linear-gradient(135deg, #4a7c59, #6a9969); color: white; padding: 8px 12px; font-size: 13px; font-weight: 600;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span>PO: ${group.poNumber || '-'} | Delivery: ${group.deliveryId || '-'} | ${group.references.length} ref${group.references.length !== 1 ? 's' : ''} | Updated: ${formatDateConcise(group.submittedAt)}</span>
+                                            <div style="display: flex; gap: 12px; align-items: center;">
+                                                <button onclick="copyGroupReferences('${groupKey}')" style="background: transparent; border: none; color: white; text-decoration: underline; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 4px; transition: background-color 0.2s ease;">
+                                                    <i class="fas fa-copy" style="margin-right: 4px;"></i>Copy all
+                                                </button>
+                                                <button onclick="downloadGroupAsCSV('${groupKey}')" style="background: transparent; border: none; color: white; text-decoration: underline; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 4px; transition: background-color 0.2s ease;">
+                                                    <i class="fas fa-download" style="margin-right: 4px;"></i>Download All as CSV
+                                                </button>
                                             </div>
                                         </div>
-                                    `).join('')}
+                                    </div>
+                                    <div style="padding: 8px;">
+                                        ${group.references.map(ref => `
+                                            <div style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 8px; padding: 6px; border-bottom: 1px solid #f1f3f4; align-items: center; font-size: 13px;">
+                                                <div style="font-weight: 600; color: #4a7c59;">${ref.referenceNumber}</div>
+                                                <div style="color: #28a745;">${ref.validationNumber || '-'}</div>
+                                                <div style="color: #6c757d; font-size: 11px;">${formatDateConcise(ref.submittedAt)}</div>
+                                                <div style="color: ${ref.direction === 'sent' ? '#dc3545' : '#007bff'}; font-weight: 600; font-size: 11px; text-transform: uppercase;">
+                                                    ${ref.direction === 'sent' ? 'Sent' : 'Received'}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
                                 </div>
-                            </div>
-                        `).join('');
+                            `;
+                        }).join('');
                     }
                 } else {
                     historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Failed to load history. Please try again.</p>';
@@ -1383,26 +1394,44 @@
             
             referenceList.innerHTML = '';
             
-            overlayReferences.forEach((ref, index) => {
-                const card = document.createElement('div');
-                card.className = 'overlay-reference-card';
-                card.innerHTML = `
-                    <div class="overlay-reference-field">
-                        <span class="overlay-reference-field-label">Reference Number:</span>
-                        <div class="overlay-reference-field-value">
-                            ${ref.referenceNumber}
-                        </div>
-                    </div>
-                    <div class="overlay-reference-field">
-                        <span class="overlay-reference-field-label">Validation Number:</span>
-                        <div class="overlay-reference-field-value">
-                            ${ref.validationNumber || '-------'}
-                        </div>
-                    </div>
-                    <button class="remove-btn" onclick="removeOverlayReference('${ref.id}')">×</button>
-                `;
-                referenceList.appendChild(card);
-            });
+                                    overlayReferences.forEach((ref, index) => {
+                            const card = document.createElement('div');
+                            card.className = 'overlay-reference-card';
+                            card.innerHTML = `
+                                <div class="overlay-reference-field">
+                                    <span class="overlay-reference-field-label">Reference Number:</span>
+                                    <div class="overlay-reference-field-value">
+                                        ${ref.referenceNumber}
+                                    </div>
+                                </div>
+                                <div class="overlay-reference-field">
+                                    <span class="overlay-reference-field-label">Validation Number:</span>
+                                    <div class="overlay-reference-field-value">
+                                        ${ref.validationNumber || '-------'}
+                                    </div>
+                                </div>
+                                <button class="remove-btn" onclick="removeOverlayReference('${ref.id}')">×</button>
+                            `;
+                            referenceList.appendChild(card);
+                        });
+                        
+                        // Add action buttons to the references header
+                        const referencesHeader = document.querySelector('.references-header');
+                        if (referencesHeader && overlayReferences.length > 0) {
+                            const actionButtons = document.createElement('div');
+                            actionButtons.style.display = 'flex';
+                            actionButtons.style.gap = '12px';
+                            actionButtons.style.alignItems = 'center';
+                            actionButtons.innerHTML = `
+                                <button onclick="copyOverlayReferences()" style="background: transparent; border: none; color: #6c757d; text-decoration: underline; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 4px; transition: color 0.2s ease;">
+                                    <i class="fas fa-copy" style="margin-right: 4px;"></i>Copy all
+                                </button>
+                                <button onclick="downloadOverlayAsCSV()" style="background: transparent; border: none; color: #6c757d; text-decoration: underline; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 4px; transition: color 0.2s ease;">
+                                    <i class="fas fa-download" style="margin-right: 4px;"></i>Download All as CSV
+                                </button>
+                            `;
+                            referencesHeader.appendChild(actionButtons);
+                        }
         }
 
         function resetOverlayForm() {
@@ -1420,6 +1449,116 @@
         function addOverlayCSVFile() {
             // CSV file upload logic
             alert('CSV file upload functionality coming soon!');
+        }
+        
+        // Copy group references to clipboard
+        function copyGroupReferences(groupKey) {
+            const groupElement = document.querySelector(`[data-group-key="${groupKey}"]`);
+            if (!groupElement) return;
+            
+            const references = [];
+            const rows = groupElement.querySelectorAll('div[style*="grid-template-columns"]');
+            
+            rows.forEach(row => {
+                const refNumber = row.children[0].textContent;
+                const valNumber = row.children[1].textContent;
+                references.push(`${refNumber}, ${valNumber}`);
+            });
+            
+            const textToCopy = references.join('\n');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Show temporary success feedback
+                const button = event.target.closest('button');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check" style="margin-right: 4px;"></i>Copied!';
+                button.style.color = '#28a745';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.color = 'white';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+        
+        // Download group as CSV
+        function downloadGroupAsCSV(groupKey) {
+            const groupElement = document.querySelector(`[data-group-key="${groupKey}"]`);
+            if (!groupElement) return;
+            
+            const references = [];
+            const rows = groupElement.querySelectorAll('div[style*="grid-template-columns"]');
+            
+            // Add CSV header
+            references.push('Reference Number,Validation Number');
+            
+            rows.forEach(row => {
+                const refNumber = row.children[0].textContent;
+                const valNumber = row.children[1].textContent;
+                references.push(`${refNumber},${valNumber}`);
+            });
+            
+            const csvContent = references.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `references_${groupKey}_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Copy overlay references to clipboard
+        function copyOverlayReferences() {
+            if (overlayReferences.length === 0) return;
+            
+            const references = overlayReferences.map(ref => 
+                `${ref.referenceNumber}, ${ref.validationNumber || '-------'}`
+            );
+            
+            const textToCopy = references.join('\n');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Show temporary success feedback
+                const button = event.target.closest('button');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check" style="margin-right: 4px;"></i>Copied!';
+                button.style.color = '#28a745';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.color = '#6c757d';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+        
+        // Download overlay as CSV
+        function downloadOverlayAsCSV() {
+            if (overlayReferences.length === 0) return;
+            
+            const references = [];
+            references.push('Reference Number,Validation Number');
+            
+            overlayReferences.forEach(ref => {
+                references.push(`${ref.referenceNumber},${ref.validationNumber || ''}`);
+            });
+            
+            const csvContent = references.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `overlay_references_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         async function submitOverlayReferences() {
