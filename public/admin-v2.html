@@ -99,7 +99,7 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        /* Searchable Dropdown Styles */
+        /* Enhanced Searchable Dropdown Styles */
         .searchable-dropdown {
             position: relative;
             width: 100%;
@@ -111,7 +111,8 @@
             border: 2px solid #e9ecef;
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
+            background: white;
         }
 
         .searchable-dropdown input:focus {
@@ -120,30 +121,40 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .searchable-dropdown input:disabled {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+
         .dropdown-list {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
             background: white;
-            border: 2px solid #e9ecef;
+            border: 2px solid #667eea;
             border-top: none;
             border-radius: 0 0 8px 8px;
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
             z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            display: none;
         }
 
         .dropdown-item {
             padding: 12px 15px;
             cursor: pointer;
             border-bottom: 1px solid #f8f9fa;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .dropdown-item:hover {
             background-color: #f8f9fa;
+            transform: translateX(2px);
         }
 
         .dropdown-item:last-child {
@@ -153,6 +164,41 @@
         .dropdown-item.selected {
             background-color: #667eea;
             color: white;
+        }
+
+        .dropdown-item .org-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .dropdown-item .org-icon {
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item.selected .org-icon {
+            color: white;
+        }
+
+        .no-results {
+            padding: 15px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+
+        .searchable-dropdown.open .dropdown-arrow {
+            transform: translateY(-50%) rotate(180deg);
         }
 
         .btn-secondary {
@@ -416,6 +462,70 @@
             color: #0c5460;
         }
 
+        /* Grouped References Styles */
+        .grouped-reference {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .grouped-reference-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .grouped-reference-content {
+            padding: 12px;
+        }
+
+        .reference-row {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr 1fr;
+            gap: 12px;
+            padding: 8px;
+            border-bottom: 1px solid #f1f3f4;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .reference-row:last-child {
+            border-bottom: none;
+        }
+
+        .reference-number {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .validation-number {
+            color: #28a745;
+        }
+
+        .reference-time {
+            color: #6c757d;
+            font-size: 11px;
+        }
+
+        .reference-direction {
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .direction-sent {
+            color: #dc3545;
+        }
+
+        .direction-received {
+            color: #007bff;
+        }
+
         .loading {
             text-align: center;
             padding: 40px;
@@ -453,6 +563,33 @@
             .header h1 {
                 font-size: 2rem;
             }
+            
+            .reference-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 12px 8px;
+            }
+            
+            .grouped-reference-header span {
+                font-size: 12px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 2% auto;
+                padding: 20px;
+            }
+            
+            .dropdown-list {
+                max-height: 200px;
+            }
+            
+            .dropdown-item {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            
+
         }
     </style>
 </head>
@@ -509,9 +646,10 @@
                     <form id="createConnectionForm">
                         <div class="form-group">
                             <label for="organisationSelect">Select Organisation</label>
-                            <div class="searchable-dropdown">
+                            <div class="searchable-dropdown" id="organisationDropdownContainer">
                                 <input type="text" id="organisationSelect" placeholder="Type to search organisations..." autocomplete="off">
-                                <div id="organisationDropdown" class="dropdown-list" style="display: none;"></div>
+                                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                                <div id="organisationDropdown" class="dropdown-list"></div>
                             </div>
                         </div>
                         
@@ -548,7 +686,7 @@
     <div id="connectionModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Connection Details</h3>
+                <h3 class="modal-title">Connection Details & History</h3>
                 <span class="close" onclick="closeConnectionModal()">&times;</span>
             </div>
             
@@ -689,55 +827,101 @@
             const input = document.getElementById('organisationSelect');
             const dropdown = document.getElementById('organisationDropdown');
             
-            // Clear previous value
+            // Clear previous value and selection
             input.value = '';
             selectedOrganisationId = null;
+            
+            // Hide dropdown if open
+            hideOrganisationDropdown();
             
             // Store organisations for filtering
             window.availableOrganisations = orgs;
         }
 
-        // Search organisations
+        // Enhanced searchable dropdown functionality
         let searchTimeout;
         let selectedOrganisationId = null;
+        let isDropdownOpen = false;
         
+        // Input event for search
         document.getElementById('organisationSelect').addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim();
             const dropdown = document.getElementById('organisationDropdown');
+            const container = document.getElementById('organisationDropdownContainer');
+            
+            // Clear previous selection if user is typing
+            if (selectedOrganisationId) {
+                selectedOrganisationId = null;
+            }
             
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 if (searchTerm.length === 0) {
-                    dropdown.style.display = 'none';
-                    return;
+                    // Show all organisations when input is empty
+                    showOrganisationDropdown(window.availableOrganisations || []);
+                } else {
+                    // Filter organisations based on search term
+                    const filtered = (window.availableOrganisations || []).filter(org => 
+                        org.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                    showOrganisationDropdown(filtered);
                 }
-                
-                // Filter organisations
-                const filtered = window.availableOrganisations.filter(org => 
-                    org.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-                
-                // Show dropdown with filtered results
-                showOrganisationDropdown(filtered);
-            }, 300);
+            }, 200);
+        });
+
+        // Focus event to show dropdown
+        document.getElementById('organisationSelect').addEventListener('focus', () => {
+            if (window.availableOrganisations && window.availableOrganisations.length > 0) {
+                showOrganisationDropdown(window.availableOrganisations);
+            }
+        });
+
+        // Click event to toggle dropdown
+        document.getElementById('organisationSelect').addEventListener('click', () => {
+            if (window.availableOrganisations && window.availableOrganisations.length > 0) {
+                if (isDropdownOpen) {
+                    hideOrganisationDropdown();
+                } else {
+                    showOrganisationDropdown(window.availableOrganisations);
+                }
+            }
+        });
+
+        // Keyboard navigation
+        document.getElementById('organisationSelect').addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideOrganisationDropdown();
+                e.target.blur();
+            } else if (e.key === 'Enter' && isDropdownOpen) {
+                e.preventDefault();
+                // Select first item if dropdown is open
+                const firstItem = document.querySelector('.dropdown-item[data-id]');
+                if (firstItem) {
+                    selectOrganisation(firstItem.dataset.id, firstItem.dataset.name);
+                }
+            }
         });
 
         // Show organisation dropdown
         function showOrganisationDropdown(organisations) {
             const dropdown = document.getElementById('organisationDropdown');
             const input = document.getElementById('organisationSelect');
+            const container = document.getElementById('organisationDropdownContainer');
             
             if (organisations.length === 0) {
-                dropdown.innerHTML = '<div class="dropdown-item">No organisations found</div>';
+                dropdown.innerHTML = '<div class="no-results">No organisations found</div>';
             } else {
                 dropdown.innerHTML = organisations.map(org => `
                     <div class="dropdown-item" data-id="${org.id}" data-name="${org.name}">
-                        ${org.name}
+                        <i class="fas fa-building org-icon"></i>
+                        <div class="org-name">${org.name}</div>
                     </div>
                 `).join('');
             }
             
             dropdown.style.display = 'block';
+            container.classList.add('open');
+            isDropdownOpen = true;
             
             // Add click handlers to dropdown items
             dropdown.querySelectorAll('.dropdown-item').forEach(item => {
@@ -749,23 +933,38 @@
             });
         }
 
+        // Hide organisation dropdown
+        function hideOrganisationDropdown() {
+            const dropdown = document.getElementById('organisationDropdown');
+            const container = document.getElementById('organisationDropdownContainer');
+            
+            dropdown.style.display = 'none';
+            container.classList.remove('open');
+            isDropdownOpen = false;
+        }
+
         // Select organisation from dropdown
         function selectOrganisation(id, name) {
             const input = document.getElementById('organisationSelect');
             const dropdown = document.getElementById('organisationDropdown');
+            const container = document.getElementById('organisationDropdownContainer');
             
             input.value = name;
             selectedOrganisationId = id;
-            dropdown.style.display = 'none';
+            hideOrganisationDropdown();
+            
+            // Focus the input to show the selected value clearly
+            input.focus();
         }
 
         // Hide dropdown when clicking outside
         document.addEventListener('click', (e) => {
             const dropdown = document.getElementById('organisationDropdown');
             const input = document.getElementById('organisationSelect');
+            const container = document.getElementById('organisationDropdownContainer');
             
-            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.style.display = 'none';
+            if (!container.contains(e.target)) {
+                hideOrganisationDropdown();
             }
         });
 
@@ -933,7 +1132,7 @@
                 </div>
                 
                 <div>
-                    <h4>Connection History</h4>
+                    <h4>Connection History <span id="historyCount" style="font-size: 0.8em; color: #6c757d; font-weight: normal;"></span></h4>
                     <div id="connectionHistory">
                         <div class="loading">
                             <div class="spinner"></div>
@@ -988,39 +1187,59 @@
                         <i class="fas fa-info-circle"></i> No references found for this connection.
                     </div>
                 `;
+                document.getElementById('historyCount').textContent = '(0 references)';
                 return;
             }
             
-            const table = `
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>PO Number</th>
-                                <th>Delivery ID</th>
-                                <th>Reference</th>
-                                <th>Validation</th>
-                                <th>Direction</th>
-                                <th>Submitted</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${history.map(ref => `
-                                <tr>
-                                    <td>${ref.po_number || '-'}</td>
-                                    <td>${ref.delivery_id || '-'}</td>
-                                    <td>${ref.reference_number}</td>
-                                    <td>${ref.validation_number || '-'}</td>
-                                    <td><span class="status-badge status-${ref.direction}">${ref.direction}</span></td>
-                                    <td>${new Date(ref.submitted_at).toLocaleDateString()}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+            // Group references by PO/Delivery
+            const grouped = {};
+            history.forEach(reference => {
+                const key = `${reference.po_number || 'no-po'}-${reference.delivery_id || 'no-delivery'}`;
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        poNumber: reference.po_number,
+                        deliveryId: reference.delivery_id,
+                        references: [],
+                        submittedAt: reference.submitted_at
+                    };
+                }
+                grouped[key].references.push({
+                    referenceNumber: reference.reference_number,
+                    validationNumber: reference.validation_number,
+                    submittedAt: reference.submitted_at,
+                    direction: reference.direction
+                });
+            });
+
+            // Generate HTML for grouped references
+            const groupedHtml = Object.values(grouped).map(group => `
+                <div class="grouped-reference">
+                    <div class="grouped-reference-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>PO: ${group.poNumber || '-'} | Delivery: ${group.deliveryId || '-'} | ${group.references.length} ref${group.references.length !== 1 ? 's' : ''} | Updated: ${formatDateConcise(group.submittedAt)}</span>
+                        </div>
+                    </div>
+                    <div class="grouped-reference-content">
+                        ${group.references.map(ref => `
+                            <div class="reference-row">
+                                <div class="reference-number">${ref.referenceNumber}</div>
+                                <div class="validation-number">${ref.validationNumber || '-'}</div>
+                                <div class="reference-time">${formatDateConcise(ref.submittedAt)}</div>
+                                <div class="reference-direction ${ref.direction === 'sent' ? 'direction-sent' : 'direction-received'}">
+                                    ${ref.direction === 'sent' ? 'Sent' : 'Received'}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
-            `;
+            `).join('');
             
-            document.getElementById('connectionHistory').innerHTML = table;
+            document.getElementById('connectionHistory').innerHTML = groupedHtml;
+            
+            // Update history count
+            const totalReferences = history.length;
+            const totalGroups = Object.keys(grouped).length;
+            document.getElementById('historyCount').textContent = `(${totalReferences} references in ${totalGroups} group${totalGroups !== 1 ? 's' : ''})`;
         }
 
         // Submit reference to connection
@@ -1073,6 +1292,31 @@
             } catch (error) {
                 console.error('Logout error:', error);
             }
+        }
+
+        // Format date in concise format (e.g., "2h ago", "3d ago")
+        function formatDateConcise(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+
+            const diffInSeconds = Math.floor((now - date) / 1000);
+
+            if (diffInSeconds < 60) {
+                return `${diffInSeconds}s ago`;
+            }
+            if (diffInSeconds < 3600) {
+                return `${Math.floor(diffInSeconds / 60)}m ago`;
+            }
+            if (diffInSeconds < 86400) {
+                return `${Math.floor(diffInSeconds / 3600)}h ago`;
+            }
+            if (diffInSeconds < 2592000) { // Less than 30 days
+                return `${Math.floor(diffInSeconds / 86400)}d ago`;
+            }
+            if (diffInSeconds < 31536000) { // Less than 1 year
+                return `${Math.floor(diffInSeconds / 2592000)}mo ago`;
+            }
+            return `${Math.floor(diffInSeconds / 31536000)}y ago`;
         }
 
         // Show alert
