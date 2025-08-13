@@ -518,10 +518,49 @@
             padding: 20px;
             color: #6c757d;
         }
+
+        /* Logo Styles */
+        .logo {
+            position: relative;
+            z-index: 10;
+            height: 34px;
+            width: 111.609px;
+            margin-bottom: 20px;
+        }
+
+        .logo svg {
+            height: 34px;
+            width: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+        }
+
+        /* Custom scrollbar for history content */
+        .history-content-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history-content-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .history-content-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .history-content-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
     </style>
 </head>
 <body>
     <div class="interface-container">
+        <!-- Logo -->
+        <div class="logo">
+            <img src="/Interu_Logo_white.svg" alt="Interu Logo" width="167.414" height="51">
+        </div>
+        
         <div class="wrapper-card">
             <!-- Column 1: Forms and History -->
             <div class="column-1 history-active">
@@ -531,51 +570,47 @@
                     <p style="color: #6c757d; margin: 8px 0 0 0; font-size: 14px;">View your submission history</p>
                 </div>
 
-                <!-- History Panel (Always visible) -->
-                <div id="history-panel" class="history-panel">
-                    <!-- History Filters -->
-                    <div class="history-filters" style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label style="font-size: 12px; margin-bottom: 4px;">PO Number</label>
-                                <input type="text" id="po-filter" placeholder="Filter by PO" style="padding: 8px 12px; font-size: 14px;">
-                            </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label style="font-size: 12px; margin-bottom: 4px;">Delivery ID</label>
-                                <input type="text" id="delivery-filter" placeholder="Filter by delivery" style="padding: 8px 12px; font-size: 14px;">
-                            </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label style="font-size: 12px; margin-bottom: 4px;">Date Range</label>
-                                <select id="date-filter" style="padding: 8px 12px; font-size: 14px;">
-                                    <option value="">All Time</option>
-                                    <option value="today">Today</option>
-                                    <option value="week">This Week</option>
-                                    <option value="month">This Month</option>
-                                </select>
-                            </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label style="font-size: 12px; margin-bottom: 4px;">Direction</label>
-                                <select id="direction-filter" style="padding: 8px 12px; font-size: 14px;">
-                                    <option value="">All</option>
-                                    <option value="sent">Sent</option>
-                                    <option value="received">Received</option>
-                                </select>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn" onclick="applyHistoryFilters()" style="padding: 8px 16px; font-size: 12px;">Filter</button>
-                                <button class="btn btn-secondary" onclick="clearHistoryFilters()" style="padding: 8px 16px; font-size: 12px;">Clear</button>
-                            </div>
+                <!-- History Filters - Slimmer -->
+                <div class="history-filters" style="background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 8px; align-items: end;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 11px; margin-bottom: 2px;">PO Number</label>
+                            <input type="text" id="po-filter" placeholder="Filter by PO" style="padding: 6px 10px; font-size: 13px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 11px; margin-bottom: 2px;">Delivery ID</label>
+                            <input type="text" id="delivery-filter" placeholder="Filter by delivery" style="padding: 6px 10px; font-size: 13px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 11px; margin-bottom: 2px;">Date Range</label>
+                            <select id="date-filter" style="padding: 6px 10px; font-size: 13px;">
+                                <option value="">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 11px; margin-bottom: 2px;">Direction</label>
+                            <select id="direction-filter" style="padding: 6px 10px; font-size: 13px;">
+                                <option value="">All</option>
+                                <option value="sent">Sent</option>
+                                <option value="received">Received</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="btn" onclick="applyHistoryFilters()" style="padding: 6px 12px; font-size: 11px;">Filter</button>
+                            <button class="btn btn-secondary" onclick="clearHistoryFilters()" style="padding: 6px 12px; font-size: 11px;">Clear</button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- History Content -->
-                    <div class="history-section">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <h3 style="color: #4a7c59; margin: 0; font-size: 18px;">Submission History</h3>
-                            <button class="btn btn-secondary" onclick="loadHistory()" style="padding: 8px 16px; font-size: 12px;">Refresh</button>
-                        </div>
-                        <div id="history-content" class="submission-history" style="background: white; border-radius: 8px; border: 1px solid #e9ecef; padding: 16px;">
-                            <p style="color: #6c757d; text-align: center; padding: 40px;">Loading your submission history...</p>
+                <!-- History Content - Optimized with scrolling -->
+                <div class="history-content-container" style="height: calc(100vh - 400px); overflow-y: auto; padding-right: 8px;">
+                    <div id="history-content" class="submission-history">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading your submission history...
                         </div>
                     </div>
                 </div>
@@ -641,20 +676,18 @@
                         // Generate HTML for grouped submissions
                         historyContent.innerHTML = Object.values(grouped).map(group => `
                             <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
-                                <div style="background: linear-gradient(135deg, #4a7c59, #6a9969); color: white; padding: 12px 16px; font-size: 14px; font-weight: 600;">
+                                <div style="background: linear-gradient(135deg, #4a7c59, #6a9969); color: white; padding: 8px 12px; font-size: 13px; font-weight: 600;">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>PO: ${group.poNumber || '-'} | Delivery: ${group.deliveryId || '-'}</span>
-                                        <small style="opacity: 0.8;">${group.references.length} ref${group.references.length !== 1 ? 's' : ''}</small>
+                                        <span>PO: ${group.poNumber || '-'} | Delivery: ${group.deliveryId || '-'} | ${group.references.length} ref${group.references.length !== 1 ? 's' : ''} | Updated: ${formatDateConcise(group.submittedAt)}</span>
                                     </div>
-                                    <small style="opacity: 0.8;">Last updated: ${new Date(group.submittedAt).toLocaleString()}</small>
                                 </div>
-                                <div style="padding: 12px;">
+                                <div style="padding: 8px;">
                                     ${group.references.map(ref => `
-                                        <div style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 12px; padding: 8px; border-bottom: 1px solid #f1f3f4; align-items: center; font-size: 14px;">
+                                        <div style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 8px; padding: 6px; border-bottom: 1px solid #f1f3f4; align-items: center; font-size: 13px;">
                                             <div style="font-weight: 600; color: #4a7c59;">${ref.referenceNumber}</div>
                                             <div style="color: #28a745;">${ref.validationNumber || '-'}</div>
-                                            <div style="color: #6c757d; font-size: 12px;">${new Date(ref.submittedAt).toLocaleString()}</div>
-                                            <div style="color: ${ref.direction === 'sent' ? '#dc3545' : '#007bff'}; font-weight: 600; font-size: 12px; text-transform: uppercase;">
+                                            <div style="color: #6c757d; font-size: 11px;">${formatDateConcise(ref.submittedAt)}</div>
+                                            <div style="color: ${ref.direction === 'sent' ? '#dc3545' : '#007bff'}; font-weight: 600; font-size: 11px; text-transform: uppercase;">
                                                 ${ref.direction === 'sent' ? 'Sent' : 'Received'}
                                             </div>
                                         </div>
@@ -688,6 +721,30 @@
             document.getElementById('direction-filter').value = '';
             historyFilters = {};
             loadHistory();
+        }
+
+        function formatDateConcise(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+
+            const diffInSeconds = Math.floor((now - date) / 1000);
+
+            if (diffInSeconds < 60) {
+                return `${diffInSeconds}s ago`;
+            }
+            if (diffInSeconds < 3600) {
+                return `${Math.floor(diffInSeconds / 60)}m ago`;
+            }
+            if (diffInSeconds < 86400) {
+                return `${Math.floor(diffInSeconds / 3600)}h ago`;
+            }
+            if (diffInSeconds < 2592000) { // Less than 30 days
+                return `${Math.floor(diffInSeconds / 86400)}d ago`;
+            }
+            if (diffInSeconds < 31536000) { // Less than 1 year
+                return `${Math.floor(diffInSeconds / 2592000)}mo ago`;
+            }
+            return `${Math.floor(diffInSeconds / 31536000)}y ago`;
         }
     </script>
 </body>
