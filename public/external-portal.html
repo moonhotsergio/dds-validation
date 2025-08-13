@@ -605,11 +605,10 @@
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <select id="direction-filter" style="padding: 6px 10px; font-size: 13px; width: 100%; border: 1px solid #e9ecef; border-radius: 4px; background: white;">
-                                <option value="">All</option>
-                                <option value="sent">Sent</option>
-                                <option value="received">Received</option>
-                            </select>
+                            <div class="direction-toggle" style="display: flex; border: 1px solid #e9ecef; border-radius: 4px; overflow: hidden; background: white;">
+                                <button type="button" id="sent-toggle" class="toggle-btn active" onclick="toggleDirection('sent')" style="flex: 1; padding: 6px 10px; font-size: 13px; border: none; background: #4a7c59; color: white; cursor: pointer; transition: all 0.2s ease;">Sent</button>
+                                <button type="button" id="received-toggle" class="toggle-btn" onclick="toggleDirection('received')" style="flex: 1; padding: 6px 10px; font-size: 13px; border: none; background: white; color: #4a7c59; cursor: pointer; transition: all 0.2s ease;">Received</button>
+                            </div>
                         </div>
                         <div style="display: flex; gap: 6px;">
                             <button class="btn" onclick="applyHistoryFilters()" style="padding: 6px 12px; font-size: 11px;">Filter</button>
@@ -722,7 +721,7 @@
                 poNumber: document.getElementById('po-filter').value,
                 deliveryId: document.getElementById('delivery-filter').value,
                 dateRange: document.getElementById('date-filter').value,
-                direction: document.getElementById('direction-filter').value
+                direction: historyFilters.direction || 'sent' // Use current toggle state or default to 'sent'
             };
             loadHistory();
         }
@@ -731,9 +730,50 @@
             document.getElementById('po-filter').value = '';
             document.getElementById('delivery-filter').value = '';
             document.getElementById('date-filter').value = '';
-            document.getElementById('direction-filter').value = '';
+            resetDirectionToggle();
             historyFilters = {};
             loadHistory();
+        }
+
+        function toggleDirection(direction) {
+            // Update toggle button states
+            const sentBtn = document.getElementById('sent-toggle');
+            const receivedBtn = document.getElementById('received-toggle');
+            
+            if (direction === 'sent') {
+                sentBtn.classList.add('active');
+                receivedBtn.classList.remove('active');
+                sentBtn.style.background = '#4a7c59';
+                sentBtn.style.color = 'white';
+                receivedBtn.style.background = 'white';
+                receivedBtn.style.color = '#4a7c59';
+            } else {
+                receivedBtn.classList.add('active');
+                sentBtn.classList.remove('active');
+                receivedBtn.style.background = '#4a7c59';
+                receivedBtn.style.color = 'white';
+                sentBtn.style.background = 'white';
+                sentBtn.style.color = '#4a7c59';
+            }
+            
+            // Update the filter value
+            historyFilters.direction = direction;
+            loadHistory();
+        }
+
+        function resetDirectionToggle() {
+            const sentBtn = document.getElementById('sent-toggle');
+            const receivedBtn = document.getElementById('received-toggle');
+            
+            // Reset to sent as default
+            sentBtn.classList.add('active');
+            receivedBtn.classList.remove('active');
+            sentBtn.style.background = '#4a7c59';
+            sentBtn.style.color = 'white';
+            receivedBtn.style.background = 'white';
+            receivedBtn.style.color = '#4a7c59';
+            
+            historyFilters.direction = 'sent';
         }
 
         function formatDateConcise(timestamp) {
