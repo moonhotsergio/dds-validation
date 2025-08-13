@@ -73,26 +73,38 @@ router.post('/:id/submit', async (req: Request, res: Response) => {
     }
 });
 
-// Get organisation's submitted references (direction = 'sent')
+// Get organisation's submitted references with direction filtering
 router.get('/:id/history', async (req: Request, res: Response) => {
     try {
         const { id } = req.params; // Connection token
+        const { direction } = req.query; // Filter by direction: 'sent', 'received', or undefined for all
         
         // Validate token format
         if (!/^[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(id)) {
             return res.status(400).json({ error: 'Invalid connection token format' });
         }
         
-        // Get references submitted by organisation
-        const result = await pool.query(
-            `SELECT re.*, o.name as organisation_name
-             FROM reference_events re
-             JOIN connections c ON re.connection_id = c.id
-             JOIN organisations o ON c.organisation_id = o.id
-             WHERE c.token = $1 AND re.direction = 'sent'
-             ORDER BY re.submitted_at DESC`,
-            [id]
-        );
+        // Build query based on direction filter
+        let query = `
+            SELECT re.*, o.name as organisation_name
+            FROM reference_events re
+            JOIN connections c ON re.connection_id = c.id
+            JOIN organisations o ON c.organisation_id = o.id
+            WHERE c.token = $1
+        `;
+        
+        let params = [id];
+        
+        // Add direction filter if specified
+        if (direction && (direction === 'sent' || direction === 'received')) {
+            query += ` AND re.direction = $2`;
+            params.push(direction);
+        }
+        
+        query += ` ORDER BY re.submitted_at DESC`;
+        
+        // Get references based on filter
+        const result = await pool.query(query, params);
         
         res.json({
             success: true,
