@@ -744,17 +744,17 @@
             if (direction === 'sent') {
                 sentBtn.classList.add('active');
                 receivedBtn.classList.remove('active');
-                sentBtn.style.background = 'white';
-                sentBtn.style.color = '#4a7c59';
-                receivedBtn.style.background = '#4a7c59';
-                receivedBtn.style.color = 'white';
+                sentBtn.style.background = '#4a7c59';
+                sentBtn.style.color = 'white';
+                receivedBtn.style.background = 'white';
+                receivedBtn.style.color = '#4a7c59';
             } else {
                 receivedBtn.classList.add('active');
                 sentBtn.classList.remove('active');
-                receivedBtn.style.background = 'white';
-                receivedBtn.style.color = '#4a7c59';
-                sentBtn.style.background = '#4a7c59';
-                sentBtn.style.color = 'white';
+                receivedBtn.style.background = '#4a7c59';
+                receivedBtn.style.color = 'white';
+                sentBtn.style.background = 'white';
+                sentBtn.style.color = '#4a7c59';
             }
             
             // Update the filter value
@@ -769,10 +769,10 @@
             // Reset to received as default
             receivedBtn.classList.add('active');
             sentBtn.classList.remove('active');
-            sentBtn.style.background = 'white';
-            sentBtn.style.color = '#4a7c59';
             receivedBtn.style.background = '#4a7c59';
             receivedBtn.style.color = 'white';
+            sentBtn.style.background = 'white';
+            sentBtn.style.color = '#4a7c59';
             
             historyFilters.direction = 'received';
         }
