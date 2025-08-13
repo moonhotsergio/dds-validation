@@ -589,22 +589,20 @@
 
                 <!-- History Filters - Simple and Consistent -->
                 <div style="background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 8px; align-items: end;">
-                        <input type="text" id="po-filter" placeholder="Filter by PO number" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 100%; border: 1px solid #e9ecef; border-radius: 4px; background: white; height: 23px; box-sizing: content-box;">
-                        <input type="text" id="delivery-filter" placeholder="Filter by Delivery ID" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 100%; border: 1px solid #e9ecef; border-radius: 4px; background: white; height: 23px; box-sizing: content-box;">
-                        <select id="date-filter" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 100%; border: 1px solid #e9ecef; border-radius: 4px; background: white; height: 23px; box-sizing: content-box;">
+                    <div style="display: flex; gap: 16px; align-items: end; flex-wrap: wrap;">
+                        <input type="text" id="po-filter" placeholder="Filter by PO number" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 120px; border: 1px solid #e9ecef; border-radius: 4px; background: white; height: 23px; box-sizing: content-box;">
+                        <input type="text" id="delivery-filter" placeholder="Filter by Delivery ID" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 120px; border: 1px solid #e9ecef; border-radius: 4px; background: white; height: 23px; box-sizing: content-box;">
+                        <select id="date-filter" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 100px; border: 1px solid #e9ecef; border-radius: 4px; background: white; height: 23px; box-sizing: content-box;">
                             <option value="">All time</option>
                             <option value="today">Today</option>
                             <option value="week">This Week</option>
                             <option value="month">This Month</option>
                         </select>
-                        <div style="display: flex; border: 1px solid #e9ecef; border-radius: 4px; overflow: hidden; background: white; height: 23px;">
+                        <button onclick="applyHistoryFilters()" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700; background: #4a7c59; color: white; border: 1px solid #e9ecef; border-radius: 4px; cursor: pointer; height: 23px; box-sizing: content-box; width: 60px;">Filter</button>
+                        <button onclick="clearHistoryFilters()" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700; background: white; color: #4a7c59; border: 1px solid #e9ecef; border-radius: 4px; cursor: pointer; height: 23px; box-sizing: content-box; width: 60px;">Clear</button>
+                        <div style="display: flex; border: 1px solid #e9ecef; border-radius: 4px; overflow: hidden; background: white; width: 140px; margin-left: auto;">
                             <button type="button" id="sent-toggle" onclick="toggleDirection('sent')" style="flex: 1; padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; border: none; background: white; color: #4a7c59; cursor: pointer; height: 23px; box-sizing: content-box;">Sent</button>
                             <button type="button" id="received-toggle" onclick="toggleDirection('received')" style="flex: 1; padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; border: none; background: #4a7c59; color: white; cursor: pointer; height: 23px; box-sizing: content-box; font-weight: 700;">Received</button>
-                        </div>
-                        <div style="display: flex; gap: 6px;">
-                            <button onclick="applyHistoryFilters()" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700; background: #4a7c59; color: white; border: 1px solid #e9ecef; border-radius: 4px; cursor: pointer; height: 23px; box-sizing: content-box;">Filter</button>
-                            <button onclick="clearHistoryFilters()" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700; background: white; color: #4a7c59; border: 1px solid #e9ecef; border-radius: 4px; cursor: pointer; height: 23px; box-sizing: content-box;">Clear</button>
                         </div>
                     </div>
                 </div>
