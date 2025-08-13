@@ -1855,6 +1855,31 @@
             document.body.removeChild(link);
         }
         
+        // Copy portal URL to clipboard
+        function copyPortalURL(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                // Show temporary success feedback
+                const button = event.target.closest('button');
+                const icon = button.querySelector('i');
+                const originalClass = icon.className;
+                
+                // Change to check icon and green color
+                icon.className = 'fas fa-check';
+                button.style.color = '#28a745';
+                button.title = 'URL copied!';
+                
+                setTimeout(() => {
+                    // Restore original icon and color
+                    icon.className = originalClass;
+                    button.style.color = '#6c757d';
+                    button.title = 'Copy URL to clipboard';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy URL: ', err);
+                alert('Failed to copy URL to clipboard');
+            });
+        }
+        
         // Submit admin references
         async function submitAdminReferences() {
             try {
@@ -1960,7 +1985,12 @@
                         </div>
                         <div>
                             <strong style="color: #495057;">Portal URL:</strong><br>
-                            <code style="background: #f8f9fa; padding: 4px 8px; border-radius: 4px; color: #495057; font-size: 12px;">${window.location.origin}/external/${connection.token}</code>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <code style="background: #f8f9fa; padding: 4px 8px; border-radius: 4px; color: #495057; font-size: 12px;">${window.location.origin}/external/${connection.token}</code>
+                                <button onclick="copyPortalURL('${window.location.origin}/external/${connection.token}')" style="background: transparent; border: none; color: #6c757d; cursor: pointer; padding: 4px; border-radius: 4px; transition: color 0.2s ease;" title="Copy URL to clipboard">
+                                    <i class="fas fa-copy" style="font-size: 14px;"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
