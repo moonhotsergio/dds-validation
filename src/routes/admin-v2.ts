@@ -91,6 +91,7 @@ router.get('/connections/:id', async (req: AdminRequest, res: Response) => {
 });
 
 // Get connection history with direction filtering
+// Note: Direction is flipped for admin view (opposite of organisation's perspective)
 router.get('/connections/:id/history', async (req: AdminRequest, res: Response) => {
     try {
         const { id } = req.params;
@@ -98,7 +99,22 @@ router.get('/connections/:id/history', async (req: AdminRequest, res: Response) 
         const adminUserId = req.adminUser?.id;
         
         let query = `
-            SELECT re.*, c.token as connection_token
+            SELECT 
+                re.id,
+                re.connection_id,
+                re.po_number,
+                re.delivery_id,
+                re.reference_number,
+                re.validation_number,
+                -- Flip direction for admin view: 'sent' becomes 'received', 'received' becomes 'sent'
+                CASE 
+                    WHEN re.direction = 'sent' THEN 'received'
+                    WHEN re.direction = 'received' THEN 'sent'
+                    ELSE re.direction
+                END as direction,
+                re.submitted_by_email,
+                re.submitted_at,
+                c.token as connection_token
             FROM reference_events re
             JOIN connections c ON re.connection_id = c.id
             WHERE c.id = $1 AND c.admin_user_id = $2
@@ -106,8 +122,10 @@ router.get('/connections/:id/history', async (req: AdminRequest, res: Response) 
         let params = [id, adminUserId];
         
         if (direction !== 'all') {
+            // Also flip the direction filter for admin view
+            const flippedDirection = direction === 'sent' ? 'received' : 'sent';
             query += ' AND re.direction = $3';
-            params.push(direction as string);
+            params.push(flippedDirection as string);
         }
         
         query += ' ORDER BY re.submitted_at DESC';
