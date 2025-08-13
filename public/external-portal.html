@@ -600,6 +600,58 @@
         .history-filters .btn-secondary {
             font-weight: 700 !important;
         }
+
+        /* Filter element classes for consistent styling */
+        .filter-input,
+        .filter-select {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-size: 11px;
+            background: white;
+            height: 23px;
+            box-sizing: content-box;
+        }
+
+        .direction-toggle {
+            display: flex;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            background: white;
+            height: 23px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            border: none;
+            background: white;
+            color: #4a7c59;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 23px;
+            box-sizing: content-box;
+        }
+
+        .toggle-btn.active {
+            background: #4a7c59;
+            color: white;
+            font-weight: 700;
+        }
+
+        .filter-btn {
+            padding: 6px 10px;
+            font-size: 11px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 700;
+            height: 23px;
+            box-sizing: content-box;
+        }
     </style>
 </head>
 <body>
@@ -622,13 +674,13 @@
                 <div class="history-filters" style="background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 8px; align-items: end;">
                         <div class="form-group" style="margin-bottom: 0;">
-                            <input type="text" id="po-filter" placeholder="Filter by PO number" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 100%; border: 1px solid #e9ecef; border-radius: 4px;">
+                            <input type="text" id="po-filter" placeholder="Filter by PO number" class="filter-input">
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <input type="text" id="delivery-filter" placeholder="Filter by Delivery ID" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 100%; border: 1px solid #e9ecef; border-radius: 4px;">
+                            <input type="text" id="delivery-filter" placeholder="Filter by Delivery ID" class="filter-input">
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <select id="date-filter" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 100%; border: 1px solid #e9ecef; border-radius: 4px; background: white;">
+                            <select id="date-filter" class="filter-select">
                                 <option value="">All time</option>
                                 <option value="today">Today</option>
                                 <option value="week">This Week</option>
@@ -636,14 +688,14 @@
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <div class="direction-toggle" style="display: flex; border: 1px solid #e9ecef; border-radius: 4px; overflow: hidden; background: white;">
-                                <button type="button" id="sent-toggle" class="toggle-btn" onclick="toggleDirection('sent')" style="flex: 1; padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; border: none; background: white; color: #4a7c59; cursor: pointer; transition: all 0.2s ease;">Sent</button>
-                                <button type="button" id="received-toggle" class="toggle-btn active" onclick="toggleDirection('received')" style="flex: 1; padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; border: none; background: #4a7c59; color: white; cursor: pointer; transition: all 0.2s ease; font-weight: 700;">Received</button>
+                            <div class="direction-toggle">
+                                <button type="button" id="sent-toggle" class="toggle-btn" onclick="toggleDirection('sent')">Sent</button>
+                                <button type="button" id="received-toggle" class="toggle-btn active" onclick="toggleDirection('received')">Received</button>
                             </div>
                         </div>
                         <div style="display: flex; gap: 6px;">
-                            <button class="btn" onclick="applyHistoryFilters()" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700;">Filter</button>
-                            <button class="btn btn-secondary" onclick="clearHistoryFilters()" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700;">Clear</button>
+                            <button class="btn filter-btn" onclick="applyHistoryFilters()">Filter</button>
+                            <button class="btn btn-secondary filter-btn" onclick="clearHistoryFilters()">Clear</button>
                         </div>
                     </div>
                 </div>
