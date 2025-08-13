@@ -846,15 +846,107 @@
             <!-- Content Area with Two Columns -->
             <div class="content-area">
                 <!-- Column 1: Header + Forms/History -->
-                <div class="column-1 history-active">
+                <div class="column-1">
                     <!-- Header (Always Visible) -->
                     <div class="header">
-                        <h2 style="color: #4a7c59; margin: 0; font-size: 24px; font-family: 'IBM Plex Sans Condensed', sans-serif;">Supplier Portal</h2>
-                        <p style="color: #6c757d; margin: 8px 0 0 0; font-size: 14px;">View your submission history</p>
+                        <!-- Role Tabs -->
+                        <div class="role-tabs">
+                            <button class="role-tab active" onclick="switchRole('supplier')">Submit</button>
+                            <div class="role-divider"></div>
+                            <button class="role-tab" onclick="switchRole('customer')">Retrieve</button>
+                        </div>
+                        
+
+                        
+                        <!-- Sub Tabs -->
+                        <div class="sub-tabs">
+                            <button class="sub-tab active" onclick="showTab('submit')">Submit References</button>
+                            <button class="sub-tab" onclick="showTab('history')">History</button>
+                        </div>
                     </div>
 
-                    <!-- History Panel (Always visible) -->
-                    <div id="history-panel" class="history-panel">
+                    <!-- Forms Panel (Only when submit active) -->
+                    <div id="forms-panel" class="forms-panel">
+                        <!-- Authentication Section -->
+                        <div id="auth-section" class="auth-section">
+                            <div class="section-header">
+                                <h3>Email Verification Required</h3>
+                                <p style="color: #6c757d; font-size: 14px; margin: 0;">Please verify your email to submit references</p>
+                            </div>
+                            
+                            <!-- Email Form -->
+                            <div id="email-form" class="auth-form">
+                                <div class="form-group">
+                                    <label for="email">Email Address:</label>
+                                    <input type="email" id="email" placeholder="Enter your email address" required>
+                                </div>
+                                <button class="btn" onclick="sendOTP()">Send Verification Code</button>
+                            </div>
+
+                            <!-- OTP Form -->
+                            <div id="otp-form" class="auth-form hidden">
+                                <div class="form-group">
+                                    <label for="otp">Verification Code:</label>
+                                    <input type="text" id="otp" placeholder="Enter 6-digit code" maxlength="6" required>
+                                </div>
+                                <button class="btn" onclick="verifyOTP()">Verify Code</button>
+                                <button class="btn btn-secondary" onclick="resendOTP()" style="margin-left: 12px;">Resend Code</button>
+                            </div>
+                        </div>
+
+                        <!-- Purchase Order Section -->
+                        <div class="purchase-order-section">
+                            <button class="purchase-order-heading expanded" id="purchase-order-heading" onclick="togglePurchaseOrder()">
+                                <span class="icon">►</span>
+                                Purchase Order Information
+                            </button>
+                            <div class="purchase-order-form" id="purchase-order-form">
+                                <div class="form-group">
+                                    <label>PO Number (Optional if Delivery ID provided)</label>
+                                    <input type="text" id="po-number" placeholder="Enter PO Number">
+                                </div>
+                                <div class="form-group">
+                                    <label>Delivery ID (Optional if PO Number provided)</label>
+                                    <input type="text" id="delivery-id" placeholder="Enter Delivery ID">
+                                </div>
+                                <div class="form-group">
+                                    <label>Delivery Postcode</label>
+                                    <input type="text" id="delivery-postcode" placeholder="Enter Postcode">
+                                </div>
+                                <div style="margin-top: 8px; font-size: 12px; color: #6c757d; font-style: italic;">
+                                    💡 <strong>Note:</strong> You must provide either a PO Number OR a Delivery ID (at least one is required)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reference Input Section -->
+                        <div class="reference-input-section">
+                            <div class="section-header">
+                                <h3>Add Reference Numbers</h3>
+                            </div>
+                            <div class="form-group">
+                                <label>Reference Number</label>
+                                <input type="text" id="reference-number" placeholder="------">
+                            </div>
+                            <div class="form-group">
+                                <label>Validation Number (Optional)</label>
+                                <input type="text" id="validation-number" placeholder="-------">
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn-add" onclick="addReference()"><i class="fas fa-plus">+</i> Add Reference</button>
+                                <button class="btn-add" onclick="addCSVFile()"><i class="fas fa-paperclip">📎</i> Add CSV File</button>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="submit-section">
+                            <button class="submit-btn" onclick="submitReferences()">Submit References</button>
+                            <button class="btn-add" onclick="testSubmission()" style="margin-left: 10px; background: #f0f0f0; padding: 8px 12px; border-radius: 6px;">Test Submission</button>
+                        </div>
+                    </div>
+
+                    <!-- History Panel (Only when history active) -->
+                    <div id="history-panel" class="history-panel hidden">
                         <!-- History Filters -->
                         <div class="history-filters" style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
@@ -914,8 +1006,414 @@
     </div>
 
     <script>
+        let references = [];
+        let isPurchaseOrderExpanded = true;
+
+        // Authentication functions
+        function sendOTP() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+            
+            const supplierLinkId = getSupplierLinkId();
+            if (!supplierLinkId) {
+                alert('Invalid supplier link. No supplier ID found in URL.');
+                return;
+            }
+
+            // Send OTP request to API
+            fetch('/api/supplier/verify-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    email: email, 
+                    supplierLinkId: supplierLinkId 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Show OTP form
+                    document.getElementById('email-form').classList.add('hidden');
+                    document.getElementById('otp-form').classList.remove('hidden');
+                    alert('Verification code sent to your email');
+                } else {
+                    alert(data.error || 'Failed to send verification code');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending OTP:', error);
+                alert('Failed to send verification code. Please try again.');
+            });
+        }
+
+        function verifyOTP() {
+            const email = document.getElementById('email').value;
+            const otp = document.getElementById('otp').value;
+            const supplierLinkId = getSupplierLinkId();
+            
+            if (!otp || otp.length !== 6) {
+                alert('Please enter a valid 6-digit verification code');
+                return;
+            }
+
+            // Verify OTP with API
+            fetch('/api/supplier/validate-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    email: email, 
+                    otp: otp, 
+                    supplierLinkId: supplierLinkId 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    // Store token and hide auth section
+                    localStorage.setItem('authToken', data.token);
+                    document.getElementById('auth-section').classList.add('hidden');
+                    alert('Authentication successful! You can now submit references.');
+                } else {
+                    alert(data.error || 'Invalid verification code');
+                }
+            })
+            .catch(error => {
+                console.error('Error verifying OTP:', error);
+                alert('Failed to verify code. Please try again.');
+            });
+        }
+
+        function resendOTP() {
+            document.getElementById('email-form').classList.remove('hidden');
+            document.getElementById('otp-form').classList.add('hidden');
+        }
+
+        // Role switching
+        function switchRole(role) {
+            const tabs = document.querySelectorAll('.role-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update UI based on role
+            if (role === 'customer') {
+                const supplierLinkId = getSupplierLinkId();
+                if (supplierLinkId) {
+                    window.location.href = `/customer?fromSupplier=${supplierLinkId}`;
+                } else {
+                    window.location.href = '/customer';
+                }
+            }
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            const formsPanel = document.getElementById('forms-panel');
+            const historyPanel = document.getElementById('history-panel');
+            const column1 = document.querySelector('.column-1');
+            const wrapperCard = document.querySelector('.wrapper-card');
+            const subTabs = document.querySelectorAll('.sub-tab');
+            
+            // Update sub tab active states
+            subTabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tabName === 'history') {
+                // Show history panel, hide forms panel
+                formsPanel.classList.add('hidden');
+                historyPanel.classList.remove('hidden');
+                
+                // Set column 1 to history-active width
+                if (column1) {
+                    column1.classList.remove('forms-active');
+                    column1.classList.add('history-active');
+                }
+                
+                // Set wrapper to history-active width
+                if (wrapperCard) {
+                    wrapperCard.classList.add('history-active');
+                }
+                
+                // Hide reference panel in history mode
+                const referencePanel = document.getElementById('reference-panel');
+                if (referencePanel) {
+                    referencePanel.style.display = 'none';
+                }
+                
+                // Auto-refresh history when switching to history tab
+                setTimeout(() => {
+                    loadHistory();
+                }, 100);
+            } else {
+                // Show forms panel, hide history panel
+                formsPanel.classList.remove('hidden');
+                historyPanel.classList.add('hidden');
+                
+                // Set column 1 to forms-active width
+                if (column1) {
+                    column1.classList.remove('history-active');
+                    column1.classList.add('forms-active');
+                }
+                
+                // Remove history-active class from wrapper card
+                if (wrapperCard) {
+                    wrapperCard.classList.remove('history-active');
+                }
+                
+                // Show reference panel if there are references
+                const referencePanel = document.getElementById('reference-panel');
+                if (referencePanel && references.length > 0) {
+                    referencePanel.style.display = 'block';
+                }
+            }
+        }
+
+        // Purchase order toggle
+        function togglePurchaseOrder() {
+            const heading = document.getElementById('purchase-order-heading');
+            const form = document.getElementById('purchase-order-form');
+            
+            isPurchaseOrderExpanded = !isPurchaseOrderExpanded;
+            
+            if (isPurchaseOrderExpanded) {
+                heading.classList.add('expanded');
+                form.classList.remove('hidden');
+            } else {
+                heading.classList.remove('expanded');
+                form.classList.add('hidden');
+            }
+        }
+
+        // Reference management
+        function addReference() {
+            const refNumber = document.getElementById('reference-number').value;
+            const valNumber = document.getElementById('validation-number').value;
+            
+            if (!refNumber) {
+                alert('Please enter a reference number');
+                return;
+            }
+            
+            const newReference = {
+                id: Date.now().toString(),
+                referenceNumber: refNumber,
+                validationNumber: valNumber
+            };
+            
+            references.push(newReference);
+            updateReferenceDisplay();
+            
+            // Clear inputs
+            document.getElementById('reference-number').value = '';
+            document.getElementById('validation-number').value = '';
+            
+            // Show reference panel if it was hidden
+            const referencePanel = document.getElementById('reference-panel');
+            if (referencePanel.style.display === 'none') {
+                referencePanel.style.display = 'block';
+            }
+        }
+
+        function removeReference(id) {
+            references = references.filter(ref => ref.id !== id);
+            updateReferenceDisplay();
+            
+            // Hide reference panel if no references left
+            if (references.length === 0) {
+                const referencePanel = document.getElementById('reference-panel');
+                referencePanel.style.display = 'none';
+            }
+        }
+
+        function updateReferenceDisplay() {
+            const referenceList = document.getElementById('reference-list');
+            const referenceCount = document.getElementById('reference-count');
+            const wrapperCard = document.querySelector('.wrapper-card');
+            
+            referenceCount.textContent = `${references.length} References created`;
+            
+            referenceList.innerHTML = '';
+            
+            references.forEach(ref => {
+                const hasError = ref.referenceNumber === '12332';
+                const card = document.createElement('div');
+                card.className = `reference-card ${hasError ? 'error' : ''}`;
+                card.innerHTML = `
+                    <div class="reference-field">
+                        <span class="reference-field-label">Reference Number:</span>
+                        <div class="reference-field-value ${hasError ? 'error' : ''}">
+                            ${ref.referenceNumber}
+                        </div>
+                    </div>
+                    <div class="reference-field">
+                        <span class="reference-field-label">Validation Number:</span>
+                        <div class="reference-field-value">
+                            ${ref.validationNumber || '-------'}
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeReference('${ref.id}')">×</button>
+                `;
+                referenceList.appendChild(card);
+            });
+            
+            // Show/hide reference panel and update wrapper width
+            const referencePanel = document.getElementById('reference-panel');
+            if (references.length > 0) {
+                referencePanel.style.display = 'block';
+                wrapperCard.classList.remove('no-references');
+                wrapperCard.classList.add('has-references');
+            } else {
+                referencePanel.style.display = 'none';
+                wrapperCard.classList.remove('has-references');
+                wrapperCard.classList.add('no-references');
+            }
+        }
+
+        // Custom scrollbar functionality - REMOVED - now using native browser scrollbar
+
+        // Initialize the layout
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state
+            const column1 = document.querySelector('.column-1');
+            const wrapperCard = document.querySelector('.wrapper-card');
+            
+            if (column1) {
+                column1.classList.add('forms-active');
+            }
+            
+            if (wrapperCard) {
+                wrapperCard.classList.add('no-references');
+            }
+            
+            // Reference list is now handled by native browser scrolling
+        });
+
+        function addCSVFile() {
+            // CSV file upload logic
+            alert('CSV file upload functionality');
+        }
+
+        // Test submission function for debugging
+        function testSubmission() {
+            // Fill in test data
+            const purchaseOrderForm = document.getElementById('purchase-order-form');
+            const formInputs = purchaseOrderForm.querySelectorAll('input');
+            formInputs[0].value = 'TEST-PO-001'; // PO Number
+            formInputs[1].value = 'TEST-DEL-001'; // Delivery ID
+            formInputs[2].value = '12345'; // Delivery Postcode
+            
+            // Add a test reference if none exist
+            if (references.length === 0) {
+                references.push({
+                    id: Date.now().toString(),
+                    referenceNumber: 'TEST-REF-001',
+                    validationNumber: 'TEST-VAL-001'
+                });
+                updateReferenceDisplay();
+            }
+            
+            console.log('Test data prepared. You can now click Submit References to test the submission.');
+            alert('Test data prepared. You can now click Submit References to test the submission.');
+        }
+
+        // Working submit references function (restored from main branch)
+        async function submitReferences() {
+            try {
+                if (references.length === 0) {
+                    alert('Please add at least one reference before submitting');
+                    return;
+                }
+
+                // Get the form fields
+                const poNumber = document.getElementById('po-number')?.value?.trim() || '';
+                const deliveryId = document.getElementById('delivery-id')?.value?.trim() || '';
+                const postcode = document.getElementById('delivery-postcode')?.value?.trim() || '';
+
+                // Check if we have at least one identifier (PO Number OR Delivery ID required)
+                if (!poNumber && !deliveryId) {
+                    alert('Please fill in either PO Number or Delivery ID (at least one is required)');
+                    return;
+                }
+
+                // Check if we have the required postcode
+                if (!postcode) {
+                    alert('Please fill in the Delivery Postcode');
+                    return;
+                }
+
+                // Submit each reference individually (like the working version)
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (const reference of references) {
+                    try {
+                        const currentSupplierFromURL = getSupplierLinkId();
+                        
+                        // Get FRESH token from localStorage (not the stale global variable)
+                        const freshAuthToken = localStorage.getItem('authToken');
+                        
+                        if (!freshAuthToken) {
+                            showAlert('Authentication required. Please refresh the page.', 'error');
+                            return;
+                        }
+                        
+                        const response = await fetch('/api/supplier/submit', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${freshAuthToken}`
+                            },
+                            body: JSON.stringify({
+                                poNumber: poNumber,
+                                deliveryId: deliveryId,
+                                deliveryPostcode: postcode,
+                                referenceNumber: reference.referenceNumber,
+                                validationNumber: reference.validationNumber || ''
+                            })
+                        });
+
+                        if (response.ok) {
+                            successCount++;
+                        } else {
+                            const errorData = await response.json();
+                            console.error('Reference submission failed:', errorData);
+                            errorCount++;
+                        }
+                    } catch (error) {
+                        errorCount++;
+                    }
+                }
+
+                if (successCount > 0) {
+                    alert(`Successfully submitted ${successCount} reference(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+                    
+                    // Clear references and reset form
+                    references = [];
+                    updateReferenceDisplay();
+                    
+                    // Clear form fields
+                    if (document.getElementById('po-number')) document.getElementById('po-number').value = '';
+                    if (document.getElementById('delivery-id')) document.getElementById('delivery-id').value = '';
+                    if (document.getElementById('delivery-postcode')) document.getElementById('delivery-postcode').value = '';
+                } else {
+                    console.error('All references failed to submit. Check console for details.');
+                    alert(`Failed to submit references. ${errorCount} references failed. Check browser console for details.`);
+                }
+            } catch (error) {
+                console.error('Error submitting references:', error);
+                alert('Network error occurred. Please try again.');
+            }
+        }
+
         // History functionality
         let historyFilters = {};
+        // Don't cache authToken globally - always get fresh from localStorage
         
         // Extract supplier link ID from URL
         function getSupplierLinkId() {
@@ -929,10 +1427,124 @@
             return null;
         }
 
+        // Initialize supplier authentication
+        async function initializeSupplier() {
+            // ALWAYS get fresh supplier ID from URL at runtime
+            const supplierLinkId = getSupplierLinkId();
+            
+            if (!supplierLinkId) {
+                alert('Invalid supplier link. No supplier ID found in URL.');
+                return false;
+            }
+
+            // Always clear cached data to prevent cross-contamination
+            const cachedSupplier = localStorage.getItem('currentSupplierLinkId');
+            if (cachedSupplier !== supplierLinkId) {
+                // Different supplier OR first time, clear ALL cached auth data
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentSupplierLinkId');
+            }
+            localStorage.setItem('currentSupplierLinkId', supplierLinkId);
+
+            // Check if admin has directly activated this link
+            try {
+                console.log('Checking admin activation for supplier:', supplierLinkId);
+                const activationResponse = await fetch('/api/supplier/check-admin-activation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ supplierLinkId })
+                });
+
+                if (activationResponse.ok) {
+                    const activationData = await activationResponse.json();
+                    console.log('Activation check response:', activationData);
+                    if (activationData.isAdminActivated || activationData.isActive) {
+                        // Admin has directly activated this link OR link is active - bypass OTP
+                        console.log('Link is active - OTP bypassed');
+                        
+                        // Generate a valid authentication token for active links
+                        const currentSupplierFromURL = getSupplierLinkId(); // Get fresh from URL
+                        
+                        const tokenData = {
+                            supplierLinkId: currentSupplierFromURL, // Use fresh URL value
+                            isActive: true,
+                            bypassedAt: new Date().toISOString()
+                        };
+                        const token = btoa(JSON.stringify(tokenData));
+                        
+                        // Store the token (force overwrite any existing token)
+                        localStorage.removeItem('authToken'); // Force remove old token
+                        localStorage.setItem('authToken', token);
+                        console.log('Generated bypass token for active link');
+                        console.log('Token content:', JSON.stringify({
+                            supplierLinkId: supplierLinkId,
+                            isActive: true,
+                            bypassedAt: new Date().toISOString()
+                        }));
+                        console.log('Encoded token:', token);
+                        
+                        document.getElementById('auth-section').classList.add('hidden');
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.log('Could not check admin activation status:', error);
+                // Continue with normal OTP flow
+            }
+
+            // Validate supplier link
+            try {
+                const response = await fetch('/api/supplier/validate-link', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ supplierLinkId })
+                });
+
+                if (!response.ok) {
+                    alert('Invalid or inactive supplier link.');
+                    return false;
+                }
+            } catch (error) {
+                alert('Failed to validate supplier link.');
+                return false;
+            }
+
+            // Check if we have a valid token
+            const currentAuthToken = localStorage.getItem('authToken');
+            if (!currentAuthToken) {
+                // No valid token - user needs to authenticate via OTP
+                console.log('No valid authentication token found. Please use OTP verification.');
+                return false;
+            } else {
+                // Already authenticated
+                return true;
+            }
+            
+            return true;
+        }
+
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', async () => {
-            // Always load history since we're only showing history view
-            await loadHistory();
+            const currentSupplierFromURL = getSupplierLinkId();
+            const cachedSupplier = localStorage.getItem('currentSupplierLinkId');
+            
+            // Clear localStorage if different supplier or no cached supplier
+            if (!cachedSupplier || cachedSupplier !== currentSupplierFromURL) {
+                localStorage.clear();
+            }
+            
+            const isAuthenticated = await initializeSupplier();
+            if (isAuthenticated) {
+                // Load history if authenticated
+                await loadHistory();
+            } else {
+                // Show authentication section if not authenticated
+                document.getElementById('auth-section').classList.remove('hidden');
+            }
         });
         
         async function loadHistory() {
@@ -940,6 +1552,14 @@
             if (!currentSupplierLinkId) {
                 const historyContent = document.getElementById('history-content');
                 historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Supplier Link ID not found. Please refresh the page.</p>';
+                return;
+            }
+
+            // Verify we have proper authentication before loading history
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                const historyContent = document.getElementById('history-content');
+                historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Authentication required. Please complete verification first.</p>';
                 return;
             }
 
@@ -951,13 +1571,25 @@
                 const params = new URLSearchParams();
                 if (historyFilters.poNumber) params.append('poNumber', historyFilters.poNumber);
                 if (historyFilters.deliveryId) params.append('deliveryId', historyFilters.deliveryId);
-                if (historyFilters.postcode) params.append('postcode', historyFilters.postcode);
+                if (historyFilters.postcode) params.append('postcode', historyFilters.postcode); // Added postcode filter
                 if (historyFilters.dateRange) params.append('dateRange', historyFilters.dateRange);
 
-                const response = await fetch(`/api/supplier/submissions?${params.toString()}`);
+                const response = await fetch(`/api/supplier/submissions?${params.toString()}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
                 const data = await response.json();
-                
                 if (response.ok) {
+                    // Validate that all submissions belong to current supplier (extra safety check)
+                    const invalidSubmissions = data.submissions.filter(s => s.supplier_link_id && s.supplier_link_id !== currentSupplierLinkId);
+                    if (invalidSubmissions.length > 0) {
+                        console.error('Data integrity error: Found submissions for different suppliers:', invalidSubmissions);
+                        historyContent.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Data integrity error. Please refresh the page.</p>';
+                        return;
+                    }
+
                     if (data.submissions.length === 0) {
                         historyContent.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 40px;">No submissions found for this supplier.</p>';
                     } else {
