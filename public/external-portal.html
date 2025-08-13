@@ -482,130 +482,100 @@
                 border-radius: 12px;
             }
         }
+
+        /* Button Styles */
+        .btn {
+            background: #00993a;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #007a2e;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #00251c;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        /* Loading Styles */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
     <div class="interface-container">
         <div class="wrapper-card">
             <!-- Column 1: Forms and History -->
-            <div class="column-1 forms-active">
+            <div class="column-1 history-active">
                 <!-- Header -->
                 <div class="header">
-                    <div class="role-tabs">
-                        <button class="role-tab active" onclick="switchToForms()">
-                            Submit
-                        </button>
-                        <button class="role-tab" onclick="switchToHistory()">
-                            History
-                        </button>
-                        <div class="role-divider"></div>
-                        <button class="role-tab" onclick="switchToRetrieve()">
-                            Retrieve
-                        </button>
-                        <button class="role-tab refresh-btn" onclick="refreshData()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
+                    <h2 style="color: #4a7c59; margin: 0; font-size: 24px; font-family: 'IBM Plex Sans Condensed', sans-serif;">External Portal</h2>
+                    <p style="color: #6c757d; margin: 8px 0 0 0; font-size: 14px;">View your submission history</p>
                 </div>
 
-                <!-- Forms Panel -->
-                <div class="forms-panel">
-                    <div class="sub-tabs">
-                        <button class="sub-tab active" onclick="switchSubTab('submit')">
-                            Submit
-                        </button>
-                        <button class="sub-tab" onclick="switchSubTab('retrieve')">
-                            Retrieve
-                        </button>
-                    </div>
-
-                    <!-- Submit Tab Content -->
-                    <div id="submit-content" class="tab-content">
-                        <div class="purchase-order-section">
-                            <button class="purchase-order-heading expanded" onclick="togglePurchaseOrder()">
-                                <i class="fas fa-chevron-down icon"></i>
-                                Purchase Order / Delivery Information
-                            </button>
-                            
-                            <div class="purchase-order-form">
-                                <div class="form-group">
-                                    <label for="po-number">PO Number (Optional)</label>
-                                    <input type="text" id="po-number" placeholder="Enter PO number">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="delivery-id">Delivery ID (Optional)</label>
-                                    <input type="text" id="delivery-id" placeholder="Enter delivery ID">
-                                </div>
+                <!-- History Panel (Always visible) -->
+                <div id="history-panel" class="history-panel">
+                    <!-- History Filters -->
+                    <div class="history-filters" style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="font-size: 12px; margin-bottom: 4px;">PO Number</label>
+                                <input type="text" id="po-filter" placeholder="Filter by PO" style="padding: 8px 12px; font-size: 14px;">
                             </div>
-                        </div>
-
-                        <!-- Reference Input Section -->
-                        <div class="reference-input-section">
-                            <div class="section-header">
-                                <h3>Reference Information</h3>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="font-size: 12px; margin-bottom: 4px;">Delivery ID</label>
+                                <input type="text" id="delivery-filter" placeholder="Filter by delivery" style="padding: 8px 12px; font-size: 14px;">
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="reference-number">Reference Number *</label>
-                                <input type="text" id="reference-number" placeholder="Enter reference number" required>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="font-size: 12px; margin-bottom: 4px;">Date Range</label>
+                                <select id="date-filter" style="padding: 8px 12px; font-size: 14px;">
+                                    <option value="">All Time</option>
+                                    <option value="today">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                </select>
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="validation-number">Validation Number (Optional)</label>
-                                <input type="text" id="validation-number" placeholder="Enter validation number">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="font-size: 12px; margin-bottom: 4px;">Direction</label>
+                                <select id="direction-filter" style="padding: 8px 12px; font-size: 14px;">
+                                    <option value="">All</option>
+                                    <option value="sent">Sent</option>
+                                    <option value="received">Received</option>
+                                </select>
                             </div>
-                            
-                            <div class="action-buttons">
-                                <button class="btn-add" onclick="addReference()">
-                                    <i class="fas fa-plus"></i>
-                                    Add Reference
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Reference Panel -->
-                        <div id="reference-panel">
-                            <div class="section-header">
-                                <h3>References to Submit</h3>
-                            </div>
-                            <div id="reference-list"></div>
-                        </div>
-
-                        <!-- Submit Section -->
-                        <div class="submit-section">
-                            <button class="submit-btn" onclick="submitReferences()">
-                                Submit References
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Retrieve Tab Content -->
-                    <div id="retrieve-content" class="tab-content" style="display: none;">
-                        <div class="table-container">
-                            <h3 style="margin-bottom: 20px; color: #495057;">
-                                <i class="fas fa-inbox"></i> References Sent by Admin
-                            </h3>
-                            <div id="retrieveData">
-                                <div class="loading">
-                                    <div class="spinner"></div>
-                                    Loading references...
-                                </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn" onclick="applyHistoryFilters()" style="padding: 8px 16px; font-size: 12px;">Filter</button>
+                                <button class="btn btn-secondary" onclick="clearHistoryFilters()" style="padding: 8px 16px; font-size: 12px;">Clear</button>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- History Panel -->
-                <div class="history-panel hidden">
-                    <div class="header">
-                        <h3>Your References</h3>
-                        <span class="count" id="reference-count">0 References</span>
-                    </div>
-                    <div class="content" id="history-content">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            Loading history...
+                    <!-- History Content -->
+                    <div class="history-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="color: #4a7c59; margin: 0; font-size: 18px;">Submission History</h3>
+                            <button class="btn btn-secondary" onclick="loadHistory()" style="padding: 8px 16px; font-size: 12px;">Refresh</button>
+                        </div>
+                        <div id="history-content" class="submission-history" style="background: white; border-radius: 8px; border: 1px solid #e9ecef; padding: 16px;">
+                            <p style="color: #6c757d; text-align: center; padding: 40px;">Loading your submission history...</p>
                         </div>
                     </div>
                 </div>
@@ -614,207 +584,34 @@
     </div>
 
     <script>
-        let references = [];
         const connectionToken = window.location.pathname.split('/').pop();
+        let historyFilters = {};
 
-        // Tab switching functions
-        function switchToForms() {
-            document.querySelector('.column-1').classList.add('forms-active');
-            document.querySelector('.column-1').classList.remove('history-active');
-            document.querySelector('.forms-panel').classList.remove('hidden');
-            document.querySelector('.history-panel').classList.add('hidden');
-        }
-
-        function switchToHistory() {
-            document.querySelector('.column-1').classList.remove('forms-active');
-            document.querySelector('.column-1').classList.add('history-active');
-            document.querySelector('.forms-panel').classList.add('hidden');
-            document.querySelector('.history-panel').classList.remove('hidden');
-            loadSubmitHistory();
-        }
-
-        function switchToRetrieve() {
-            // This will be handled by the sub-tab switching
-            switchSubTab('retrieve');
-        }
-
-        function switchSubTab(tabName) {
-            // Hide all sub-tab contents
-            document.getElementById('submit-content').style.display = 'none';
-            document.getElementById('retrieve-content').style.display = 'none';
-            
-            // Remove active class from all sub-tabs
-            document.querySelectorAll('.sub-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected sub-tab content
-            if (tabName === 'submit') {
-                document.getElementById('submit-content').style.display = 'block';
-                document.querySelector('.sub-tab:first-child').classList.add('active');
-            } else if (tabName === 'retrieve') {
-                document.getElementById('retrieve-content').style.display = 'block';
-                document.querySelector('.sub-tab:last-child').classList.add('active');
-                loadRetrieveData();
-            }
-        }
-
-        function togglePurchaseOrder() {
-            const heading = document.querySelector('.purchase-order-heading');
-            const form = document.querySelector('.purchase-order-form');
-            
-            if (heading.classList.contains('expanded')) {
-                heading.classList.remove('expanded');
-                form.style.display = 'none';
-            } else {
-                heading.classList.add('expanded');
-                form.style.display = 'flex';
-            }
-        }
-
-        function addReference() {
-            const refNumber = document.getElementById('reference-number').value.trim();
-            const valNumber = document.getElementById('validation-number').value.trim();
-            
-            if (!refNumber) {
-                alert('Please enter a reference number');
-                return;
+        // Initialize the layout
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state
+            const column1 = document.querySelector('.column-1');
+            if (column1) {
+                column1.classList.add('history-active');
             }
             
-            const newReference = {
-                id: Date.now().toString(),
-                referenceNumber: refNumber,
-                validationNumber: valNumber
-            };
-            
-            references.push(newReference);
-            updateReferenceDisplay();
-            
-            // Clear inputs
-            document.getElementById('reference-number').value = '';
-            document.getElementById('validation-number').value = '';
-            
-            // Show reference panel if it was hidden
-            const referencePanel = document.getElementById('reference-panel');
-            referencePanel.style.display = 'block';
-        }
+            // Load initial data
+            loadHistory();
+        });
 
-        function removeReference(id) {
-            references = references.filter(ref => ref.id !== id);
-            updateReferenceDisplay();
-            
-            // Hide reference panel if no references left
-            if (references.length === 0) {
-                const referencePanel = document.getElementById('reference-panel');
-                referencePanel.style.display = 'none';
-            }
-        }
-
-        function updateReferenceDisplay() {
-            const referenceList = document.getElementById('reference-list');
-            const referencePanel = document.getElementById('reference-panel');
-            
-            referenceList.innerHTML = '';
-            
-            references.forEach(ref => {
-                const card = document.createElement('div');
-                card.className = 'reference-card';
-                card.innerHTML = `
-                    <div class="reference-field">
-                        <span class="reference-field-label">Reference Number:</span>
-                        <div class="reference-field-value">${ref.referenceNumber}</div>
-                    </div>
-                    <div class="reference-field">
-                        <span class="reference-field-label">Validation Number:</span>
-                        <div class="reference-field-value">${ref.validationNumber || '-------'}</div>
-                    </div>
-                    <button class="remove-btn" onclick="removeReference('${ref.id}')">×</button>
-                `;
-                referenceList.appendChild(card);
-            });
-            
-            // Show/hide reference panel
-            if (references.length > 0) {
-                referencePanel.style.display = 'block';
-            } else {
-                referencePanel.style.display = 'none';
-            }
-        }
-
-        async function submitReferences() {
-            try {
-                if (references.length === 0) {
-                    alert('Please add at least one reference before submitting');
-                    return;
-                }
-
-                // Get the form fields
-                const poNumber = document.getElementById('po-number')?.value?.trim() || '';
-                const deliveryId = document.getElementById('delivery-id')?.value?.trim() || '';
-
-                // Check if we have at least one identifier (PO Number OR Delivery ID required)
-                if (!poNumber && !deliveryId) {
-                    alert('Please fill in either PO Number or Delivery ID (at least one is required)');
-                    return;
-                }
-
-                // Submit each reference individually
-                let successCount = 0;
-                let errorCount = 0;
-
-                for (const reference of references) {
-                    try {
-                        const response = await fetch(`/api/external/${connectionToken}/submit`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                poNumber: poNumber,
-                                deliveryId: deliveryId,
-                                referenceNumber: reference.referenceNumber,
-                                validationNumber: reference.validationNumber || ''
-                            })
-                        });
-
-                        if (response.ok) {
-                            successCount++;
-                        } else {
-                            const errorData = await response.json();
-                            console.error('Reference submission failed:', errorData);
-                            errorCount++;
-                        }
-                    } catch (error) {
-                        errorCount++;
-                    }
-                }
-
-                if (successCount > 0) {
-                    alert(`Successfully submitted ${successCount} reference(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
-                    
-                    // Clear references and reset form
-                    references = [];
-                    updateReferenceDisplay();
-                    
-                    // Clear form fields
-                    if (document.getElementById('po-number')) document.getElementById('po-number').value = '';
-                    if (document.getElementById('delivery-id')) document.getElementById('delivery-id').value = '';
-                } else {
-                    console.error('All references failed to submit. Check console for details.');
-                    alert(`Failed to submit references. ${errorCount} references failed. Check browser console for details.`);
-                }
-            } catch (error) {
-                console.error('Error submitting references:', error);
-                alert('Network error occurred. Please try again.');
-            }
-        }
-
-        async function loadSubmitHistory() {
+        async function loadHistory() {
             try {
                 const historyContent = document.getElementById('history-content');
                 historyContent.innerHTML = '<div class="loading">Loading...</div>';
 
-                const response = await fetch(`/api/external/${connectionToken}/history`);
+                // Build query parameters
+                const params = new URLSearchParams();
+                if (historyFilters.poNumber) params.append('poNumber', historyFilters.poNumber);
+                if (historyFilters.deliveryId) params.append('deliveryId', historyFilters.deliveryId);
+                if (historyFilters.dateRange) params.append('dateRange', historyFilters.dateRange);
+                if (historyFilters.direction) params.append('direction', historyFilters.direction);
+
+                const response = await fetch(`/api/external/${connectionToken}/history?${params.toString()}`);
                 const data = await response.json();
                 
                 if (response.ok) {
@@ -870,56 +667,24 @@
             }
         }
 
-        async function loadRetrieveData() {
-            try {
-                const retrieveData = document.getElementById('retrieveData');
-                retrieveData.innerHTML = '<div class="loading">Loading...</div>';
-
-                const response = await fetch(`/api/external/${connectionToken}/retrieve`);
-                const data = await response.json();
-                
-                if (response.ok) {
-                    if (data.references.length === 0) {
-                        retrieveData.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 40px;">No references found.</p>';
-                    } else {
-                        // Generate HTML for retrieve data
-                        retrieveData.innerHTML = data.references.map(ref => `
-                            <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; padding: 16px;">
-                                <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center; font-size: 14px;">
-                                    <div style="font-weight: 600; color: #4a7c59;">${ref.reference_number}</div>
-                                    <div style="color: #28a745;">${ref.validation_number || '-'}</div>
-                                    <div style="color: #6c757d; font-size: 12px;">${new Date(ref.submitted_at).toLocaleString()}</div>
-                                </div>
-                            </div>
-                        `).join('');
-                    }
-                } else {
-                    retrieveData.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Failed to load references. Please try again.</p>';
-                }
-            } catch (error) {
-                retrieveData.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 40px;">Network error occurred.</p>';
-            }
+        function applyHistoryFilters() {
+            historyFilters = {
+                poNumber: document.getElementById('po-filter').value,
+                deliveryId: document.getElementById('delivery-filter').value,
+                dateRange: document.getElementById('date-filter').value,
+                direction: document.getElementById('direction-filter').value
+            };
+            loadHistory();
         }
 
-        function refreshData() {
-            if (document.querySelector('.column-1').classList.contains('history-active')) {
-                loadSubmitHistory();
-            } else if (document.getElementById('retrieve-content').style.display !== 'none') {
-                loadRetrieveData();
-            }
+        function clearHistoryFilters() {
+            document.getElementById('po-filter').value = '';
+            document.getElementById('delivery-filter').value = '';
+            document.getElementById('date-filter').value = '';
+            document.getElementById('direction-filter').value = '';
+            historyFilters = {};
+            loadHistory();
         }
-
-        // Initialize the layout
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set initial state
-            const column1 = document.querySelector('.column-1');
-            if (column1) {
-                column1.classList.add('forms-active');
-            }
-            
-            // Load initial data
-            loadSubmitHistory();
-        });
     </script>
 </body>
 </html>
