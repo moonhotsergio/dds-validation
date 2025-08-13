@@ -652,6 +652,31 @@
             height: 23px;
             box-sizing: content-box;
         }
+
+        /* Unified filter element styling - ALL elements get identical styling */
+        .filter-input,
+        .filter-select,
+        .direction-toggle,
+        .toggle-btn,
+        .filter-btn {
+            height: 23px !important;
+            padding: 6px 10px !important;
+            font-size: 11px !important;
+            font-family: 'IBM Plex Sans Condensed', sans-serif !important;
+            border: 1px solid #e9ecef !important;
+            border-radius: 4px !important;
+            box-sizing: content-box !important;
+        }
+
+        /* Remove borders from toggle buttons since they're inside the toggle container */
+        .toggle-btn {
+            border: none !important;
+        }
+
+        /* Ensure toggle container has no border since individual buttons handle borders */
+        .direction-toggle {
+            border: none !important;
+        }
     </style>
 </head>
 <body>
