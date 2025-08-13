@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal V2 - DDS Validation</title>
+    <title>Admin Portal - DDS Validation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -13,35 +16,395 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle, #dfeeda, #c0d9bd, #5c7d5d);
             min-height: 100vh;
-            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
+        /* Background image layer */
+        body::before {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 50vw;
+            height: 100vh;
+            background-image: url('/bg-image.png');
+            background-position: right bottom;
+            background-repeat: no-repeat;
+            background-size: 50vw auto;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .interface-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4a7c59 0%, #6a9969 100%);
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
 
+        .wrapper-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 24px;
+            padding-top: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 60px;
+            margin-bottom: 60px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Logo Styles */
+        .logo {
+            position: relative;
+            z-index: 10;
+            height: 22px;
+            width: 71px;
+            margin-left: 20px;
+        }
+
+        .logo svg {
+            height: 22px;
+            width: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+        }
+
+        /* Header Styles */
         .header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .header-title {
+            color: #4a7c59;
+            margin: 0;
+            font-size: 24px;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            font-weight: 600;
+        }
+
+        .header-subtitle {
+            color: #6c757d;
+            margin: 0;
+            font-size: 14px;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            justify-content: center;
+            max-width: 400px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Organisation Selector Styles */
+        .searchable-dropdown {
+            position: relative;
+            width: 250px;
+        }
+
+        .searchable-dropdown input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        .searchable-dropdown input:focus {
+            outline: none;
+            border-color: #4a7c59;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+        }
+
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #4a7c59;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item .org-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .dropdown-item .org-icon {
+            color: #4a7c59;
+            font-size: 0.9rem;
+        }
+        
+        .dropdown-item .connected-icon {
+            color: #28a745;
+            font-size: 0.8rem;
+            margin-left: auto;
+            opacity: 0.8;
+        }
+
+        .no-results {
+            padding: 15px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Connect Button */
+        .btn-connect {
+            background: #4a7c59;
             color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        .btn-connect:hover {
+            background: #3d6b4a;
+            transform: translateY(-1px);
         }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .btn-connect:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            background: #6c757d;
+        }
+        
+        .btn-connect:disabled:hover {
+            background: #6c757d;
+            transform: none;
         }
 
+        /* User Avatar and Logout */
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4a7c59 0%, #6a9969 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .user-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            margin-bottom: 8px;
+        }
+
+        .user-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+        }
+
+        .user-avatar:hover .user-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        /* Connections Table Styles */
+        .connections-section {
+            margin-top: 20px;
+        }
+
+        .connections-header {
+            margin-bottom: 20px;
+        }
+
+        .connections-title {
+            color: #4a7c59;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
+            margin-bottom: 8px;
+        }
+
+        .connections-description {
+            color: #6c757d;
+            font-size: 14px;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        .connections-table {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .connections-table th,
+        .connections-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        .connections-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .connections-table td {
+            font-size: 14px;
+        }
+
+        .connections-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .connection-token {
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #495057;
+        }
+
+        .btn-view {
+            background: #4a7c59;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background: #3d6b4a;
+        }
+
+        /* Admin Container */
+        .admin-container {
+            display: none;
+            width: 100%;
+        }
+        
+        .admin-container.show {
+            display: block;
+        }
+
+        /* Login Form Styles */
         .login-container {
             background: white;
             border-radius: 15px;
@@ -49,10 +412,6 @@
             padding: 40px;
             max-width: 400px;
             margin: 0 auto;
-        }
-
-        .admin-container {
-            display: none;
         }
 
         .form-group {
@@ -64,6 +423,7 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: #495057;
+            font-family: 'IBM Plex Sans', sans-serif;
         }
 
         .form-group input {
@@ -73,16 +433,17 @@
             border-radius: 8px;
             font-size: 1rem;
             transition: border-color 0.3s ease;
+            font-family: 'IBM Plex Sans', sans-serif;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #4a7c59;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4a7c59 0%, #6a9969 100%);
             color: white;
             border: none;
             padding: 12px 30px;
@@ -92,127 +453,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
+            font-family: 'IBM Plex Sans', sans-serif;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        /* Enhanced Searchable Dropdown Styles */
-        .searchable-dropdown {
-            position: relative;
-            width: 100%;
-        }
-
-        .searchable-dropdown input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .searchable-dropdown input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .searchable-dropdown input:disabled {
-            background: #f8f9fa;
-            cursor: not-allowed;
-        }
-
-        .dropdown-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 2px solid #667eea;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            display: none;
-        }
-
-        .dropdown-item {
-            padding: 12px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #f8f9fa;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            transform: translateX(2px);
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item.selected {
-            background-color: #667eea;
-            color: white;
-        }
-
-        .dropdown-item .org-name {
-            flex: 1;
-            font-weight: 500;
-        }
-
-        .dropdown-item .org-icon {
-            color: #667eea;
-            font-size: 0.9rem;
-        }
-
-        .dropdown-item.selected .org-icon {
-            color: white;
-        }
-
-        .no-results {
-            padding: 15px;
-            text-align: center;
-            color: #6c757d;
-            font-style: italic;
-        }
-
-        .dropdown-arrow {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-            pointer-events: none;
-            transition: transform 0.3s ease;
-        }
-
-        .searchable-dropdown.open .dropdown-arrow {
-            transform: translateY(-50%) rotate(180deg);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+            box-shadow: 0 5px 15px rgba(74, 124, 89, 0.4);
         }
 
         .alert {
@@ -220,6 +466,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             font-weight: 500;
+            font-family: 'IBM Plex Sans', sans-serif;
         }
 
         .alert-success {
@@ -234,131 +481,29 @@
             border: 1px solid #f5c6cb;
         }
 
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .admin-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .admin-avatar {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .admin-details h3 {
-            color: #495057;
-            margin-bottom: 5px;
-        }
-
-        .admin-details p {
+        .loading {
+            text-align: center;
+            padding: 40px;
             color: #6c757d;
-            font-size: 0.9rem;
+            font-family: 'IBM Plex Sans', sans-serif;
         }
 
-        .logout-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.3s ease;
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4a7c59;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
 
-        .logout-btn:hover {
-            background: #c82333;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            padding: 25px;
-        }
-
-        .card h3 {
-            color: #495057;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .connections-list {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            padding: 25px;
-        }
-
-        .connection-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-left: 4px solid #667eea;
-        }
-
-        .connection-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .connection-name {
-            font-weight: 600;
-            color: #495057;
-            font-size: 1.1rem;
-        }
-
-        .connection-token {
-            background: #e9ecef;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: #495057;
-        }
-
-        .connection-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-sm {
-            padding: 8px 15px;
-            font-size: 0.9rem;
-        }
-
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -394,6 +539,7 @@
             font-size: 1.5rem;
             color: #495057;
             font-weight: 600;
+            font-family: 'IBM Plex Sans Condensed', sans-serif;
         }
 
         .close {
@@ -413,269 +559,141 @@
             gap: 20px;
         }
 
-        .table-container {
-            margin-top: 20px;
-            overflow-x: auto;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .data-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-sent {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-received {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        /* Grouped References Styles */
-        .grouped-reference {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .grouped-reference-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 12px 16px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .grouped-reference-content {
-            padding: 12px;
-        }
-
-        .reference-row {
-            display: grid;
-            grid-template-columns: 2fr 2fr 1fr 1fr;
-            gap: 12px;
-            padding: 8px;
-            border-bottom: 1px solid #f1f3f4;
-            align-items: center;
-            font-size: 13px;
-        }
-
-        .reference-row:last-child {
-            border-bottom: none;
-        }
-
-        .reference-number {
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .validation-number {
-            color: #28a745;
-        }
-
-        .reference-time {
-            color: #6c757d;
-            font-size: 11px;
-        }
-
-        .reference-direction {
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-
-        .direction-sent {
-            color: #dc3545;
-        }
-
-        .direction-received {
-            color: #007bff;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
             }
-            
+
+            .header-center {
+                max-width: none;
+            }
+
+            .searchable-dropdown {
+                width: 100%;
+            }
+
+            .user-section {
+                justify-content: center;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
-            .container {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .reference-row {
-                grid-template-columns: 1fr;
-                gap: 8px;
-                padding: 12px 8px;
-            }
-            
-            .grouped-reference-header span {
-                font-size: 12px;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 2% auto;
-                padding: 20px;
-            }
-            
-            .dropdown-list {
-                max-height: 200px;
-            }
-            
-            .dropdown-item {
-                padding: 10px 12px;
-                gap: 8px;
-            }
-            
 
+            .wrapper-card {
+                padding: 16px;
+                margin-top: 40px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-user-shield"></i> Admin Portal V2</h1>
-            <p>Manage organisations and connections</p>
+    <div class="interface-container">
+        <!-- Logo -->
+        <div class="logo">
+            <img src="/Interu_Logo_white.svg" alt="Interu Logo" width="167.414" height="51">
         </div>
-
-        <!-- Login Form -->
-        <div id="loginForm" class="login-container">
-            <h2 style="text-align: center; margin-bottom: 30px; color: #495057;">
-                <i class="fas fa-sign-in-alt"></i> Admin Login
-            </h2>
-            
-            <div id="loginAlert" style="display: none;"></div>
-            
-            <form id="adminLoginForm">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required placeholder="Enter your email">
-                </div>
+        
+        <div class="wrapper-card">
+            <!-- Login Form -->
+            <div id="loginForm" class="login-container">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #495057; font-family: 'IBM Plex Sans Condensed', sans-serif;">
+                    <i class="fas fa-sign-in-alt"></i> Admin Login
+                </h2>
                 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required placeholder="Enter your password">
-                </div>
+                <div id="loginAlert" style="display: none;"></div>
                 
-                <button type="submit" class="btn" id="loginBtn">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </button>
-            </form>
-        </div>
-
-        <!-- Admin Dashboard -->
-        <div id="adminDashboard" class="admin-container">
-            <div class="admin-header">
-                <div class="admin-info">
-                    <div class="admin-avatar" id="adminAvatar">A</div>
-                    <div class="admin-details">
-                        <h3 id="adminName">Admin User</h3>
-                        <p id="adminEmail">admin@example.com</p>
+                <form id="adminLoginForm">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required placeholder="Enter your email" value="sergio.andrade@moonshot.partners">
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Enter your password" value="Moonshot2020!">
+                    </div>
+                    
+                    <button type="submit" class="btn" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #4a7c59;">
+                    <h4 style="margin: 0 0 10px 0; color: #495057; font-size: 14px;">Test Credentials:</h4>
+                    <p style="margin: 0; font-size: 12px; color: #6c757d;">
+                        <strong>Email:</strong> sergio.andrade@moonshot.partners<br>
+                        <strong>Password:</strong> Moonshot2020!
+                    </p>
                 </div>
-                <button class="logout-btn" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
             </div>
 
-            <div class="main-content">
-                <div class="card">
-                    <h3><i class="fas fa-plus-circle"></i> Create Connection</h3>
-                    <form id="createConnectionForm">
-                        <div class="form-group">
-                            <label for="organisationSelect">Select Organisation</label>
-                            <div class="searchable-dropdown" id="organisationDropdownContainer">
-                                <input type="text" id="organisationSelect" placeholder="Type to search organisations..." autocomplete="off">
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                                <div id="organisationDropdown" class="dropdown-list"></div>
-                            </div>
+            <!-- Admin Dashboard -->
+            <div id="adminDashboard" class="admin-container">
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-left">
+                        <h1 class="header-title">Admin Portal</h1>
+                        <p class="header-subtitle">Manage organisations and connections</p>
+                    </div>
+                    
+                    <div class="header-center">
+                        <div class="searchable-dropdown" id="organisationDropdownContainer">
+                            <input type="text" id="organisationSelect" placeholder="Select organisation..." autocomplete="off">
+                            <div id="organisationDropdown" class="dropdown-list"></div>
                         </div>
-                        
-                        <button type="submit" class="btn" id="createConnectionBtn">
-                            <i class="fas fa-link"></i> Create Connection
+                        <button type="button" class="btn-connect" id="createConnectionBtn" onclick="createConnection()" disabled>
+                            <i class="fas fa-link"></i> Connect
                         </button>
-                    </form>
-                </div>
-
-                <div class="card">
-                    <h3><i class="fas fa-list"></i> Available Organisations</h3>
-                    <div id="organisationsList">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            Loading organisations...
+                    </div>
+                    
+                    <div class="header-right">
+                        <div class="user-section">
+                            <div class="user-avatar" id="adminAvatar" title="Click to see details">
+                                A
+                                <div class="user-tooltip" id="userTooltip">
+                                    <div id="tooltipName">Admin User</div>
+                                    <div id="tooltipEmail">admin@example.com</div>
+                                </div>
+                            </div>
+                            <button class="logout-btn" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="connections-list">
-                <h3><i class="fas fa-link"></i> Your Connections</h3>
-                <div id="connectionsList">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        Loading connections...
+                <!-- Connections Section -->
+                <div class="connections-section">
+                    <div class="connections-header">
+                        <h3 class="connections-title">Your Connections</h3>
+                        <p class="connections-description">Manage and monitor your organisation connections</p>
+                    </div>
+                    
+                    <div class="connections-table">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th>Organisation</th>
+                                    <th>Connection Token</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Last Used</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="connectionsTableBody">
+                                <tr>
+                                    <td colspan="6" class="loading">
+                                        <div class="spinner"></div>
+                                        Loading connections...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -700,24 +718,55 @@
         let currentAdmin = null;
         let organisations = [];
         let connections = [];
+        let selectedOrganisationId = null;
 
         // Check if admin is already logged in
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, checking auth status...');
             checkAuthStatus();
+            
+            // Test API connectivity
+            testAPIConnectivity();
         });
+        
+        // Test API connectivity
+        async function testAPIConnectivity() {
+            try {
+                console.log('Testing API connectivity...');
+                const response = await fetch('/api/admin-v2/organisations');
+                console.log('API test response status:', response.status);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('API test successful, organisations:', data);
+                } else {
+                    console.log('API test failed:', response.status);
+                }
+            } catch (error) {
+                console.error('API connectivity test failed:', error);
+            }
+        }
 
         // Check authentication status
         async function checkAuthStatus() {
             try {
+                console.log('Checking authentication status...');
                 const response = await fetch('/api/admin/auth/me');
+                console.log('Auth response status:', response.status);
+                
                 if (response.ok) {
                     const result = await response.json();
+                    console.log('Auth successful:', result);
                     currentAdmin = result.admin;
                     showAdminDashboard();
                     loadOrganisations();
                     loadConnections();
+                } else {
+                    console.log('Auth failed with status:', response.status);
+                    const errorText = await response.text();
+                    console.log('Auth error response:', errorText);
                 }
             } catch (error) {
+                console.error('Auth check error:', error);
                 console.log('Not authenticated');
             }
         }
@@ -739,6 +788,8 @@
                     password: formData.get('password')
                 };
                 
+                console.log('Attempting login with:', data.email);
+                
                 const response = await fetch('/api/admin/auth/login', {
                     method: 'POST',
                     headers: {
@@ -747,19 +798,24 @@
                     body: JSON.stringify(data)
                 });
                 
-                const result = await response.json();
+                console.log('Login response status:', response.status);
                 
                 if (response.ok) {
+                    const result = await response.json();
+                    console.log('Login successful:', result);
                     currentAdmin = result.admin;
                     showAdminDashboard();
                     loadOrganisations();
                     loadConnections();
                     showAlert('loginAlert', 'Login successful!', 'success');
                 } else {
-                    throw new Error(result.error || 'Login failed');
+                    const errorText = await response.text();
+                    console.error('Login failed:', response.status, errorText);
+                    throw new Error(`Login failed: ${response.status}`);
                 }
                 
             } catch (error) {
+                console.error('Login error:', error);
                 showAlert('loginAlert', error.message, 'error');
             } finally {
                 loginBtn.disabled = false;
@@ -769,78 +825,102 @@
 
         // Show admin dashboard
         function showAdminDashboard() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'block';
-            
-            // Update admin info
-            document.getElementById('adminName').textContent = currentAdmin.email.split('@')[0];
-            document.getElementById('adminEmail').textContent = currentAdmin.email;
-            document.getElementById('adminAvatar').textContent = currentAdmin.email.charAt(0).toUpperCase();
+            try {
+                console.log('Showing admin dashboard...');
+                
+                // Hide login form and show dashboard
+                const loginForm = document.getElementById('loginForm');
+                const adminDashboard = document.getElementById('adminDashboard');
+                
+                if (loginForm) loginForm.style.display = 'none';
+                if (adminDashboard) adminDashboard.style.display = 'block';
+                
+                // Update admin info safely
+                if (currentAdmin && currentAdmin.email) {
+                    const adminName = currentAdmin.email.split('@')[0];
+                    const adminEmail = currentAdmin.email;
+                    const adminInitial = currentAdmin.email.charAt(0).toUpperCase();
+                    
+                    const adminAvatar = document.getElementById('adminAvatar');
+                    const tooltipName = document.getElementById('tooltipName');
+                    const tooltipEmail = document.getElementById('tooltipEmail');
+                    
+                    if (adminAvatar) adminAvatar.textContent = adminInitial;
+                    if (tooltipName) tooltipName.textContent = adminName;
+                    if (tooltipEmail) tooltipEmail.textContent = adminEmail;
+                    
+                    console.log('Admin info updated:', { adminName, adminEmail, adminInitial });
+                }
+                
+                // Initialize connect button state
+                updateConnectButtonState();
+                
+                console.log('Dashboard shown successfully');
+            } catch (error) {
+                console.error('Error showing admin dashboard:', error);
+            }
         }
 
         // Load organisations
-        async function loadOrganisations(search = '') {
+        async function loadOrganisations() {
             try {
-                const url = search ? `/api/admin-v2/organisations?search=${encodeURIComponent(search)}` : '/api/admin-v2/organisations';
-                const response = await fetch(url);
-                const result = await response.json();
+                console.log('Loading organisations...');
+                const response = await fetch('/api/admin-v2/organisations');
+                console.log('Organisations response status:', response.status);
                 
                 if (response.ok) {
+                    const result = await response.json();
+                    console.log('Organisations loaded:', result);
                     organisations = result;
-                    displayOrganisations(result);
                     updateOrganisationSelect(result);
                 } else {
-                    throw new Error(result.error || 'Failed to load organisations');
+                    const errorText = await response.text();
+                    console.error('Failed to load organisations:', response.status, errorText);
+                    throw new Error(`Failed to load organisations: ${response.status}`);
                 }
             } catch (error) {
-                document.getElementById('organisationsList').innerHTML = `
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
-                    </div>
-                `;
+                console.error('Load organisations error:', error);
             }
-        }
-
-        // Display organisations
-        function displayOrganisations(orgs) {
-            if (!orgs || orgs.length === 0) {
-                document.getElementById('organisationsList').innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-info-circle"></i> No organisations found.
-                    </div>
-                `;
-                return;
-            }
-            
-            const orgsHtml = orgs.map(org => `
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                    <strong>${org.name}</strong>
-                    <br><small style="color: #6c757d;">Created: ${new Date(org.created_at).toLocaleDateString()}</small>
-                </div>
-            `).join('');
-            
-            document.getElementById('organisationsList').innerHTML = orgsHtml;
         }
 
         // Update organisation select dropdown
         function updateOrganisationSelect(orgs) {
-            const input = document.getElementById('organisationSelect');
-            const dropdown = document.getElementById('organisationDropdown');
-            
-            // Clear previous value and selection
-            input.value = '';
-            selectedOrganisationId = null;
-            
-            // Hide dropdown if open
-            hideOrganisationDropdown();
-            
-            // Store organisations for filtering
             window.availableOrganisations = orgs;
+            
+            // If dropdown is currently open, refresh it to show updated connection status
+            if (isDropdownOpen) {
+                showOrganisationDropdown(orgs);
+            }
+        }
+        
+        // Update connect button state based on selected organisation
+        function updateConnectButtonState() {
+            const connectBtn = document.getElementById('createConnectionBtn');
+            if (!connectBtn) return;
+            
+            if (!selectedOrganisationId) {
+                // No organisation selected
+                connectBtn.disabled = true;
+                connectBtn.title = 'Please select an organisation first';
+                return;
+            }
+            
+            // Check if organisation is already connected
+            const isConnected = connections.some(conn => conn.organisation_id === selectedOrganisationId);
+            
+            if (isConnected) {
+                // Organisation already connected
+                connectBtn.disabled = true;
+                connectBtn.title = 'This organisation is already connected';
+            } else {
+                // Organisation not connected, enable button
+                connectBtn.disabled = false;
+                connectBtn.title = 'Connect to this organisation';
+            }
         }
 
         // Enhanced searchable dropdown functionality
         let searchTimeout;
-        let selectedOrganisationId = null;
         let isDropdownOpen = false;
         
         // Input event for search
@@ -852,15 +932,15 @@
             // Clear previous selection if user is typing
             if (selectedOrganisationId) {
                 selectedOrganisationId = null;
+                // Update button state when selection is cleared
+                updateConnectButtonState();
             }
             
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 if (searchTerm.length === 0) {
-                    // Show all organisations when input is empty
                     showOrganisationDropdown(window.availableOrganisations || []);
                 } else {
-                    // Filter organisations based on search term
                     const filtered = (window.availableOrganisations || []).filter(org => 
                         org.name.toLowerCase().includes(searchTerm.toLowerCase())
                     );
@@ -882,22 +962,8 @@
                 if (isDropdownOpen) {
                     hideOrganisationDropdown();
                 } else {
+                    // Always refresh the dropdown to show current connection status
                     showOrganisationDropdown(window.availableOrganisations);
-                }
-            }
-        });
-
-        // Keyboard navigation
-        document.getElementById('organisationSelect').addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                hideOrganisationDropdown();
-                e.target.blur();
-            } else if (e.key === 'Enter' && isDropdownOpen) {
-                e.preventDefault();
-                // Select first item if dropdown is open
-                const firstItem = document.querySelector('.dropdown-item[data-id]');
-                if (firstItem) {
-                    selectOrganisation(firstItem.dataset.id, firstItem.dataset.name);
                 }
             }
         });
@@ -905,22 +971,27 @@
         // Show organisation dropdown
         function showOrganisationDropdown(organisations) {
             const dropdown = document.getElementById('organisationDropdown');
-            const input = document.getElementById('organisationSelect');
             const container = document.getElementById('organisationDropdownContainer');
             
             if (organisations.length === 0) {
                 dropdown.innerHTML = '<div class="no-results">No organisations found</div>';
             } else {
-                dropdown.innerHTML = organisations.map(org => `
-                    <div class="dropdown-item" data-id="${org.id}" data-name="${org.name}">
-                        <i class="fas fa-building org-icon"></i>
-                        <div class="org-name">${org.name}</div>
-                    </div>
-                `).join('');
+                // Get connected organisation IDs for comparison
+                const connectedOrgIds = connections.map(conn => conn.organisation_id);
+                
+                dropdown.innerHTML = organisations.map(org => {
+                    const isConnected = connectedOrgIds.includes(org.id);
+                    return `
+                        <div class="dropdown-item" data-id="${org.id}" data-name="${org.name}">
+                            <i class="fas fa-building org-icon"></i>
+                            <div class="org-name">${org.name}</div>
+                            ${isConnected ? '<i class="fas fa-link connected-icon" title="Already connected"></i>' : ''}
+                        </div>
+                    `;
+                }).join('');
             }
             
             dropdown.style.display = 'block';
-            container.classList.add('open');
             isDropdownOpen = true;
             
             // Add click handlers to dropdown items
@@ -936,31 +1007,25 @@
         // Hide organisation dropdown
         function hideOrganisationDropdown() {
             const dropdown = document.getElementById('organisationDropdown');
-            const container = document.getElementById('organisationDropdownContainer');
-            
             dropdown.style.display = 'none';
-            container.classList.remove('open');
             isDropdownOpen = false;
         }
 
         // Select organisation from dropdown
         function selectOrganisation(id, name) {
             const input = document.getElementById('organisationSelect');
-            const dropdown = document.getElementById('organisationDropdown');
-            const container = document.getElementById('organisationDropdownContainer');
-            
             input.value = name;
             selectedOrganisationId = id;
             hideOrganisationDropdown();
-            
-            // Focus the input to show the selected value clearly
             input.focus();
+            
+            // Update connect button state based on connection status
+            updateConnectButtonState();
         }
 
         // Hide dropdown when clicking outside
         document.addEventListener('click', (e) => {
             const dropdown = document.getElementById('organisationDropdown');
-            const input = document.getElementById('organisationSelect');
             const container = document.getElementById('organisationDropdownContainer');
             
             if (!container.contains(e.target)) {
@@ -969,9 +1034,7 @@
         });
 
         // Create connection
-        document.getElementById('createConnectionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
+        async function createConnection() {
             if (!selectedOrganisationId) {
                 showAlert('loginAlert', 'Please select an organisation', 'error');
                 return;
@@ -981,7 +1044,7 @@
             const originalText = createBtn.innerHTML;
             
             createBtn.disabled = true;
-            createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
             
             try {
                 const data = {
@@ -1004,6 +1067,8 @@
                     document.getElementById('organisationSelect').value = '';
                     selectedOrganisationId = null;
                     loadConnections();
+                    // Update button state after new connection
+                    updateConnectButtonState();
                 } else {
                     throw new Error(result.error || 'Failed to create connection');
                 }
@@ -1013,25 +1078,33 @@
                 createBtn.disabled = false;
                 createBtn.innerHTML = originalText;
             }
-        });
+        }
 
         // Load connections
         async function loadConnections() {
             try {
+                console.log('Loading connections...');
                 const response = await fetch('/api/admin-v2/connections');
-                const result = await response.json();
+                console.log('Connections response status:', response.status);
                 
                 if (response.ok) {
+                    const result = await response.json();
+                    console.log('Connections loaded:', result);
                     connections = result;
                     displayConnections(result);
                 } else {
-                    throw new Error(result.error || 'Failed to load connections');
+                    const errorText = await response.text();
+                    console.error('Failed to load connections:', response.status, errorText);
+                    throw new Error(`Failed to load connections: ${response.status}`);
                 }
             } catch (error) {
-                document.getElementById('connectionsList').innerHTML = `
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
-                    </div>
+                console.error('Load connections error:', error);
+                document.getElementById('connectionsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #dc3545; padding: 20px;">
+                            <i class="fas fa-exclamation-triangle"></i> ${error.message}
+                        </td>
+                    </tr>
                 `;
             }
         }
@@ -1039,36 +1112,42 @@
         // Display connections
         function displayConnections(conns) {
             if (!conns || conns.length === 0) {
-                document.getElementById('connectionsList').innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-info-circle"></i> No connections created yet.
-                    </div>
+                document.getElementById('connectionsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #6c757d; padding: 40px;">
+                            <i class="fas fa-info-circle"></i> No connections created yet.
+                        </td>
+                    </tr>
                 `;
                 return;
             }
             
             const connsHtml = conns.map(conn => `
-                <div class="connection-item">
-                    <div class="connection-header">
-                        <div>
-                            <div class="connection-name">${conn.organisation_name}</div>
-                            <div class="connection-token">${conn.token}</div>
-                        </div>
-                        <div class="connection-actions">
-                            <button class="btn btn-sm" onclick="viewConnectionDetails('${conn.id}')">
-                                <i class="fas fa-eye"></i> View Details
-                            </button>
-                        </div>
-                    </div>
-                    <div style="color: #6c757d; font-size: 0.9rem;">
-                        Created: ${new Date(conn.created_at).toLocaleDateString()}
-                        ${conn.last_used ? ` | Last used: ${new Date(conn.last_used).toLocaleDateString()}` : ''}
-                    </div>
-                </div>
+                <tr>
+                    <td style="font-weight: 600; color: #495057;">${conn.organisation_name}</td>
+                    <td><span class="connection-token">${conn.token}</span></td>
+                    <td>
+                        <span style="color: ${conn.is_active ? '#28a745' : '#6c757d'}; font-weight: 600;">
+                            ${conn.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td style="color: #6c757d;">${new Date(conn.created_at).toLocaleDateString()}</td>
+                    <td style="color: #6c757d;">
+                        ${conn.last_used ? new Date(conn.last_used).toLocaleDateString() : 'Never'}
+                    </td>
+                    <td>
+                        <button class="btn-view" onclick="viewConnectionDetails('${conn.id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
             `).join('');
             
-            document.getElementById('connectionsList').innerHTML = connsHtml;
+            document.getElementById('connectionsTableBody').innerHTML = connsHtml;
         }
+        
+        // Update connect button state after connections are displayed
+        updateConnectButtonState();
 
         // View connection details
         async function viewConnectionDetails(connectionId) {
@@ -1213,19 +1292,19 @@
 
             // Generate HTML for grouped references
             const groupedHtml = Object.values(grouped).map(group => `
-                <div class="grouped-reference">
-                    <div class="grouped-reference-header">
+                <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #4a7c59, #6a9969); color: white; padding: 8px 12px; font-size: 13px; font-weight: 600;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span>PO: ${group.poNumber || '-'} | Delivery: ${group.deliveryId || '-'} | ${group.references.length} ref${group.references.length !== 1 ? 's' : ''} | Updated: ${formatDateConcise(group.submittedAt)}</span>
                         </div>
                     </div>
-                    <div class="grouped-reference-content">
+                    <div style="padding: 8px;">
                         ${group.references.map(ref => `
-                            <div class="reference-row">
-                                <div class="reference-number">${ref.referenceNumber}</div>
-                                <div class="validation-number">${ref.validationNumber || '-'}</div>
-                                <div class="reference-time">${formatDateConcise(ref.submittedAt)}</div>
-                                <div class="reference-direction ${ref.direction === 'sent' ? 'direction-sent' : 'direction-received'}">
+                            <div style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 8px; padding: 6px; border-bottom: 1px solid #f1f3f4; align-items: center; font-size: 13px;">
+                                <div style="font-weight: 600; color: #4a7c59;">${ref.referenceNumber}</div>
+                                <div style="color: #28a745;">${ref.validationNumber || '-'}</div>
+                                <div style="color: #6c757d; font-size: 11px;">${formatDateConcise(ref.submittedAt)}</div>
+                                <div style="color: ${ref.direction === 'sent' ? '#dc3545' : '#007bff'}; font-weight: 600; font-size: 11px; text-transform: uppercase;">
                                     ${ref.direction === 'sent' ? 'Sent' : 'Received'}
                                 </div>
                             </div>
@@ -1345,3 +1424,4 @@
     </script>
 </body>
 </html>
+

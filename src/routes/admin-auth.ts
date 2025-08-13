@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { adminLogin, generateAdminToken } from '../middleware/adminAuth';
+import { adminLogin, generateAdminToken, verifyAdminToken, AdminRequest } from '../middleware/adminAuth';
 import pool from '../database/connection';
 import bcrypt from 'bcrypt';
 
@@ -97,37 +97,20 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 // Get current admin user info
-router.get('/me', async (req: Request, res: Response) => {
+router.get('/me', verifyAdminToken, async (req: AdminRequest, res: Response) => {
     try {
-        const token = req.cookies?.adminToken || req.headers.authorization?.replace('Bearer ', '');
-        
-        if (!token) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
-        
-        // This would typically be handled by middleware, but for this endpoint we'll decode directly
-        const jwt = require('jsonwebtoken');
-        const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-        
-        const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
-        
-        const result = await pool.query(
-            'SELECT id, email, created_at FROM admin_users WHERE id = $1 AND email = $2',
-            [decoded.id, decoded.email]
-        );
-        
-        if (result.rows.length === 0) {
-            return res.status(401).json({ error: 'Invalid token' });
+        if (!req.adminUser) {
+            return res.status(401).json({ error: 'Not authenticated' });
         }
         
         res.json({
             success: true,
-            admin: result.rows[0]
+            admin: req.adminUser
         });
         
     } catch (error) {
         console.error('Get admin info error:', error);
-        res.status(401).json({ error: 'Invalid token' });
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
