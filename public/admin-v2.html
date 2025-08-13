@@ -513,12 +513,12 @@
 
         .modal-content {
             background-color: white;
-            margin: 5% auto;
+            margin: 3% auto;
             padding: 30px;
             border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
+            width: 95%;
+            max-width: 1400px;
+            max-height: 90vh;
             overflow-y: auto;
         }
 
@@ -1800,49 +1800,58 @@
             document.getElementById('connectionModal').style.display = 'block';
             
             const modalContent = `
-                <div style="margin-bottom: 20px;">
-                    <h4>Connection Information</h4>
-                    <p><strong>Organisation:</strong> ${connection.organisation_name}</p>
-                    <p><strong>Token:</strong> <code>${connection.token}</code></p>
-                    <p><strong>Status:</strong> ${connection.is_active ? 'Active' : 'Inactive'}</p>
-                    <p><strong>Created:</strong> ${new Date(connection.created_at).toLocaleDateString()}</p>
-                    ${connection.last_used ? `<p><strong>Last Used:</strong> ${new Date(connection.last_used).toLocaleDateString()}</p>` : ''}
-                    <p><strong>Portal URL:</strong> <code>${window.location.origin}/external/${connection.token}</code></p>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <h4>Submit Reference to Organisation</h4>
-                    <form id="submitReferenceForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="modalPoNumber">PO Number (Optional)</label>
-                                <input type="text" id="modalPoNumber" name="poNumber" placeholder="Enter PO number">
-                            </div>
-                            <div class="form-group">
-                                <label for="modalDeliveryId">Delivery ID (Optional)</label>
-                                <input type="text" id="modalDeliveryId" name="deliveryId" placeholder="Enter delivery ID">
-                            </div>
+                <div style="margin-bottom: 20px; padding: 20px; background: rgba(249,251,252,0.6); border: 1px solid #c3c6c8; border-radius: 10px; backdrop-filter: blur(7.25px);">
+                    <h4 style="margin: 0 0 16px 0; color: #4a7c59; font-family: 'IBM Plex Sans Condensed', sans-serif;">Connection Information</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: center;">
+                        <div>
+                            <strong style="color: #495057;">Organisation:</strong><br>
+                            <span style="color: #6c757d;">${connection.organisation_name}</span>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="modalReferenceNumber">Reference Number *</label>
-                            <input type="text" id="modalReferenceNumber" name="referenceNumber" required placeholder="Enter reference number">
+                        <div>
+                            <strong style="color: #495057;">Token:</strong><br>
+                            <code style="background: #f8f9fa; padding: 4px 8px; border-radius: 4px; color: #495057;">${connection.token}</code>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="modalValidationNumber">Validation Number (Optional)</label>
-                            <input type="text" id="modalValidationNumber" name="validationNumber" placeholder="Enter validation number">
+                        <div>
+                            <strong style="color: #495057;">Status:</strong><br>
+                            <span style="color: ${connection.is_active ? '#28a745' : '#6c757d'}; font-weight: 600;">${connection.is_active ? 'Active' : 'Inactive'}</span>
                         </div>
-                        
-                        <button type="submit" class="btn">
-                            <i class="fas fa-paper-plane"></i> Submit Reference
-                        </button>
-                    </form>
+                        <div>
+                            <strong style="color: #495057;">Created:</strong><br>
+                            <span style="color: #6c757d;">${new Date(connection.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div>
+                            <strong style="color: #495057;">Last Used:</strong><br>
+                            <span style="color: #6c757d;">${connection.last_used ? new Date(connection.last_used).toLocaleDateString() : 'Never'}</span>
+                        </div>
+                        <div>
+                            <strong style="color: #495057;">Portal URL:</strong><br>
+                            <code style="background: #f8f9fa; padding: 4px 8px; border-radius: 4px; color: #495057; font-size: 12px;">${window.location.origin}/external/${connection.token}</code>
+                        </div>
+                    </div>
                 </div>
                 
                 <div>
-                    <h4>Connection History <span id="historyCount" style="font-size: 0.8em; color: #6c757d; font-weight: normal;"></span></h4>
-                    <div id="connectionHistory">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h4 style="margin: 0; color: #4a7c59; font-family: 'IBM Plex Sans Condensed', sans-serif;">Connection History</h4>
+                        <div style="display: flex; gap: 16px; align-items: center;">
+                            <input type="text" id="modal-po-filter" placeholder="Filter by PO number" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 120px; border: 1px solid #e9ecef; border-radius: 4px; background: white; height: 23px; box-sizing: content-box;">
+                            <input type="text" id="modal-delivery-filter" placeholder="Filter by Delivery ID" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 120px; border: 1px solid #e9ecef; border-radius: 4px; background: white; height: 23px; box-sizing: content-box;">
+                            <select id="modal-date-filter" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; width: 100px; border: 1px solid #e9ecef; border-radius: 4px; background: white; height: 23px; box-sizing: content-box;">
+                                <option value="">All time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                            <button onclick="applyModalHistoryFilters()" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700; background: #4a7c59; color: white; border: 1px solid #e9ecef; border-radius: 4px; cursor: pointer; height: 23px; box-sizing: content-box; width: 60px;">Filter</button>
+                            <button onclick="clearModalHistoryFilters()" style="padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700; background: white; color: #4a7c59; border: 1px solid #e9ecef; border-radius: 4px; cursor: pointer; height: 23px; box-sizing: content-box; width: 60px;">Clear</button>
+                            <div style="display: flex; border: 1px solid #e9ecef; border-radius: 4px; overflow: hidden; background: white; width: 140px;">
+                                <button type="button" id="modal-sent-toggle" onclick="toggleModalDirection('sent')" style="flex: 1; padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; border: none; background: white; color: #4a7c59; cursor: pointer; height: 23px; box-sizing: content-box;">Sent</button>
+                                <button type="button" id="modal-received-toggle" onclick="toggleModalDirection('received')" style="flex: 1; padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; border: none; background: #4a7c59; color: white; cursor: pointer; height: 23px; box-sizing: content-box; font-weight: 700;">Received</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="connectionHistory" style="background: rgba(255,255,255,0.6); border-radius: 10px; border: 1px solid #f3f3f3; box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.25); height: 500px; overflow-y: auto; padding: 16px;">
                         <div class="loading">
                             <div class="spinner"></div>
                             Loading history...
@@ -1856,11 +1865,8 @@
             // Load connection history
             loadConnectionHistory(connection.id);
             
-            // Add submit reference form handler
-            document.getElementById('submitReferenceForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                submitReferenceToConnection(connection.id, e.target);
-            });
+            // Initialize modal filters
+            initializeModalFilters();
         }
 
         // Close connection modal
@@ -1868,10 +1874,43 @@
             document.getElementById('connectionModal').style.display = 'none';
         }
 
-        // Load connection history
+        // Modal filter state
+        let modalHistoryFilters = {
+            poNumber: '',
+            deliveryId: '',
+            dateRange: '',
+            direction: 'received' // Default to received
+        };
+        let currentModalConnectionId = null;
+
+        // Initialize modal filters
+        function initializeModalFilters() {
+            // Set default direction toggle state
+            const sentBtn = document.getElementById('modal-sent-toggle');
+            const receivedBtn = document.getElementById('modal-received-toggle');
+            if (sentBtn && receivedBtn) {
+                receivedBtn.style.background = '#4a7c59';
+                receivedBtn.style.color = 'white';
+                receivedBtn.style.fontWeight = '700';
+                sentBtn.style.background = 'white';
+                sentBtn.style.color = '#4a7c59';
+                sentBtn.style.fontWeight = '400';
+            }
+        }
+
+        // Load connection history with filters
         async function loadConnectionHistory(connectionId) {
             try {
-                const response = await fetch(`/api/admin-v2/connections/${connectionId}/history`);
+                currentModalConnectionId = connectionId;
+                
+                // Build query parameters
+                const params = new URLSearchParams();
+                if (modalHistoryFilters.poNumber) params.append('poNumber', modalHistoryFilters.poNumber);
+                if (modalHistoryFilters.deliveryId) params.append('deliveryId', modalHistoryFilters.deliveryId);
+                if (modalHistoryFilters.dateRange) params.append('dateRange', modalHistoryFilters.dateRange);
+                if (modalHistoryFilters.direction) params.append('direction', modalHistoryFilters.direction);
+
+                const response = await fetch(`/api/admin-v2/connections/${connectionId}/history?${params.toString()}`);
                 const result = await response.json();
                 
                 if (response.ok) {
@@ -1888,22 +1927,73 @@
             }
         }
 
+        // Apply modal history filters
+        function applyModalHistoryFilters() {
+            modalHistoryFilters.poNumber = document.getElementById('modal-po-filter').value;
+            modalHistoryFilters.deliveryId = document.getElementById('modal-delivery-filter').value;
+            modalHistoryFilters.dateRange = document.getElementById('modal-date-filter').value;
+            
+            if (currentModalConnectionId) {
+                loadConnectionHistory(currentModalConnectionId);
+            }
+        }
+
+        // Clear modal history filters
+        function clearModalHistoryFilters() {
+            document.getElementById('modal-po-filter').value = '';
+            document.getElementById('modal-delivery-filter').value = '';
+            document.getElementById('modal-date-filter').value = '';
+            
+            modalHistoryFilters.poNumber = '';
+            modalHistoryFilters.deliveryId = '';
+            modalHistoryFilters.dateRange = '';
+            
+            if (currentModalConnectionId) {
+                loadConnectionHistory(currentModalConnectionId);
+            }
+        }
+
+        // Toggle modal direction
+        function toggleModalDirection(direction) {
+            const sentBtn = document.getElementById('modal-sent-toggle');
+            const receivedBtn = document.getElementById('modal-received-toggle');
+            
+            if (direction === 'sent') {
+                sentBtn.style.background = '#4a7c59';
+                sentBtn.style.color = 'white';
+                sentBtn.style.fontWeight = '700';
+                receivedBtn.style.background = 'white';
+                receivedBtn.style.color = '#4a7c59';
+                receivedBtn.style.fontWeight = '400';
+            } else {
+                receivedBtn.style.background = '#4a7c59';
+                receivedBtn.style.color = 'white';
+                receivedBtn.style.fontWeight = '700';
+                sentBtn.style.background = 'white';
+                sentBtn.style.color = '#4a7c59';
+                sentBtn.style.fontWeight = '400';
+            }
+            
+            modalHistoryFilters.direction = direction;
+            
+            if (currentModalConnectionId) {
+                loadConnectionHistory(currentModalConnectionId);
+            }
+        }
+
         // Display connection history
         function displayConnectionHistory(history) {
             if (!history || history.length === 0) {
                 document.getElementById('connectionHistory').innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-info-circle"></i> No references found for this connection.
-                    </div>
+                    <p style="color: #6c757d; text-align: center; padding: 40px;">No submissions found.</p>
                 `;
-                document.getElementById('historyCount').textContent = '(0 references)';
                 return;
             }
             
-            // Group references by PO/Delivery
+            // Group submissions by PO/Delivery
             const grouped = {};
             history.forEach(reference => {
-                const key = `${reference.po_number || 'no-po'}-${reference.delivery_id || 'no-delivery'}`;
+                const key = `${reference.po_number}-${reference.delivery_id}`;
                 if (!grouped[key]) {
                     grouped[key] = {
                         poNumber: reference.po_number,
@@ -1920,7 +2010,7 @@
                 });
             });
 
-            // Generate HTML for grouped references
+            // Generate HTML for grouped submissions (same format as external portal)
             const groupedHtml = Object.values(grouped).map(group => `
                 <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
                     <div style="background: linear-gradient(135deg, #4a7c59, #6a9969); color: white; padding: 8px 12px; font-size: 13px; font-weight: 600;">
@@ -1944,51 +2034,9 @@
             `).join('');
             
             document.getElementById('connectionHistory').innerHTML = groupedHtml;
-            
-            // Update history count
-            const totalReferences = history.length;
-            const totalGroups = Object.keys(grouped).length;
-            document.getElementById('historyCount').textContent = `(${totalReferences} references in ${totalGroups} group${totalGroups !== 1 ? 's' : ''})`;
         }
 
-        // Submit reference to connection
-        async function submitReferenceToConnection(connectionId, form) {
-            try {
-                const formData = new FormData(form);
-                const data = {
-                    poNumber: formData.get('poNumber') || null,
-                    deliveryId: formData.get('deliveryId') || null,
-                    referenceNumber: formData.get('referenceNumber'),
-                    validationNumber: formData.get('validationNumber') || null
-                };
-                
-                // Validate that at least one of PO Number or Delivery ID is provided
-                if (!data.poNumber && !data.deliveryId) {
-                    throw new Error('Either PO Number or Delivery ID must be provided');
-                }
-                
-                const response = await fetch(`/api/admin-v2/connections/${connectionId}/submit`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    showAlert('loginAlert', 'Reference submitted successfully!', 'success');
-                    form.reset();
-                    loadConnectionHistory(connectionId);
-                } else {
-                    throw new Error(result.error || 'Failed to submit reference');
-                }
-                
-            } catch (error) {
-                showAlert('loginAlert', error.message, 'error');
-            }
-        }
+
 
         // Logout
         async function logout() {
