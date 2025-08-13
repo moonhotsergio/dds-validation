@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organisation Portal - DDS Validation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .portal-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .table-container {
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-sent {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-received {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-building"></i> Organisation Portal</h1>
+            <p>Submit and retrieve reference numbers</p>
+        </div>
+
+        <div class="portal-card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('submit')">
+                    <i class="fas fa-upload"></i> Submit
+                </button>
+                <button class="tab" onclick="switchTab('retrieve')">
+                    <i class="fas fa-download"></i> Retrieve
+                </button>
+            </div>
+
+            <!-- Submit Tab -->
+            <div id="submit" class="tab-content active">
+                <h2 style="margin-bottom: 20px; color: #495057;">
+                    <i class="fas fa-upload"></i> Submit Reference
+                </h2>
+                
+                <div id="submitAlert" style="display: none;"></div>
+                
+                <form id="submitForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="poNumber">PO Number (Optional)</label>
+                            <input type="text" id="poNumber" name="poNumber" placeholder="Enter PO number">
+                        </div>
+                        <div class="form-group">
+                            <label for="deliveryId">Delivery ID (Optional)</label>
+                            <input type="text" id="deliveryId" name="deliveryId" placeholder="Enter delivery ID">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="referenceNumber">Reference Number *</label>
+                        <input type="text" id="referenceNumber" name="referenceNumber" required placeholder="Enter reference number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="validationNumber">Validation Number (Optional)</label>
+                        <input type="text" id="validationNumber" name="validationNumber" placeholder="Enter validation number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email (Optional)</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email">
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Reference
+                    </button>
+                </form>
+
+                <div class="table-container">
+                    <h3 style="margin-bottom: 20px; color: #495057;">
+                        <i class="fas fa-history"></i> Your References
+                    </h3>
+                    <div id="submitHistory">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading your references...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Retrieve Tab -->
+            <div id="retrieve" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: #495057;">
+                    <i class="fas fa-download"></i> Retrieve References
+                </h2>
+                
+                <div id="retrieveAlert" style="display: none;"></div>
+                
+                <div class="table-container">
+                    <h3 style="margin-bottom: 20px; color: #495057;">
+                        <i class="fas fa-inbox"></i> References Sent by Admin
+                    </h3>
+                    <div id="retrieveData">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading references...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get connection token from URL
+        const connectionToken = window.location.pathname.split('/').pop();
+        
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to selected tab
+            event.target.classList.add('active');
+            
+            // Load data for the selected tab
+            if (tabName === 'submit') {
+                loadSubmitHistory();
+            } else if (tabName === 'retrieve') {
+                loadRetrieveData();
+            }
+        }
+
+        // Submit form
+        document.getElementById('submitForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            
+            try {
+                const formData = new FormData(e.target);
+                const data = {
+                    poNumber: formData.get('poNumber') || null,
+                    deliveryId: formData.get('deliveryId') || null,
+                    referenceNumber: formData.get('referenceNumber'),
+                    validationNumber: formData.get('validationNumber') || null,
+                    email: formData.get('email') || null
+                };
+                
+                // Validate that at least one of PO Number or Delivery ID is provided
+                if (!data.poNumber && !data.deliveryId) {
+                    throw new Error('Either PO Number or Delivery ID must be provided');
+                }
+                
+                const response = await fetch(`/api/org/${connectionToken}/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('submitAlert', 'Reference submitted successfully!', 'success');
+                    e.target.reset();
+                    loadSubmitHistory(); // Refresh the history
+                } else {
+                    throw new Error(result.error || 'Failed to submit reference');
+                }
+                
+            } catch (error) {
+                showAlert('submitAlert', error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // Load submit history
+        async function loadSubmitHistory() {
+            try {
+                const response = await fetch(`/api/org/${connectionToken}/history`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displaySubmitHistory(result.references);
+                } else {
+                    throw new Error(result.error || 'Failed to load history');
+                }
+            } catch (error) {
+                document.getElementById('submitHistory').innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Load retrieve data
+        async function loadRetrieveData() {
+            try {
+                const response = await fetch(`/api/org/${connectionToken}/retrieve`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayRetrieveData(result.references);
+                } else {
+                    throw new Error(result.error || 'Failed to load references');
+                }
+            } catch (error) {
+                document.getElementById('retrieveData').innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Display submit history
+        function displaySubmitHistory(references) {
+            if (!references || references.length === 0) {
+                document.getElementById('submitHistory').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-info-circle"></i> No references submitted yet.
+                    </div>
+                `;
+                return;
+            }
+            
+            const table = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PO Number</th>
+                            <th>Delivery ID</th>
+                            <th>Reference</th>
+                            <th>Validation</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${references.map(ref => `
+                            <tr>
+                                <td>${ref.po_number || '-'}</td>
+                                <td>${ref.delivery_id || '-'}</td>
+                                <td>${ref.reference_number}</td>
+                                <td>${ref.validation_number || '-'}</td>
+                                <td>${new Date(ref.submitted_at).toLocaleDateString()}</td>
+                                <td><span class="status-badge status-sent">Sent</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('submitHistory').innerHTML = table;
+        }
+
+        // Display retrieve data
+        function displayRetrieveData(references) {
+            if (!references || references.length === 0) {
+                document.getElementById('retrieveData').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-info-circle"></i> No references received from admin yet.
+                    </div>
+                `;
+                return;
+            }
+            
+            const table = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PO Number</th>
+                            <th>Delivery ID</th>
+                            <th>Reference</th>
+                            <th>Validation</th>
+                            <th>Received</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${references.map(ref => `
+                            <tr>
+                                <td>${ref.po_number || '-'}</td>
+                                <td>${ref.delivery_id || '-'}</td>
+                                <td>${ref.reference_number}</td>
+                                <td>${ref.validation_number || '-'}</td>
+                                <td>${new Date(ref.submitted_at).toLocaleDateString()}</td>
+                                <td><span class="status-badge status-received">Received</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('retrieveData').innerHTML = table;
+        }
+
+        // Show alert
+        function showAlert(elementId, message, type) {
+            const alertDiv = document.getElementById(elementId);
+            alertDiv.innerHTML = `
+                <div class="alert alert-${type}">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}
+                </div>
+            `;
+            alertDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSubmitHistory();
+        });
+    </script>
+</body>
+</html>

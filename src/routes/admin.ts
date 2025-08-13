@@ -35,8 +35,7 @@ router.post('/generate-link', async (req, res) => {
             linkId = existingSupplier.rows[0].id;
         } else {
             // Generate new unique link ID using new format
-            const supplierLinkInfo = await createSupplierLink(supplierEmail);
-            linkId = supplierLinkInfo.id;
+            linkId = createSupplierLink();
         }
 
         const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3004';

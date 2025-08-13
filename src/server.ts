@@ -3,10 +3,14 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 import { generalLimiter } from './middleware/rateLimiter';
 import supplierRoutes from './routes/supplier';
 import customerRoutes from './routes/customer';
 import adminRoutes from './routes/admin';
+import adminAuthRoutes from './routes/admin-auth';
+import adminV2Routes from './routes/admin-v2';
+import orgRoutes from './routes/org';
 
 dotenv.config();
 
@@ -36,6 +40,9 @@ app.use(generalLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Cookie parsing middleware
+app.use(cookieParser());
+
 // Serve static files
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -43,6 +50,11 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/supplier', supplierRoutes);
 app.use('/api/customer', customerRoutes);
 app.use('/api/admin', adminRoutes);
+
+// V2 API routes
+app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/admin-v2', adminV2Routes);
+app.use('/api/org', orgRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -62,8 +74,17 @@ app.get('/customer', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/customer-v2.html'));
 });
 
+// V2 organisation portal routes
+app.get('/org/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/org-portal.html'));
+});
+
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
+});
+
+app.get('/admin-v2', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/admin-v2.html'));
 });
 
 // Error handling middleware
