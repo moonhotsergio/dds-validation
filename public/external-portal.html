@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organisation Portal - DDS Validation</title>
+    <title>External Portal - DDS Validation</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -249,7 +249,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-building"></i> Organisation Portal</h1>
+            <h1><i class="fas fa-external-link-alt"></i> External Portal</h1>
             <p>Submit and retrieve reference numbers</p>
         </div>
 
@@ -394,7 +394,7 @@
                     throw new Error('Either PO Number or Delivery ID must be provided');
                 }
                 
-                const response = await fetch(`/api/org/${connectionToken}/submit`, {
+                const response = await fetch(`/api/external/${connectionToken}/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -423,7 +423,7 @@
         // Load submit history
         async function loadSubmitHistory() {
             try {
-                const response = await fetch(`/api/org/${connectionToken}/history`);
+                const response = await fetch(`/api/external/${connectionToken}/history`);
                 const result = await response.json();
                 
                 if (response.ok) {
@@ -443,7 +443,7 @@
         // Load retrieve data
         async function loadRetrieveData() {
             try {
-                const response = await fetch(`/api/org/${connectionToken}/retrieve`);
+                const response = await fetch(`/api/external/${connectionToken}/retrieve`);
                 const result = await response.json();
                 
                 if (response.ok) {

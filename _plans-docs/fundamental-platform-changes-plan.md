@@ -17,7 +17,7 @@
    - “Supplier” and “Customer” become “Organisation”.
    - Unique links represent a Connection between Admin and Organisation.
    - Update UI labels: tabs are “Submit” and “Retrieve”.
-   - URL scheme: `/org/:id` where `:id` matches `[A-Z0-9]{4}-[A-Z0-9]{4}` (e.g., `ABCD-1234`).
+   - URL scheme: `/external/:id` where `:id` matches `[A-Z0-9]{4}-[A-Z0-9]{4}` (e.g., `ABCD-1234`).
 
 3. Unique Connection Model
    - Admin creates a unique link to an Organisation, establishing a 1:1 Connection between that admin and that organisation (multiple connections are possible across different admins and organisations).
@@ -100,10 +100,10 @@
 - GET /api/admin/connections/:id/history?direction=all|sent|received → unified history
 - POST /api/admin/connections/:id/submit { poNumber?, deliveryId?, referenceNumber, validationNumber? } → create Admin → Organisation reference_event (direction = received)
 
-### Organisation Portal (via Connection Token)
-- POST /api/org/:id/submit { poNumber?, deliveryId?, referenceNumber, validationNumber? } — `:id` is `XXXX-XXXX` format
-- GET /api/org/:id/history → organisation-sent (direction = sent)
-- GET /api/org/:id/retrieve → admin-sent (direction = received)
+### External Portal (via Connection Token)
+- POST /api/external/:id/submit { poNumber?, deliveryId?, referenceNumber, validationNumber? } — `:id` is `XXXX-XXXX` format
+- GET /api/external/:id/history → organisation-sent (direction = sent)
+- GET /api/external/:id/retrieve → admin-sent (direction = received)
 
 ### Removals/Deprecations
 - Remove postcode fields and validation from all endpoints.
@@ -119,7 +119,7 @@
   - Right: “Submit References” form (fields: PO Number optional if Delivery ID present; Delivery ID optional if PO Number present; Reference; Validation).
   - Bottom: History table (columns: PO, Delivery, Reference, Validation, Direction [Sent/Received], Submitted At). Filters for PO/Delivery/date and Direction.
 
-### Organisation Portal
+### External Portal
 - Keep two tabs: Submit and Retrieve.
 - Submit tab: form and “Your References” panel (no postcode anywhere).
 - Retrieve tab: table styled exactly like history, but data source = admin-sent (direction = received).
@@ -169,7 +169,7 @@ Notes:
 
 ## Decisions Confirmed
 - Organisations keep OTP verification.
-- URL path uses `/org/:id` with `XXXX-XXXX` format.
+- URL path uses `/external/:id` with `XXXX-XXXX` format.
 - Seed the first admin; no public admin self-registration.
 
 ## Plan Maintenance Workflow (per major step)
@@ -197,18 +197,18 @@ Notes:
 3. **V2 API Routes** ✅
    - `/api/admin/auth/*` - Admin authentication endpoints
    - `/api/admin-v2/*` - New admin management endpoints
-   - `/api/org/*` - Organisation portal endpoints
+   - `/api/external/*` - External portal endpoints
    - All endpoints support new data model without postcodes
 
 4. **Frontend Interfaces** ✅
    - `admin-v2.html` - New admin dashboard with organisation management
-   - `org-portal.html` - Organisation portal with Submit/Retrieve tabs
+   - `external-portal.html` - External portal with Submit/Retrieve tabs
    - Modern UI with responsive design
    - Real-time data loading and form validation
 
 5. **Core Functionality** ✅
    - Admin can create connections to organisations
-   - Organisation portal supports Submit and Retrieve operations
+   - External portal supports Submit and Retrieve operations
    - Direction-based reference tracking (sent vs received)
    - Connection token-based access (XXXX-XXXX format)
 

@@ -54,7 +54,7 @@ app.use('/api/admin', adminRoutes);
 // V2 API routes
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin-v2', adminV2Routes);
-app.use('/api/org', orgRoutes);
+app.use('/api/external', orgRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -74,9 +74,9 @@ app.get('/customer', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/customer-v2.html'));
 });
 
-// V2 organisation portal routes
-app.get('/org/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/org-portal.html'));
+// V2 external portal routes
+app.get('/external/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/external-portal.html'));
 });
 
 app.get('/admin', (req, res) => {

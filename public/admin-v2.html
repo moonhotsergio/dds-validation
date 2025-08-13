@@ -779,7 +779,7 @@
                     <p><strong>Status:</strong> ${connection.is_active ? 'Active' : 'Inactive'}</p>
                     <p><strong>Created:</strong> ${new Date(connection.created_at).toLocaleDateString()}</p>
                     ${connection.last_used ? `<p><strong>Last Used:</strong> ${new Date(connection.last_used).toLocaleDateString()}</p>` : ''}
-                    <p><strong>Portal URL:</strong> <code>${window.location.origin}/org/${connection.token}</code></p>
+                    <p><strong>Portal URL:</strong> <code>${window.location.origin}/external/${connection.token}</code></p>
                 </div>
                 
                 <div style="margin-bottom: 20px;">
