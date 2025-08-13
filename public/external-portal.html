@@ -606,13 +606,13 @@
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
                             <div class="direction-toggle" style="display: flex; border: 1px solid #e9ecef; border-radius: 4px; overflow: hidden; background: white;">
-                                <button type="button" id="sent-toggle" class="toggle-btn" onclick="toggleDirection('sent')" style="flex: 1; padding: 6px 10px; font-size: 13px; border: none; background: white; color: #4a7c59; cursor: pointer; transition: all 0.2s ease;">Sent</button>
-                                <button type="button" id="received-toggle" class="toggle-btn active" onclick="toggleDirection('received')" style="flex: 1; padding: 6px 10px; font-size: 13px; border: none; background: #4a7c59; color: white; cursor: pointer; transition: all 0.2s ease;">Received</button>
+                                <button type="button" id="sent-toggle" class="toggle-btn" onclick="toggleDirection('sent')" style="flex: 1; padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; border: none; background: white; color: #4a7c59; cursor: pointer; transition: all 0.2s ease;">Sent</button>
+                                <button type="button" id="received-toggle" class="toggle-btn active" onclick="toggleDirection('received')" style="flex: 1; padding: 6px 10px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; border: none; background: #4a7c59; color: white; cursor: pointer; transition: all 0.2s ease; font-weight: 700;">Received</button>
                             </div>
                         </div>
                         <div style="display: flex; gap: 6px;">
-                            <button class="btn" onclick="applyHistoryFilters()" style="padding: 6px 12px; font-size: 11px;">Filter</button>
-                            <button class="btn btn-secondary" onclick="clearHistoryFilters()" style="padding: 6px 12px; font-size: 11px;">Clear</button>
+                            <button class="btn" onclick="applyHistoryFilters()" style="padding: 6px 12px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700;">Filter</button>
+                            <button class="btn btn-secondary" onclick="clearHistoryFilters()" style="padding: 6px 12px; font-size: 11px; font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700;">Clear</button>
                         </div>
                     </div>
                 </div>
@@ -722,7 +722,7 @@
                 poNumber: document.getElementById('po-filter').value,
                 deliveryId: document.getElementById('delivery-filter').value,
                 dateRange: document.getElementById('date-filter').value,
-                direction: historyFilters.direction || 'sent' // Use current toggle state or default to 'sent'
+                direction: historyFilters.direction || 'received' // Keep current toggle state, don't change it
             };
             loadHistory();
         }
@@ -731,8 +731,11 @@
             document.getElementById('po-filter').value = '';
             document.getElementById('delivery-filter').value = '';
             document.getElementById('date-filter').value = '';
-            resetDirectionToggle();
-            historyFilters = {};
+            // Don't reset the toggle - keep current direction filter
+            historyFilters.poNumber = '';
+            historyFilters.deliveryId = '';
+            historyFilters.dateRange = '';
+            // Keep direction filter as is
             loadHistory();
         }
 
@@ -746,15 +749,19 @@
                 receivedBtn.classList.remove('active');
                 sentBtn.style.background = '#4a7c59';
                 sentBtn.style.color = 'white';
+                sentBtn.style.fontWeight = '700';
                 receivedBtn.style.background = 'white';
                 receivedBtn.style.color = '#4a7c59';
+                receivedBtn.style.fontWeight = '400';
             } else {
                 receivedBtn.classList.add('active');
                 sentBtn.classList.remove('active');
                 receivedBtn.style.background = '#4a7c59';
                 receivedBtn.style.color = 'white';
+                receivedBtn.style.fontWeight = '700';
                 sentBtn.style.background = 'white';
                 sentBtn.style.color = '#4a7c59';
+                sentBtn.style.fontWeight = '400';
             }
             
             // Update the filter value
@@ -771,8 +778,10 @@
             sentBtn.classList.remove('active');
             receivedBtn.style.background = '#4a7c59';
             receivedBtn.style.color = 'white';
+            receivedBtn.style.fontWeight = '700';
             sentBtn.style.background = 'white';
             sentBtn.style.color = '#4a7c59';
+            sentBtn.style.fontWeight = '400';
             
             historyFilters.direction = 'received';
         }
