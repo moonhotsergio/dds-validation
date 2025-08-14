@@ -1857,27 +1857,82 @@
         
         // Copy portal URL to clipboard
         function copyPortalURL(url) {
-            navigator.clipboard.writeText(url).then(() => {
-                // Show temporary success feedback
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showCopySuccessFeedback();
+                }).catch(err => {
+                    console.error('Clipboard API failed, trying fallback method:', err);
+                    fallbackCopyToClipboard(url);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopyToClipboard(url);
+            }
+        }
+        
+        // Fallback copy method using document.execCommand
+        function fallbackCopyToClipboard(url) {
+            try {
+                // Create a temporary textarea element
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                
+                // Select and copy the text
+                textArea.focus();
+                textArea.select();
+                const successful = document.execCommand('copy');
+                
+                // Clean up
+                document.body.removeChild(textArea);
+                
+                if (successful) {
+                    showCopySuccessFeedback();
+                } else {
+                    throw new Error('execCommand copy failed');
+                }
+            } catch (err) {
+                console.error('Fallback copy method failed:', err);
+                // Show user-friendly error message
                 const button = event.target.closest('button');
                 const icon = button.querySelector('i');
                 const originalClass = icon.className;
                 
-                // Change to check icon and green color
-                icon.className = 'fas fa-check';
-                button.style.color = '#28a745';
-                button.title = 'URL copied!';
+                // Change to error icon and red color
+                icon.className = 'fas fa-exclamation-triangle';
+                button.style.color = '#dc3545';
+                button.title = 'Copy failed - try selecting and copying manually';
                 
                 setTimeout(() => {
                     // Restore original icon and color
                     icon.className = originalClass;
                     button.style.color = '#6c757d';
                     button.title = 'Copy URL to clipboard';
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy URL: ', err);
-                alert('Failed to copy URL to clipboard');
-            });
+                }, 3000);
+            }
+        }
+        
+        // Show copy success feedback
+        function showCopySuccessFeedback() {
+            const button = event.target.closest('button');
+            const icon = button.querySelector('i');
+            const originalClass = icon.className;
+            
+            // Change to check icon and green color
+            icon.className = 'fas fa-check';
+            button.style.color = '#28a745';
+            button.title = 'URL copied!';
+            
+            setTimeout(() => {
+                // Restore original icon and color
+                icon.className = originalClass;
+                button.style.color = '#6c757d';
+                button.title = 'Copy URL to clipboard';
+            }, 2000);
         }
         
         // Submit admin references
